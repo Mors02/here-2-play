@@ -1,0 +1,15 @@
+- SETUP FRONTEND
+npm i
+
+- SETUP BACKEND
+pipenv install
+
+
+Per far partire il progetto:
+1. cd backend
+2. pipenv shell
+3. python manage.py runserver
+
+in un nuovo terminale
+1. cd frontend
+2. npm start
