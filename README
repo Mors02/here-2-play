@@ -4,6 +4,9 @@ npm i
 - SETUP BACKEND
 pipenv install
 
+- SETUP DB
+sudo apt-get install sqlite3 libsqlite3-dev
+
 
 Per far partire il progetto:
 1. cd backend
@@ -13,3 +16,7 @@ Per far partire il progetto:
 in un nuovo terminale
 1. cd frontend
 2. npm start
+
+Per controllare il db:
+1. cb backend
+2. python manage.py dbshell

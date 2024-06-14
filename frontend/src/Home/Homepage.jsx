@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Sidebar from '../Component/Sidebar';
 
-function HelloWorld() {
+
+function Homepage() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -15,11 +17,11 @@ function HelloWorld() {
   }, []);
 
   return (
-    <div>
-      <h1>Welcome to my site</h1>
-      <p>{message}</p>
-    </div>
+      <div>
+        <h1>Store homepage</h1>
+        <p>{message}</p>
+      </div>
   );
 }
 
-export default HelloWorld;
+export default Homepage;

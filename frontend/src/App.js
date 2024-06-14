@@ -1,16 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
-import HelloWorld from './Home/HelloWorld';
+import { BrowserRouter } from 'react-router-dom';
+
+import Homepage from './Home/Homepage';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <div>
-          <HelloWorld />
-        </div>
-      </header>
-    </div>
+    <BrowserRouter>
+      <div className="App">
+        <header>
+          <div>
+            <Sidebar>
+              <Homepage />
+            </Sidebar> 
+          </div>
+        </header>
+      </div>
+    </BrowserRouter>
   );
 }
 
