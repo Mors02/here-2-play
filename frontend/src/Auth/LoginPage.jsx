@@ -1,31 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useForm } from 'react-hook-form';
 import { Stack, Grid, TextField, Button } from "@mui/material";
 import CenterBox from "../Component/CenterBox";
+import { ErrorMap } from "../enums";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
     const {
         register,
-        handleSubmit,
-        watch,
-        formState
+        formState: {errors},
+        getValues
     } = useForm()
 
-    function onSubmit(event) {    
-        console.log(formState);
-        axios.post(process.env.REACT_APP_BASE_URL + '/api/login/', {
-            email: "pierino",
-            password: "pier"
-        })
+    function enterPress(e) {
+        if (e.key == "Enter")
+            onSubmit();
+    }
+
+    function onSubmit(event) {  
+        const data = getValues();
+
+        axios.post(process.env.REACT_APP_BASE_URL + '/api/login/', data)
             .then(response => {
-                
+                if (response.data.result) {
+                    navigate("/", {replace: true});
+                } else {
+                    setError(ErrorMap["ERR_INVALID_LOGIN"])
+                }
             })
             .catch(error => {
-            console.log(error);
+                console.log(error)
+                setError(ErrorMap[error.code]);
             });
         
     }
+    console.log(errors)
 
     return (
         <Grid container
@@ -37,17 +49,18 @@ function LoginPage() {
             <CenterBox>
                 <Stack direction="column">
                     <h2>Login</h2>
-                    <form onSubmit={() => handleSubmit(onSubmit)}>
+                    <form>
                         <p>
-                            <TextField label="Email" defaultValue="" {...register("email")} variant="standard" />
+                            <TextField label="Email" type="email" defaultValue="" {...register("email")} variant="standard" />
                         </p>
                         <p>
-                            <TextField label="Password" defaultValue="" {...register("password")} variant="standard" />
+                            <TextField label="Password" type="password" defaultValue="" {...register("password")} variant="standard" />
                         </p>
                         <p>
-                            <Button type="submit" variant="contained" color="info">Entra</Button>
+                            <Button onClick={(e) => onSubmit(e)} onKeyDown={(e) => enterPress(e)} variant="contained" color="info">Entra</Button>
                         </p>
                     </form>
+                    {error != ""? <p>{error}</p> : <></>}
                 </Stack>
             </CenterBox>
         </Grid>
