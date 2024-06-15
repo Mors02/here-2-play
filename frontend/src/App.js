@@ -1,20 +1,22 @@
-import { BrowserRouter } from 'react-router-dom';
 
+import { requirePropFactory } from "@mui/material";
+import Layout from "./Component/Layout";
+import Sidebar from "./Component/Sidebar";
 import Homepage from './Home/Homepage';
+import AppRoutes from "./Routing/Route";
 
 function App() {
   return (
-    <BrowserRouter>
+  
       <div className="App">
         <header>
           <div>
-            <Sidebar>
-              <Homepage />
-            </Sidebar> 
+            <Layout />            
+            <AppRoutes />
           </div>
         </header>
       </div>
-    </BrowserRouter>
+
   );
 }
 

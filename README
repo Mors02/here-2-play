@@ -1,7 +1,9 @@
 - SETUP FRONTEND
-npm i
+#REQUISITI: node v16^
+yarn
 
 - SETUP BACKEND
+#REQUISITI: python v3.8
 pipenv install
 
 - SETUP DB
