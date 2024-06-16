@@ -1,33 +1,36 @@
 import React, {useState, useEffect} from "react";
-import axios from 'axios';
+import {axiosConfig, getCookie} from "../axiosConfig";
 import Sidebar from "./Sidebar";
 import {Container, Button, Box, Drawer} from "@mui/material";
 import ReorderIcon from '@mui/icons-material/Reorder';
 
+
 function Layout(props) {
     const [open, toggleDrawer] = useState(false);
-    const [isAuth, setAuth] = useState(false);
-    useEffect(() => {
-        axios.get(process.env.REACT_APP_BASE_URL + '/api/is-authenticated/')
-          .then(response => {
-            setAuth(response.data.message)
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      }, []);
+    const [authUser, setAuth] = useState();
+
+      useEffect(() => {        
+        axiosConfig.get("/api/user/")
+        .then(res => {
+            console.log("AUTH")
+            setAuth(res);
+        })
+        .catch(error => {
+            setAuth();
+        })
+      });
+
     
     return (
         <Box>
             <Container class="min-h-12 bg-slate-500">
                 <div class="p-5">
                     LOGO HERE
-                    <span class="ml-10">{isAuth? "Loggato" : "Non Loggato"}</span>
                     <Button class="float-right" onClick={() => toggleDrawer(true)}><ReorderIcon /></Button>
-                </div>                
+                </div>
             </Container>
             <Drawer open={open} onClose={() => toggleDrawer(false) } anchor="right">
-                <Sidebar onSelect={() => toggleDrawer(false)}/>
+                <Sidebar authUser={authUser} onSelect={() => toggleDrawer(false)}/>
             </Drawer>
             {props.children}  
         </Box>      

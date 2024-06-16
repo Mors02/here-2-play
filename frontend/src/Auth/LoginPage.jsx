@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+//import axios from "axios";
 import axios from "axios";
 import { useForm } from 'react-hook-form';
 import { Stack, Grid, TextField, Button } from "@mui/material";
@@ -6,38 +7,43 @@ import CenterBox from "../Component/CenterBox";
 import { ErrorMap } from "../enums";
 import { useNavigate } from "react-router-dom";
 
+
+
 function LoginPage() {
+
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const {
         register,
         formState: {errors},
-        getValues
+        getValues,
+        setValue
     } = useForm()
 
-    function enterPress(e) {
-        if (e.key == "Enter")
-            onSubmit();
-    }
-
-    function onSubmit(event) {  
+    function onSubmit(e) {
+        e.preventDefault();
         const data = getValues();
 
-        axios.post(process.env.REACT_APP_BASE_URL + '/api/login/', data)
-            .then(response => {
-                if (response.data.result) {
+        axios.post(`${process.env.REACT_APP_BASE_URL}/api/login/`, data, {
+            xsrfCookieName: "csrftoken",
+            xsrfHeaderName: "X-CSRFToken",
+            withCredentials: false,
+        }).then(response => {
+                console.log(response)
+                if (response.data) {
+                    
                     navigate("/", {replace: true});
                 } else {
-                    setError(ErrorMap["ERR_INVALID_LOGIN"])
+                    setError(ErrorMap[420])
                 }
             })
             .catch(error => {
-                console.log(error)
-                setError(ErrorMap[error.code]);
+                console.log(ErrorMap[error["response"]["status"]])
+                //setValue('password', null)
+                setError(ErrorMap[error["response"]["status"]]);
             });
         
     }
-    console.log(errors)
 
     return (
         <Grid container
@@ -49,7 +55,7 @@ function LoginPage() {
             <CenterBox>
                 <Stack direction="column">
                     <h2>Login</h2>
-                    <form>
+                    <form onSubmit={e => onSubmit(e)}>
                         <p>
                             <TextField label="Email" type="email" defaultValue="" {...register("email")} variant="standard" />
                         </p>
@@ -57,10 +63,10 @@ function LoginPage() {
                             <TextField label="Password" type="password" defaultValue="" {...register("password")} variant="standard" />
                         </p>
                         <p>
-                            <Button onClick={(e) => onSubmit(e)} onKeyDown={(e) => enterPress(e)} variant="contained" color="info">Entra</Button>
+                            <Button type="submit" variant="contained" color="info">Entra</Button>
                         </p>
                     </form>
-                    {error != ""? <p>{error}</p> : <></>}
+                    {error != ""? <p class="">{error}</p> : <></>}
                 </Stack>
             </CenterBox>
         </Grid>

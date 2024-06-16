@@ -1,6 +1,8 @@
 const ErrorMap = {
-    "ERR_BAD_RESPONSE": "Errore nel server.",
-    "ERR_INVALID_LOGIN": "Email o password sbagliati."
+    "420": "Email o password sbagliati.",
+    
+    "500": "Errore nel server.",    
+    "505": "Errore di rete."
 }
 
 
