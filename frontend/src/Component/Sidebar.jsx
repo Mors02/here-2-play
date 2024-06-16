@@ -2,9 +2,6 @@ import React from "react";
 import {Link, useNavigate} from "react-router-dom";
 import { Box, Stack, Button } from "@mui/material";
 import axios from "axios";
-axios.defaults.xsrfCookieName = "csrftoken";
-axios.defaults.xsrfHeaderName = "X-CSRFToken";
-axios.defaults.withCredentials = true;
 
 function Sidebar(props) {
     const {onSelect, authUser} = props;

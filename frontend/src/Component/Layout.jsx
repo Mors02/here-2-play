@@ -10,9 +10,14 @@ function Layout(props) {
     const [authUser, setAuth] = useState();
 
       useEffect(() => {        
-        axiosConfig.get("/api/user/")
+        console.log(getCookie('csrftoken'))
+        axiosConfig.get("/api/user/", {
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            withCredentials: true
+        })
         .then(res => {
-            console.log("AUTH")
             setAuth(res);
         })
         .catch(error => {
