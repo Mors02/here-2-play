@@ -55,28 +55,28 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'main.urls'
 
-CORS_ORIGIN_WHITELIST = [
+CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'http://localhost:8000',
     'http://127.0.0.1:8000' 
 ]
 
-CORS_ALLOWED_ORIGIN = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'localhost:3000',
-    'http://localhost:8000',
-    'http://127.0.0.1:8000' 
-]
+CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_CRENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
 ]
 ''''''
 #CORS_ORIGIN_ALLOW_ALL = False
+
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True 
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_NAME = "csrftoken"
+CSRF_COOKIE_DOMAIN  = "http://localhost:3000"
 
 TEMPLATES = [
     {
@@ -94,11 +94,8 @@ TEMPLATES = [
     },
 ]
 
-CSRF_COOKIE_DOMAIN  = "http://localhost:3000"
-
 CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding',
-                      'content-type', 'accept', 'origin', 'authorization', 'x-crsf-token')
-CSRF_COOKIE_NAME = "XSRF-TOKEN"
+                      'content-type', 'accept', 'origin', 'authorization', 'x-csrftoken')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (

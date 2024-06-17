@@ -67,7 +67,10 @@ class UserLogin(APIView):
 
 #Classe per il logout degli utenti
 class UserLogout(APIView):
-    def post(self, request):
+    #permission_classes = (permissions.AllowAny,)
+
+    def get(self, request):
+        print("Logout")
         logout(request)
         return Response(status=status.HTTP_200_OK)
 

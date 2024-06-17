@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 //import axios from "axios";
 import axios from "axios";
 import { useForm } from 'react-hook-form';
@@ -6,6 +6,8 @@ import { Stack, Grid, TextField, Button } from "@mui/material";
 import CenterBox from "../Component/CenterBox";
 import { ErrorMap } from "../enums";
 import { useNavigate } from "react-router-dom";
+import { getCookie } from "../axiosConfig";
+import useCurrentUser from "./UseCurrentUser";
 
 
 
@@ -13,6 +15,14 @@ function LoginPage() {
 
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const {loggedIn} = useCurrentUser();
+
+    if (loggedIn)
+        navigate("/", {replace: true})
+    
+    //if already logged in
+    
+
     const {
         register,
         formState: {errors},
@@ -27,7 +37,7 @@ function LoginPage() {
         axios.post(`${process.env.REACT_APP_BASE_URL}/api/login/`, data, {
             xsrfCookieName: "csrftoken",
             xsrfHeaderName: "X-CSRFToken",
-            withCredentials: false,
+            withCredentials: true,
         }).then(response => {
                 console.log(response)
                 if (response.data) {

@@ -1,5 +1,6 @@
 import React from "react";
 import {Link, useNavigate} from "react-router-dom";
+import { getCookie, axiosConfig } from "../axiosConfig";
 import { Box, Stack, Button } from "@mui/material";
 import axios from "axios";
 
@@ -7,7 +8,13 @@ function Sidebar(props) {
     const {onSelect, authUser} = props;
     const navigate = useNavigate();
     function logout(e) {
-        axios.post(process.env.REACT_APP_BASE_URL + "/api/logout/", {withCredentials: true})
+        onSelect()
+        axiosConfig.get("/api/logout/", {
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            withCredentials: true
+        })
         .then(res => {
             navigate("/", {replace: true})
         })

@@ -23,9 +23,10 @@ const axiosConfig = axios.create({
     baseURL: `${process.env.REACT_APP_BASE_URL}`,
     xsrfCookieName: "csrftoken",
     xsrfHeaderName: "X-CSRFToken",
-    withCredentials: false,
+    withCredentials: true,
     withXSRFToken: true
 });
+
 
 // Where you would set stuff like your 'Authorization' header, etc ...
 //instance.defaults.headers.common['Authorization'] = 'AUTH TOKEN FROM INSTANCE';
@@ -33,6 +34,24 @@ const axiosConfig = axios.create({
 axiosConfig.defaults.xsrfHeaderName = "X-CSRFToken";
 axiosConfig.defaults.withCredentials = false;
 axiosConfig.defaults.withXSRFToken = true;
-axiosConfig.defaults.headers.common['X-CSRF-TOKEN'] = getCookie('csrftoken');*/
+axiosConfig.defaults.headers['X-CSRFToken'] = getCookie('csrftoken');*/
+
+/*
+axiosConfig.interceptors.request.use(
+  config => {
+    console.log(config)
+    if (!config.headers["X-CSRFToken"]) {
+      const token = getCookie('csrftoken');
+
+      if (token) {
+        config.headers['X-CSRFToken'] = `${token}`;
+      }
+    }
+
+    return config;
+  },
+  error => Promise.reject(error)
+);
+*/
 
 export {axiosConfig, getCookie};
