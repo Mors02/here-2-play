@@ -12,16 +12,12 @@ import useCurrentUser from "./UseCurrentUser";
 
 
 function LoginPage() {
-
     const [error, setError] = useState("");
+    const { loggedIn } = useCurrentUser();
     const navigate = useNavigate();
-    const {loggedIn} = useCurrentUser();
 
     if (loggedIn)
         navigate("/", {replace: true})
-    
-    //if already logged in
-    
 
     const {
         register,
@@ -39,20 +35,18 @@ function LoginPage() {
             xsrfHeaderName: "X-CSRFToken",
             withCredentials: true,
         }).then(response => {
-                console.log(response)
-                if (response.data) {
-                    
-                    navigate("/", {replace: true});
-                } else {
-                    setError(ErrorMap[420])
-                }
-            })
-            .catch(error => {
-                console.log(ErrorMap[error["response"]["status"]])
-                //setValue('password', null)
-                setError(ErrorMap[error["response"]["status"]]);
-            });
-        
+            console.log(response)
+            if (response.data) {
+                navigate("/", {replace: true});
+            } else {
+                setError(ErrorMap[420])
+            }
+        })
+        .catch(error => {
+            console.log(ErrorMap[error["response"]["status"]])
+            //setValue('password', null)
+            setError(ErrorMap[error["response"]["status"]]);
+        });
     }
 
     return (

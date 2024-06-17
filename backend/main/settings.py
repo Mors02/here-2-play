@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'django-insecure-0uc8ga7(vxak8uh29+_-805($sm1n*hs^3ix61v3avg=)^^*e!
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -120,7 +118,7 @@ DATABASES = {
     }
 }
 
-AUTHENTICATION_BACKENDS = ['auth.views.EmailBackend']
+AUTHENTICATION_BACKENDS = ['authentication.views.EmailBackend']
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
