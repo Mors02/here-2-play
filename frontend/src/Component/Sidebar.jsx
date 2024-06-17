@@ -1,15 +1,16 @@
-import React from "react";
+import React, {useReducer} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import { getCookie, axiosConfig } from "../config/axiosConfig";
 import { Box, Stack, Button } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../config/AuthContext";
-import { ToastContainer, toast} from 'react-toastify';
+import { toast } from 'react-toastify';
 
 function Sidebar(props) {
     const {onSelect, authUser} = props;
     const navigate = useNavigate();
     const {logout} = useAuth();
+    const [, forceUpdate] = useReducer(x => x + 1, 0);
 
     function handleLogout(e) {
         onSelect()
@@ -20,9 +21,8 @@ function Sidebar(props) {
             withCredentials: true
         })
         .then(res => {
-            toast.success("Logout effettuato.")
             logout();
-            navigate("/", {replace: true})
+            toast.success("Logout effettuato.", {onClose: () =>{forceUpdate(); navigate("/")}})
         })
     }
 
@@ -34,16 +34,12 @@ function Sidebar(props) {
                 <Stack>
                     <Link to="/" onClick={() => onSelect()}>Homepage</Link>
                     { 
-                        !authUser
-                        ? <Link to="/login" onClick={() => onSelect()}>Login</Link> 
-                        : <Button onClick={(e) => logout(e)}  variant="text" color="error" >Logout</Button> 
+                        authUser
+                        ?  <Button onClick={(e) => handleLogout(e)}  variant="text" color="error" >Logout</Button>
+                        :  <Link to="/login" onClick={() => onSelect()}>Login</Link>
                     }
                 </Stack>
             </nav>
-            <ToastContainer 
-                position="bottom-left"
-                autoClose={5000}
-            />
         </Stack>
     )
 }

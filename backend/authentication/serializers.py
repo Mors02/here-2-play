@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth.hashers import make_password
 
 UserModel = get_user_model()
 
@@ -7,12 +8,19 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = '__all__'
-        def create(self, clean_data):
+
+    def create(self, clean_data):
+        alreadyRegistered = UserModel.objects.filter(email=clean_data["email"]).exists()
+        if (alreadyRegistered):
+            return None
+        else:
+            #se non trova lo user allora lo creiamo
             user = UserModel.objects.create_user(
-                email = clean_data["email"], 
-                password = clean_data["password"],
-                username = clean_data["username"]
+                email = clean_data["email"],                 
+                username = clean_data["username"],
+                password = clean_data["password"]
             )
+            #user.set_password(clean_data["password"])
             user.save()
             return user
 

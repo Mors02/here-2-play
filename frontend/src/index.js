@@ -10,15 +10,14 @@ import ToastProvider from './config/ToastProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <ToastProvider>
-    <AuthProvider>    
+    <AuthProvider>   
         <BrowserRouter>
           <React.StrictMode>
             <App />
           </React.StrictMode>
         </BrowserRouter>
     </AuthProvider>
-  </ToastProvider>
+  
 );
 
 // If you want to start measuring performance in your app, pass a function
