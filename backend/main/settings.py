@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'apilayer'
+    'authentication'
 ]
 
 MIDDLEWARE = [
@@ -68,7 +68,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
 ]
-''''''
+
 #CORS_ORIGIN_ALLOW_ALL = False
 
 SESSION_COOKIE_SAMESITE = 'None'
@@ -120,7 +120,7 @@ DATABASES = {
     }
 }
 
-AUTHENTICATION_BACKENDS = ['apilayer.views.EmailBackend']
+AUTHENTICATION_BACKENDS = ['auth.views.EmailBackend']
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 

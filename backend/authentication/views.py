@@ -62,7 +62,7 @@ class UserLogin(APIView):
             user = serializer.check_user(clean_data=data)
             if (user is None):
                 return Response(None, status=420)
-            login(request, user, 'apilayer.views.EmailBackend')
+            login(request, user, 'authentication.views.EmailBackend')
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 #Classe per il logout degli utenti
