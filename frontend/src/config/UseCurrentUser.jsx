@@ -17,7 +17,7 @@ export default function useCurrentUser() {
         .catch(error => {
             setAuth();
         })
-        }, []);
+    }, []);
 
-  return {user: auth, loggedIn: auth != null}
+    return {user: auth, loggedIn: auth != null}
 }

@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import {axiosConfig, getCookie} from "../config/axiosConfig";
 import Sidebar from "./Sidebar";
-import {Container, Button, Box, Drawer} from "@mui/material";
+import { Container, Button, Box, Drawer } from "@mui/material";
 import ReorderIcon from '@mui/icons-material/Reorder';
 import useCurrentUser from "../config/UseCurrentUser";
 import { useAuth } from "../config/AuthContext";
@@ -26,7 +26,7 @@ function Layout(props) {
             <Drawer open={open} onClose={() => toggleDrawer(false) } anchor="right">
                 <Sidebar authUser={isAuthenticated} onSelect={() => toggleDrawer(false)}/>
             </Drawer>
-            {props.children}  
+            { props.children }  
         </Box>      
     );
 }

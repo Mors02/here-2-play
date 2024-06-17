@@ -4,7 +4,6 @@ import Homepage from "../Home/Homepage";
 import LoginPage from "../Auth/LoginPage";
 
 function AppRoutes() {
-
     return (
         <Routes>
             <Route path="/" element={<Homepage />}></Route>

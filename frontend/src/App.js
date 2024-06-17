@@ -1,4 +1,3 @@
-
 import { requirePropFactory } from "@mui/material";
 import Layout from "./Component/Layout";
 import Sidebar from "./Component/Sidebar";

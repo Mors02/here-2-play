@@ -14,7 +14,6 @@ import { ToastContainer, toast } from 'react-toastify';
 
 
 function LoginPage() {
-
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const {loggedIn, refresh} = useCurrentUser();

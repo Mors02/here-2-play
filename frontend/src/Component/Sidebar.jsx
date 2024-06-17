@@ -27,15 +27,17 @@ function Sidebar(props) {
     }
 
     return (
-        <>
         <Stack class="float-right w-52 h- bg-slate-500 min-h-dvh">
            <h3 class="text-xl m-10">Menu laterale</h3>
            
             <nav class="mx-10">
                 <Stack>
                     <Link to="/" onClick={() => onSelect()}>Homepage</Link>
-                    {!authUser?<Link to="/login" onClick={() => onSelect()}>Login</Link> : <p></p>}
-                    {authUser? <Button onClick={(e) => handleLogout(e)}  variant="text" color="error" >Logout</Button> : <></>}
+                    { 
+                        !authUser
+                        ? <Link to="/login" onClick={() => onSelect()}>Login</Link> 
+                        : <Button onClick={(e) => logout(e)}  variant="text" color="error" >Logout</Button> 
+                    }
                 </Stack>
             </nav>
             <ToastContainer 
@@ -43,9 +45,7 @@ function Sidebar(props) {
                 autoClose={5000}
             />
         </Stack>
-        </>
     )
-    
 }
 
 export default Sidebar;
