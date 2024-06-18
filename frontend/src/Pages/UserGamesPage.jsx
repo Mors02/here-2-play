@@ -9,7 +9,7 @@ function UserGamesPage() {
     useEffect(() => {
         axiosConfig.get('/api/games/')
             .then(
-                (res) => setGames(res.data)
+                (res) => {setGames(res.data); console.log(res.data)}
             )
     }, [])
 

@@ -26,7 +26,7 @@ class Game(models.Model):
         db_table = "games"
 
     def __str__(self):
-        return self.title
+        return self.title + " - " + self.description + " - " + str(self.price)
     
 # Haven't been tested yet
 class GameAttachment(models.Model):

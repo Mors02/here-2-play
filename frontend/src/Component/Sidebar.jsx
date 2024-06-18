@@ -9,6 +9,7 @@ function Sidebar(props) {
     const navigate = useNavigate();
     function logout(e) {
         onSelect()
+        console.log(getCookie('csrftoken'));
         axiosConfig.get("/api/logout/", {
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
@@ -27,7 +28,7 @@ function Sidebar(props) {
             <nav class="mx-10">
                 <Stack>
                     <Link to="/">Homepage</Link>
-                    <Link to="/your-games">Your Games</Link>
+                    <Link to="/your-games" onClick={() => onSelect()}>Your Games</Link>
                     { 
                         !authUser
                         ? <Link to="/login" onClick={() => onSelect()}>Login</Link> 

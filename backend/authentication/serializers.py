@@ -6,14 +6,14 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
-        def create(self, clean_data):
-            user = User.objects.create_user(
-                email=clean_data["email"], 
-                password=clean_data["password"],
-                username=clean_data["username"]
-            )
-            user.save()
-            return user
+    def create(self, clean_data):
+        user = User.objects.create_user(
+            email=clean_data["email"], 
+            password=clean_data["password"],
+            username=clean_data["username"]
+        )
+        user.save()
+        return user
 
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
