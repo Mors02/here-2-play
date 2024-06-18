@@ -28,7 +28,7 @@ function PublishGamePage() {
 
     return (
         <form onSubmit={e => onSubmit(e)}>
-            <Stack direction="column">
+            <Stack direction="column" spacing={2}>
                 <TextField {...register('title')} label="Title" variant="outlined" required />
                 <TextField {...register('description')} label="Description" variant="outlined" multiline rows={2} required />
                 <TextField {...register('price')} label="Prezzo" type="number" variant="outlined" rows={2} required />
@@ -45,6 +45,18 @@ function PublishGamePage() {
                         <DatePicker label="End" />
                     </div>
                 }
+
+                {/* WIP */}
+                <Button variant="contained" component="label">
+                    Upload Game Cover
+                    <input type="file" hidden />
+                </Button>
+
+                {/* WIP */}
+                <Button variant="contained" component="label">
+                    Upload Game Attachments
+                    <input type="file" hidden />
+                </Button>
 
                 <Button type="submit" variant="contained">Publish</Button>
             </Stack>

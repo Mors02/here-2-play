@@ -6,6 +6,14 @@ from .serializers import GameSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import permissions, status
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
+class GameList(generics.ListAPIView):
+    serializer_class = GameSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return Game.objects.all()
 
 class GameListCreate(generics.ListCreateAPIView):
     serializer_class = GameSerializer
