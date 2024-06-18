@@ -5,9 +5,11 @@ import { Box, Stack, Button } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../config/AuthContext";
 import { toast } from 'react-toastify';
+import useCurrentUser from "../config/UseCurrentUser";
 
 function Sidebar(props) {
-    const {onSelect, authUser} = props;
+    const {onSelect} = props;
+    const {user, loggedIn} = useCurrentUser();
     const navigate = useNavigate();
     const {logout} = useAuth();
     const [, forceUpdate] = useReducer(x => x + 1, 0);
@@ -33,8 +35,11 @@ function Sidebar(props) {
             <nav class="mx-10">
                 <Stack>
                     <Link to="/" onClick={() => onSelect()}>Homepage</Link>
+                    {loggedIn?
+                    <Link to="/user" onClick={onSelect}>Profilo</Link>: <></>
+                    }
                     { 
-                        authUser
+                        loggedIn
                         ?  <Button onClick={(e) => handleLogout(e)}  variant="text" color="error" >Logout</Button>
                         :  <Link to="/login" onClick={() => onSelect()}>Login</Link>
                     }

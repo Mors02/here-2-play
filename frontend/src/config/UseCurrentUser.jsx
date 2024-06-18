@@ -5,7 +5,6 @@ export default function useCurrentUser() {
   const [auth, setAuth] = useState();
   const [loading, setLoading] = useState(true);
     useEffect(() => {        
-        console.log(getCookie('csrftoken'))
         axiosConfig.get("/api/user/", {
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
@@ -14,13 +13,13 @@ export default function useCurrentUser() {
         })
         .then(res => {            
             setAuth(res.data);
-            setLoading(false)
+            setLoading(false);
         })
         .catch(error => {
-            setAuth();
             setLoading(false);
+            setAuth();            
         })
     }, []);
     
-    return {user: auth, loggedIn: auth != undefined, loading: loading}
+    return {user: auth, loggedIn: auth != null, loading: loading}
 }

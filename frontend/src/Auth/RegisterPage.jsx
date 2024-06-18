@@ -10,6 +10,7 @@ import useCurrentUser from "../config/UseCurrentUser";
 import { useAuth } from "../config/AuthContext";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { ToastContainer, toast } from 'react-toastify';
+import UserForm from "./UserForm";
 
 
 
@@ -29,16 +30,11 @@ function RegisterPage() {
 
     const notify = () => toast.success("Login effettuato con successo.");
 
-    const {
-        register,
-        formState: {errors},
-        getValues,
-        setValue
-    } = useForm()
 
-    function onSubmit(e) {
+    function onSubmit(e, values) {
         e.preventDefault();
-        const data = getValues();
+        console.log(values);
+        let data = values;
         if (data.password == data.confirmPassword) {
             axios.post(`${process.env.REACT_APP_BASE_URL}/api/register/`, data, {
                 xsrfCookieName: "csrftoken",
@@ -46,14 +42,10 @@ function RegisterPage() {
                 withCredentials: true,
             }).then(response => {
                 console.log(response)
-                if (response.message) {
-                    toast.success("Registrazione effettuato con successo.", {onClose: () => {login(); navigate("/login")}})                   
-                }
+                toast.success("Registrazione effettuato con successo.", {onClose: () => {navigate("/login")}})                   
             })
             .catch(error => {               
                 let errorType = error["response"]["data"];
-                setValue('password', null)
-                setValue('confirmPassword', null)
                 setError(ErrorMap[errorType])
                 toast.error(ErrorMap[errorType])
             });
@@ -72,8 +64,8 @@ function RegisterPage() {
             justifyContent="center"
             class="flex items-center min-h-screen bg-slate-300 justify-center">
             <CenterBox>
-                <Stack direction="column">
-                    <h2>Login</h2>
+                {/* <Stack direction="column">
+                    <h2>Registrazione</h2>
                     <form onSubmit={e => onSubmit(e)}>
                         <p>
                             <TextField label="Username" type="text" defaultValue="" {...register("username")} variant="standard" />
@@ -95,7 +87,9 @@ function RegisterPage() {
                         </p>
                     </form>
                     {error != ""? <p class="">{error}</p> : <></>}
-                </Stack>
+                </Stack> */}
+                <UserForm title="Registrazione" onSubmit={onSubmit} isEdit={false} />
+                {error != ""? <p class="">{error}</p> : <></>}
             </CenterBox>
              {/* Container in cui verranno renderizzati i toast */}
         </Grid>
