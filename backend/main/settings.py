@@ -75,7 +75,7 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_NAME = "csrftoken"
-#CSRF_COOKIE_DOMAIN  = "localhost"
+#CSRF_COOKIE_DOMAIN  = "http://localhost:3000"
 
 TEMPLATES = [
     {
