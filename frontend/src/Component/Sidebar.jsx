@@ -26,7 +26,8 @@ function Sidebar(props) {
            
             <nav class="mx-10">
                 <Stack>
-                    <Link to="/" onClick={() => onSelect()}>Homepage</Link>
+                    <Link to="/">Homepage</Link>
+                    <Link to="/your-games">Your Games</Link>
                     { 
                         !authUser
                         ? <Link to="/login" onClick={() => onSelect()}>Login</Link> 

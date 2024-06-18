@@ -53,4 +53,4 @@ axiosConfig.interceptors.request.use(
 );
 */
 
-export {axiosConfig, getCookie};
+export { axiosConfig, getCookie };

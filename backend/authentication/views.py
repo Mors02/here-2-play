@@ -48,13 +48,13 @@ class UserView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         print(serializer.data)
-        return Response({'user': serializer.data}, status = status.HTTP_200_OK)
+        return Response({'user': serializer.data}, status=status.HTTP_200_OK)
 
 class EmailBackend(ModelBackend):
-    def authenticate(self, request, username = None, password = None, **kwargs):
+    def authenticate(self, request, username=None, password=None, **kwargs):
         UserModel = get_user_model()
         try:
-            user = UserModel.objects.get(email = username)
+            user = UserModel.objects.get(email=username)
         except UserModel.DoesNotExist:
             return None
         else:
