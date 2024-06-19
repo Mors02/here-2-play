@@ -53,7 +53,7 @@ class UserEditSerializer(serializers.Serializer):
             alreadyRegistered = user
         #and its not our user
         if (alreadyRegistered.pk != user.pk):
-            return None
+            self.context["message"] = "ERR_ALREADY_REGISTERED"
         
         #check if new username is already used
         try:
@@ -62,34 +62,32 @@ class UserEditSerializer(serializers.Serializer):
             alreadyRegistered = user
         #and its not our user
         if (alreadyRegistered.pk != user.pk):
-            return None
+            self.context["message"] = "ERR_ALREADY_REGISTERED"
         
-        password = ""
 
         if ("oldPassword" in data and data["oldPassword"] is not None):
             #check if oldPassword is correct
             correctUser = authenticate(username = user.email, password = data["oldPassword"])
+            print("CORRECT USER")
+            print(correctUser)
             #if is None then error
             if (correctUser is None):
-                return None
+                self.context["message"] = "ERR_WRONG_CREDENTIALS"
             
             #check if new password is not equal to confirm new password
             if (data["newPassword"] != data["confirmNewPassword"]):
-                return None
-            
-            password = data["newPassword"]
-        else:
-            password = user.password
+                self.context["message"] = "ERR_DIFFERENT_PASSWORDS"
 
         editedUser = UserModel.objects.filter(pk=user.pk).get()
         editedUser.username = data["username"]
         editedUser.email = data["email"]
         editedUser.first_name = data["first_name"]
         editedUser.last_name = data["last_name"]
-        editedUser.set_password(password)
+        if ("newPassword" in data):
+            print("changedPassowed")
+            editedUser.set_password(data["newPassword"])
         editedUser.save()
         self.context["user"] = editedUser
-        print("editedUser")
         #user = authenticate(username = clean_data["email"], password=clean_data["password"])
         #print(user)
         return editedUser
@@ -97,4 +95,4 @@ class UserEditSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
-        fields = ("email", "username")
+        fields = ("email", "username", "first_name", "last_name")

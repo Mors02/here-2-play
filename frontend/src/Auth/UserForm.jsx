@@ -15,8 +15,8 @@ function UserForm({title, onSubmit, isEdit, user}) {
         if (user) {
             setValue("username", user.username);
             setValue("email", user.email);
-            setValue("first_name", user.firstname);
-            setValue("last_name", user.lastname);
+            setValue("first_name", user.first_name);
+            setValue("last_name", user.last_name);
         }
     }, [])
 
