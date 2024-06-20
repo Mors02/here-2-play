@@ -11,6 +11,7 @@ import { useAuth } from "../config/AuthContext";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { ToastContainer, toast } from 'react-toastify';
 import UserForm from "./UserForm";
+import ErrorLabel from "../Component/ErrorLabel";
 
 
 
@@ -24,16 +25,11 @@ function RegisterPage() {
     if (loggedIn) {
         console.log(loggedIn)
         navigate("/", {replace: true})
-    }
-        
-    
-
-    const notify = () => toast.success("Login effettuato con successo.");
+    }    
 
 
     function onSubmit(e, values) {
-        e.preventDefault();
-        console.log(values);
+        e.preventDefault();        
         let data = values;
         if (data.password == data.confirmPassword) {
             axios.post(`${process.env.REACT_APP_BASE_URL}/api/register/`, data, {
@@ -41,7 +37,7 @@ function RegisterPage() {
                 xsrfHeaderName: "X-CSRFToken",
                 withCredentials: true,
             }).then(response => {
-                console.log(response)
+                setError();
                 toast.success("Registrazione effettuato con successo.", {onClose: () => {navigate("/login")}})                   
             })
             .catch(error => {               
@@ -50,7 +46,7 @@ function RegisterPage() {
                 toast.error(ErrorMap[errorType])
             });
         } else {
-            toast.error("Le password non corrispondono!")
+            toast.error(ErrorMap["ERR_DIFFERENT_PASSWORDS"])
         }
         
         
@@ -89,7 +85,10 @@ function RegisterPage() {
                     {error != ""? <p class="">{error}</p> : <></>}
                 </Stack> */}
                 <UserForm title="Registrazione" onSubmit={onSubmit} isEdit={false} />
-                {error != ""? <p class="">{error}</p> : <></>}
+                <ErrorLabel text={error}/>
+                <p>
+                    <span>Sei già registrato?</span><a href="/login"> Entra.</a>
+                </p>
             </CenterBox>
              {/* Container in cui verranno renderizzati i toast */}
         </Grid>

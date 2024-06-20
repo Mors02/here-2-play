@@ -37,8 +37,8 @@ class UserEditSerializer(serializers.Serializer):
     username = serializers.CharField()
     email = serializers.EmailField()
     password = serializers.CharField()
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
+    first_name = serializers.CharField(allow_null=True, allow_blank=True)
+    last_name = serializers.CharField(allow_null=True, allow_blank=True)
 
     def edit(self, user, data):
         
@@ -76,19 +76,23 @@ class UserEditSerializer(serializers.Serializer):
             if (data["newPassword"] != data["confirmNewPassword"]):
                 self.context["message"] = "ERR_DIFFERENT_PASSWORDS"
 
-        editedUser = UserModel.objects.filter(pk=user.pk).get()
-        editedUser.username = data["username"]
-        editedUser.email = data["email"]
-        editedUser.first_name = data["first_name"]
-        editedUser.last_name = data["last_name"]
-        if ("newPassword" in data):
-            print("changedPassowed")
-            editedUser.set_password(data["newPassword"])
-        editedUser.save()
-        self.context["user"] = editedUser
+        if (self.context["message"] == ""):
+            editedUser = UserModel.objects.filter(pk=user.pk).get()
+            editedUser.username = data["username"]
+            editedUser.email = data["email"]
+            editedUser.first_name = data["first_name"]
+            editedUser.last_name = data["last_name"]
+            if ("newPassword" in data):
+                self.context["changedPassword"] = True
+                editedUser.set_password(data["newPassword"])
+            editedUser.save()
+            self.context["user"] = editedUser
+            return editedUser
         #user = authenticate(username = clean_data["email"], password=clean_data["password"])
         #print(user)
-        return editedUser
+
+        return None
+        
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

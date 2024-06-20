@@ -64,9 +64,6 @@ function UserForm({title, onSubmit, isEdit, user}) {
                 {isEdit? <Button sx={{margin: "15px", display: "inline"}} onClick={() => setChangePassword(!changePassword)} variant="contained" color="warning">Cambia password</Button> : <></>}
                 <Button sx={{display: "inline"}} onClick={(e) => {console.log(getValues()); onSubmit(e, getValues())}} variant="contained" color="info">Registrati</Button>
             </p>
-            {!isEdit? <p>
-               <span>Sei già registrato?</span><a href="/login"> Entra.</a>
-            </p> : <></>}
         </form>
         
     </Stack>
