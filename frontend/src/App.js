@@ -1,16 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
-import HelloWorld from './Home/HelloWorld';
+import { requirePropFactory } from "@mui/material";
+import Layout from "./Component/Layout";
+import Sidebar from "./Component/Sidebar";
+import Homepage from './Home/Homepage';
+import AppRoutes from "./Routing/Route";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <div>
-          <HelloWorld />
+        <div className="App">
+          <ToastContainer autoClose={400} position="bottom-center" hideProgressBar/>
+          <header>
+            <div>
+              <Layout />            
+              <AppRoutes />
+            </div>
+          </header>
         </div>
-      </header>
-    </div>
   );
 }
 

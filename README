@@ -1,15 +1,27 @@
 - SETUP FRONTEND
-npm i
+#REQUISITI: node v16^
+yarn
 
 - SETUP BACKEND
+#REQUISITI: python v3.8
 pipenv install
 
+- SETUP DB
+sudo apt-get install sqlite3 libsqlite3-dev
 
 Per far partire il progetto:
+
 1. cd backend
 2. pipenv shell
 3. python manage.py runserver
 
-in un nuovo terminale
+In un nuovo terminale
+
 1. cd frontend
 2. npm start
+
+Per controllare il db:
+
+1. cb backend
+2. pipenv shell
+3. python manage.py dbshell
