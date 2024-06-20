@@ -8,6 +8,7 @@ import {useNavigate } from "react-router";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { toast } from "react-toastify";
 import { ErrorMap } from "../config/enums";
+import ErrorLabel from "../Component/ErrorLabel";
 
 
 function UserPage() {
@@ -15,16 +16,25 @@ function UserPage() {
     const [err, setError] = useState();
     const navigate = useNavigate();
     
-    if (!loading && !loggedIn)
-        navigate("/")
+    if (!loading) {
+        if (!loggedIn)
+            navigate("/")
+    } 
     
     function onSubmit(e, values) {
         axiosConfig.post('/api/user/edit/', values)
         .then(res => {
-            toast.success("Cambio password effettuato. Dovrai rifare il login.", {onClose: () => {navigate("/login")}})
+            setError()
+            if (res.data.force_relogin)
+                toast.success("Cambio password effettuato. Dovrai rifare il login.", {onClose: () => {navigate("/login")}})
+            else {
+                toast.success("Dati modificati.")
+            }
+                
         }).catch((err) => {
-            setError(ErrorMap[err]);
-            toast.error(ErrorMap[err]);
+            console.log("ERR", err, ErrorMap[err]);
+            setError(ErrorMap[err["response"]["data"]]);
+            toast.error(ErrorMap[err["response"]["data"]]);
         })
     }
 
@@ -37,8 +47,8 @@ function UserPage() {
                     Ciao, {user.username}
                 </Typography>
                 <UserForm title={"Modifica dati"} onSubmit={onSubmit} isEdit={true} user={user}/>
+                <ErrorLabel text={err} />
             </CenterBox>
-            {err? <p>{err}</p> : <></>}
         </Container>
         : <></>}
         </>

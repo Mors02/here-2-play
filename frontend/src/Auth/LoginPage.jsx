@@ -10,6 +10,7 @@ import useCurrentUser from "../config/UseCurrentUser";
 import { useAuth } from "../config/AuthContext";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { ToastContainer, toast } from 'react-toastify';
+import ErrorLabel from "../Component/ErrorLabel";
 
 
 
@@ -46,6 +47,7 @@ function LoginPage() {
         }).then(response => {
                 console.log(response)
                 if (response.data) {
+                    setError()
                     toast.success("Login effettuato con successo.", {onClose: () => {login(); navigate("/")}})                   
                 }
             })
@@ -78,11 +80,11 @@ function LoginPage() {
                         <p>
                             <Button type="submit" variant="contained" color="info">Entra</Button>
                         </p>
-                        <p>
-                           <span>Non sei ancora registrato?</span><a href="/register"> Registrati.</a>
-                        </p>
                     </form>
-                    {error != ""? <p class="">{error}</p> : <></>}
+                    <ErrorLabel text={error} />
+                    <p>
+                        <span>Non sei ancora registrato?</span><a href="/register"> Registrati.</a>
+                    </p>
                 </Stack>
             </CenterBox>
              {/* Container in cui verranno renderizzati i toast */}

@@ -77,15 +77,19 @@ class UserEdit(APIView):
                                               "first_name": data["first_name"],
                                               "last_name": data["last_name"],
                                               "email": data["email"]},
-                                        context={"user": request.user, "message": ""})
+                                        context={"user": request.user, 
+                                                 "message": "", 
+                                                 "changedPassword": False})
         if (serializer.is_valid(raise_exception=True)):
             serializer.edit(user=request.user, data=request.data)
 
             if (serializer.context["message"] != ""):
                 return Response(serializer.context["message"], status=status.HTTP_400_BAD_REQUEST)
             
-            login(request, serializer.context["user"], 'authentication.views.EmailBackend')
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            if (serializer.context["changedPassword"]):
+                logout(request)
+            #login(request, serializer.context["user"], 'authentication.views.EmailBackend')
+            return Response({"user": serializer.data, "force_relogin": serializer.context["changedPassword"]}, status=status.HTTP_200_OK)
         #check if oldpassword is correct
 
 #Classe per autenticare con la mail gli utenti
