@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from .serializers import UserEditSerializer, UserRegisterSerializer, UserLoginSerializer, UserSerializer
 from rest_framework import permissions, status
 from django.contrib.auth.backends import ModelBackend
-import re
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 # Classe per la registrazione degli utenti
 class UserRegister(APIView):
@@ -38,6 +39,7 @@ class UserLogin(APIView):
     authentication_classes = (SessionAuthentication,)
 
     def post(self, request):
+
         data = request.data #TODO: VALIDATE DATA
         serializer = UserLoginSerializer(data = data)
         
@@ -46,7 +48,8 @@ class UserLogin(APIView):
             if (user is None):
                 return Response("ERR_WRONG_CREDENTIALS", status = status.HTTP_401_UNAUTHORIZED)
             login(request, user, 'authentication.views.EmailBackend')
-            return Response(serializer.data, status = status.HTTP_200_OK)
+            token = RefreshToken.for_user(user)
+            return Response({user: serializer.data, "refresh": token, "access": token.access_token}, status = status.HTTP_200_OK)
 
 # Classe per il logout degli utenti
 class UserLogout(APIView):
@@ -91,6 +94,7 @@ class UserEdit(APIView):
             #login(request, serializer.context["user"], 'authentication.views.EmailBackend')
             return Response({"user": serializer.data, "force_relogin": serializer.context["changedPassword"]}, status=status.HTTP_200_OK)
         #check if oldpassword is correct
+
 
 #Classe per autenticare con la mail gli utenti
 class EmailBackend(ModelBackend):

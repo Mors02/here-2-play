@@ -40,11 +40,7 @@ function LoginPage() {
     function onSubmit(e) {
         e.preventDefault();
         const data = getValues();
-        axios.post(`${process.env.REACT_APP_BASE_URL}/api/login/`, data, {
-            xsrfCookieName: "csrftoken",
-            xsrfHeaderName: "X-CSRFToken",
-            withCredentials: true,
-        }).then(response => {
+        axios.post(`${process.env.REACT_APP_BASE_URL}/api/login/`, data).then(response => {
                 console.log(response)
                 if (response.data) {
                     setError()
