@@ -5,9 +5,7 @@ export default function useCurrentUser() {
   const [auth, setAuth] = useState();
   const [loading, setLoading] = useState(true);
     useEffect(() => {        
-        axiosConfig.get("/api/user/", {
-            headers: {"Authorization": getToken()}
-        })
+        axiosConfig.get("/api/user/")
         .then(res => {            
             setAuth(res.data);
             setLoading(false);
