@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import make_password
+from .models import UserProfile
 
 UserModel = get_user_model()
 
@@ -9,7 +10,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         model = UserModel
         fields = '__all__'
 
-    def create(self, clean_data):
+    def create(self, clean_data, role):
         alreadyRegistered = UserModel.objects.filter(email=clean_data["email"]).exists()
         if (alreadyRegistered):
             return None
@@ -20,6 +21,11 @@ class UserRegisterSerializer(serializers.ModelSerializer):
                 username = clean_data["username"],
                 password = clean_data["password"]
             )
+            profile = UserProfile(
+                user=user,
+                role=role                
+            )
+            profile.save()
             #user.set_password(clean_data["password"])
             user.save()
             return user
@@ -42,9 +48,7 @@ class UserEditSerializer(serializers.Serializer):
     first_name = serializers.CharField(allow_null=True, allow_blank=True)
     last_name = serializers.CharField(allow_null=True, allow_blank=True)
 
-    def edit(self, user, data):
-        
-        
+    def edit(self, user, data):     
         #check if new email is already used
         try:
             alreadyRegistered = UserModel.objects.filter(email=data["email"]).get()
@@ -98,5 +102,7 @@ class UserEditSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserModel
-        fields = ("email", "username", "first_name", "last_name")
+        model = UserProfile
+        #fields = ("email", "username", "first_name", "last_name", "role")
+        fields = ["user", "role"]
+        depth = 1        
