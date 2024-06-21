@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
-import { axiosConfig, getCookie } from './axiosConfig';
+import { axiosConfig, getToken } from './axiosConfig';
 
 export default function useCurrentUser() {
   const [auth, setAuth] = useState();
   const [loading, setLoading] = useState(true);
     useEffect(() => {        
         axiosConfig.get("/api/user/", {
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            withCredentials: true
+            headers: {"Authorization": getToken()}
         })
         .then(res => {            
             setAuth(res.data);
