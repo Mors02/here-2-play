@@ -1,11 +1,11 @@
 from django.contrib.auth import get_user_model, login, logout
-from rest_framework.authentication import SessionAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import UserEditSerializer, UserRegisterSerializer, UserLoginSerializer, UserSerializer
 from rest_framework import permissions, status
 from django.contrib.auth.backends import ModelBackend
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 
 # Classe per la registrazione degli utenti
@@ -36,7 +36,7 @@ class UserRegister(APIView):
 # Classe per il login degli utenti
 class UserLogin(APIView):
     permission_classes = (permissions.AllowAny,)
-    authentication_classes = (SessionAuthentication,)
+    authentication_classes = (JWTAuthentication,)
 
     def post(self, request):
 
@@ -49,18 +49,27 @@ class UserLogin(APIView):
                 return Response("ERR_WRONG_CREDENTIALS", status = status.HTTP_401_UNAUTHORIZED)
             login(request, user, 'authentication.views.EmailBackend')
             token = RefreshToken.for_user(user)
-            return Response({user: serializer.data, "refresh": token, "access": token.access_token}, status = status.HTTP_200_OK)
+            return Response({"user": serializer.data, "refresh": str(token), "access": str(token.access_token)}, status = status.HTTP_200_OK)
 
 # Classe per il logout degli utenti
 class UserLogout(APIView):
-    def get(self, request):
-        logout(request)
-        return Response(status=status.HTTP_200_OK)
+    def post(self, request):
+        try:
+            
+            refresh_token = request.data["refresh_token"]
+            print(refresh_token)
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            logout(request)
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_404_NOT_FOUND)        
 
 # Classe per recuperare le info degli utenti
 class UserView(APIView):    
     permission_classes = (permissions.IsAuthenticated,)
-    authentication_classes = (SessionAuthentication,)
+    authentication_classes = (JWTAuthentication,)
 
     def get(self, request):
         serializer = UserSerializer(request.user)        
@@ -68,7 +77,7 @@ class UserView(APIView):
 
 class UserEdit(APIView):
     permission_classes = (permissions.IsAuthenticated,)
-    authentication_classes = (SessionAuthentication,)
+    authentication_classes = (JWTAuthentication,)
 
     def post(self, request):
         data = request.data

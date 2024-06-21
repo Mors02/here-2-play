@@ -11,6 +11,7 @@ import { useAuth } from "../config/AuthContext";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { ToastContainer, toast } from 'react-toastify';
 import ErrorLabel from "../Component/ErrorLabel";
+import { axiosConfig } from "../config/axiosConfig";
 
 
 
@@ -24,11 +25,7 @@ function LoginPage() {
     if (loggedIn) {
         console.log(loggedIn)
         navigate("/", {replace: true})
-    }
-        
-    
-
-    const notify = () => toast.success("Login effettuato con successo.");
+    }    
 
     const {
         register,
@@ -41,11 +38,16 @@ function LoginPage() {
         e.preventDefault();
         const data = getValues();
         axios.post(`${process.env.REACT_APP_BASE_URL}/api/login/`, data).then(response => {
-                console.log(response)
-                if (response.data) {
-                    setError()
-                    toast.success("Login effettuato con successo.", {onClose: () => {login(); navigate("/")}})                   
-                }
+                //console.log(response)
+                setError()
+                const data = response.data
+                console.log(data, data.access)
+                localStorage.setItem('access_token', data.access);
+                localStorage.setItem('refresh_token', data.refresh);
+                axiosConfig.defaults.headers.common['Authorization'] = 
+                                                `JWT ${data['access']}`;
+                toast.success("Login effettuato con successo.", {onClose: () => {login(); navigate("/")}})                   
+                
             })
             .catch(error => {
                 let errorType = error["response"]["data"];
