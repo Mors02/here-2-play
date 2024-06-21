@@ -10,7 +10,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         model = UserModel
         fields = '__all__'
 
-    def create(self, clean_data):
+    def create(self, clean_data, role):
         alreadyRegistered = UserModel.objects.filter(email=clean_data["email"]).exists()
         if (alreadyRegistered):
             return None
@@ -21,9 +21,11 @@ class UserRegisterSerializer(serializers.ModelSerializer):
                 username = clean_data["username"],
                 password = clean_data["password"]
             )
-            profile = UserProfile.create(
-                user=user,                
+            profile = UserProfile(
+                user=user,
+                role=role                
             )
+            profile.save()
             #user.set_password(clean_data["password"])
             user.save()
             return user
@@ -100,5 +102,7 @@ class UserEditSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserModel
-        fields = ("email", "username", "first_name", "last_name")
+        model = UserProfile
+        #fields = ("email", "username", "first_name", "last_name", "role")
+        fields = ["user", "role"]
+        depth = 1        

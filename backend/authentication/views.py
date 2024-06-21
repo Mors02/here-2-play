@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from .serializers import UserEditSerializer, UserRegisterSerializer, UserLoginSerializer, UserSerializer
 from rest_framework import permissions, status
 from django.contrib.auth.backends import ModelBackend
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken
+from .models import Role, UserProfile
 
 
 # Classe per la registrazione degli utenti
@@ -15,7 +16,9 @@ class UserRegister(APIView):
 
     def post(self, request):
         clean_data = request.data #TODO: VALIDATE DATA
-
+        print(clean_data)
+        role = Role.objects.get(slug=clean_data["role_slug"])
+        print(role)
         if (request.data["password"] != request.data["confirmPassword"]):
             return Response("ERR_INVALID_PASSWORD", status = status.HTTP_400_BAD_REQUEST)
         #if (re.fullmatch(self.emailRegex, request.data["email"])):
@@ -26,7 +29,7 @@ class UserRegister(APIView):
         serializer = UserRegisterSerializer(data = clean_data)
         if serializer.is_valid(raise_exception = True):
             
-            user = serializer.create(clean_data)
+            user = serializer.create(clean_data, role)
             if user:
                 return Response(serializer.data, status = status.HTTP_201_CREATED)
             else:
@@ -55,9 +58,7 @@ class UserLogin(APIView):
 class UserLogout(APIView):
     def post(self, request):
         try:
-            
             refresh_token = request.data["refresh_token"]
-            print(refresh_token)
             token = RefreshToken(refresh_token)
             token.blacklist()
             logout(request)
@@ -72,7 +73,8 @@ class UserView(APIView):
     authentication_classes = (JWTAuthentication,)
 
     def get(self, request):
-        serializer = UserSerializer(request.user)        
+        profile = UserProfile.objects.get(user_id=request.user.pk)
+        serializer = UserSerializer(profile)        
         return Response(serializer.data, status = status.HTTP_200_OK)
 
 class UserEdit(APIView):

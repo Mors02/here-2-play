@@ -65,7 +65,7 @@ let refresh = false;
 axiosConfig.interceptors.response.use(resp => resp, async error => {
   if (error.response.status === 401 && !refresh) {
      refresh = true;
-     console.log(localStorage.getItem('refresh_token'))
+     //console.log(localStorage.getItem('refresh_token'))
      console.log("FETCHING NEW ACCESS TOKEN...")
      const response = await   
            axios.post(`${process.env.REACT_APP_BASE_URL}/token/refresh/`, {      
