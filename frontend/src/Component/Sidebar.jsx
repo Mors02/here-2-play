@@ -1,6 +1,6 @@
 import React, {useReducer} from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getCookie, axiosConfig } from "../config/axiosConfig";
+import { getToken, axiosConfig, getRefreshToken } from "../config/axiosConfig";
 import { Box, Stack, Button } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../config/AuthContext";
@@ -16,16 +16,14 @@ function Sidebar(props) {
 
     function handleLogout(e) {
         onSelect()
-        console.log(getCookie('csrftoken'));
-        axiosConfig.get("/api/logout/", {
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            withCredentials: true
-        })
+        axiosConfig.post("/api/logout/", {"refresh_token": getRefreshToken()})
         .then(res => {
             logout();
+            localStorage.clear();
+            axiosConfig.defaults.headers.common['Authorization'] = null;
             toast.success("Logout effettuato.", {onClose: () =>{forceUpdate(); navigate("/")}})
+        }).catch(err => {
+            console.log(err)
         })
     }
 

@@ -32,11 +32,7 @@ function RegisterPage() {
         e.preventDefault();        
         let data = values;
         if (data.password == data.confirmPassword) {
-            axios.post(`${process.env.REACT_APP_BASE_URL}/api/register/`, data, {
-                xsrfCookieName: "csrftoken",
-                xsrfHeaderName: "X-CSRFToken",
-                withCredentials: true,
-            }).then(response => {
+            axios.post(`${process.env.REACT_APP_BASE_URL}/api/register/`, data).then(response => {
                 setError();
                 toast.success("Registrazione effettuato con successo.", {onClose: () => {navigate("/login")}})                   
             })

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import useCurrentUser from "../config/UseCurrentUser";
 import UserForm from "./UserForm";
 import CenterBox from "../Component/CenterBox";
-import { axiosConfig, getCookie } from "../config/axiosConfig";
+import { axiosConfig, getToken } from "../config/axiosConfig";
 import {useNavigate } from "react-router";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { toast } from "react-toastify";
@@ -25,8 +25,8 @@ function UserPage() {
         axiosConfig.post('/api/user/edit/', values)
         .then(res => {
             setError()
-            if (res.data.force_relogin)
-                toast.success("Cambio password effettuato. Dovrai rifare il login.", {onClose: () => {navigate("/login")}})
+            if (res.data && res.data.force_relogin)
+                toast.success("Cambio password effettuato. Dovrai rifare il login.", {onClose: () => {localStorage.clear(); navigate("/login")}})
             else {
                 toast.success("Dati modificati.")
             }
