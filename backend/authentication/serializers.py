@@ -105,4 +105,9 @@ class UserSerializer(serializers.ModelSerializer):
         model = UserProfile
         #fields = ("email", "username", "first_name", "last_name", "role")
         fields = ["user", "role"]
-        depth = 1        
+        depth = 1  
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = ["username", "date_joined"]

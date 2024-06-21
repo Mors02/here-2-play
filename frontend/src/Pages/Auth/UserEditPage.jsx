@@ -1,19 +1,19 @@
 import { Box, Container, CircularProgress, Typography, Button } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import useCurrentUser from "../config/UseCurrentUser";
+import useCurrentUser from "../../config/UseCurrentUser";
 import UserForm from "./UserForm";
-import CenterBox from "../Component/CenterBox";
-import { axiosConfig, getToken } from "../config/axiosConfig";
+import CenterBox from "../../Component/CenterBox";
+import { axiosConfig, getToken } from "../../config/axiosConfig";
 import {useNavigate } from "react-router";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { toast } from "react-toastify";
-import { ErrorMap } from "../config/enums";
-import ErrorLabel from "../Component/ErrorLabel";
+import { ErrorMap } from "../../config/enums";
+import ErrorLabel from "../../Component/ErrorLabel";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
 
 
-function UserPage() {
+function UserEditPage() {
     const {user, role, loading, loggedIn} = useCurrentUser();
     const [err, setError] = useState();
     const navigate = useNavigate();
@@ -82,4 +82,4 @@ function UserPage() {
     )
 }
 
-export default UserPage
+export default UserEditPage

@@ -3,15 +3,15 @@ import React, { Component, useEffect, useState } from "react";
 import axios from "axios";
 import { useForm } from 'react-hook-form';
 import { Stack, Grid, TextField, Button } from "@mui/material";
-import CenterBox from "../Component/CenterBox";
-import { ErrorMap } from "../config/enums";
+import CenterBox from "../../Component/CenterBox";
+import { ErrorMap } from "../../config/enums";
 import { useNavigate } from "react-router-dom";
-import useCurrentUser from "../config/UseCurrentUser";
-import { useAuth } from "../config/AuthContext";
+import useCurrentUser from "../../config/UseCurrentUser";
+import { useAuth } from "../../config/AuthContext";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { ToastContainer, toast } from 'react-toastify';
-import ErrorLabel from "../Component/ErrorLabel";
-import { axiosConfig } from "../config/axiosConfig";
+import ErrorLabel from "../../Component/ErrorLabel";
+import { axiosConfig } from "../../config/axiosConfig";
 
 
 

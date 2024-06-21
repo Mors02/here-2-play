@@ -35,7 +35,7 @@ function Sidebar(props) {
                 <Stack>
                     <Link to="/" onClick={() => onSelect()}>Homepage</Link>
                     {loggedIn?
-                    <Link to="/user" onClick={onSelect}>Profilo</Link>: <></>
+                    <Link to={"/user/"+user.id} onClick={onSelect}>Profilo</Link>: <></>
                     }
                     { 
                         loggedIn
