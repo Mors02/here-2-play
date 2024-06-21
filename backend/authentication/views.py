@@ -7,7 +7,8 @@ from rest_framework import permissions, status
 from django.contrib.auth.backends import ModelBackend
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Role, UserProfile
-
+from rest_framework import viewsets
+from .models import User
 
 # Classe per la registrazione degli utenti
 class UserRegister(APIView):
@@ -91,13 +92,22 @@ class UserView(APIView):
         serializer = UserSerializer(profile)        
         return Response(serializer.data, status = status.HTTP_200_OK)
 
-class UserEdit(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
-    authentication_classes = (JWTAuthentication,)
+class UserViewSet(viewsets.ViewSet):
+    def get_permissions(self):
+        if (self.action == "update"):
+            permission_classes = (permissions.IsAuthenticated,)
+        else:
+            permission_classes = (permissions.AllowAny,)
+        
+        return [permission() for permission in permission_classes]
+    
+    def retrieve(self, request, pk=None):
+        user = User.objects.get(pk=pk)
+        print(user)
+        pass
 
-    def post(self, request):
-        data = request.data
-        print(data)
+    def update(self, request, pk=None):
+        data = request.data        
         serializer = UserEditSerializer(data={"username": data["username"], 
                                               "password": request.user.password, 
                                               "pk": request.user.pk,
@@ -118,8 +128,6 @@ class UserEdit(APIView):
                 logout(request)
             #login(request, serializer.context["user"], 'authentication.views.EmailBackend')
             return Response({"user": serializer.data, "force_relogin": serializer.context["changedPassword"]}, status=status.HTTP_200_OK)
-        #check if oldpassword is correct
-
 
 #Classe per autenticare con la mail gli utenti
 class EmailBackend(ModelBackend):
