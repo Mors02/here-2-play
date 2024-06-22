@@ -1,9 +1,13 @@
 from django.shortcuts import render
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
-# Create your views here.
+from rest_framework import viewsets, status
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.response import Response
+from .serializer import UserReportSerializer
+from authentication.models import User
+import pytz
+from django.utils import timezone
 
-class GameViewSet(viewsets.ModelViewSet):
+class UserReportsView(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if (self.action in ['create']):
@@ -13,11 +17,24 @@ class GameViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
     
     def create(self, request):
+        data = request.data
+        user = request.user
+        user_reported = User.objects.get(username=data["userReported"]["username"])
+        clean_data = {"user": user.pk, 
+                      "user_reported": user_reported.pk, 
+                      "cause": data["selected"],
+                      "report_date": timezone.now()}
+        serializer = UserReportSerializer(data=clean_data)
+        if (serializer.is_valid(raise_exception=True)):
+            #print(serializer.data)
+            #serializer.create(clean_data=clean_data)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response("ERR_SERVER_ERROR", status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, pk=None):
         pass
 
-    def retrieve(self, request):
-        pass
-
-    def list(self, request):
+    def list(self, request, pk=None):
         pass
 
