@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.authentication import SessionAuthentication
 from .models import Game
 from .serializers import GameSerializer
 from rest_framework.response import Response
@@ -43,7 +44,7 @@ class GameViewSet(viewsets.ModelViewSet):
 
 class YourGameList(generics.ListAPIView):
     serializer_class = GameSerializer
-    permission_classes = [IsAuthenticated]
+    authentication_classes = (SessionAuthentication,)
 
     def get_queryset(self):
         return Game.objects.filter(published=self.request.user)
