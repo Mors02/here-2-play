@@ -5,9 +5,6 @@ import Homepage from './Home/Homepage';
 import AppRoutes from "./Routing/Route";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-
 
 function App() {
   return (

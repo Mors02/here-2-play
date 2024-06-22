@@ -44,7 +44,7 @@ class GameViewSet(viewsets.ModelViewSet):
 
 class YourGameList(generics.ListAPIView):
     serializer_class = GameSerializer
-    authentication_classes = (SessionAuthentication,)
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Game.objects.filter(published=self.request.user)
