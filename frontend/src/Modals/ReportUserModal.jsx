@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import Modal from 'react-modal';
 import { MdReport } from "react-icons/md";
 import { toast } from 'react-toastify';
+import { axiosConfig } from '../config/axiosConfig';
+import { ErrorMap } from '../config/enums';
 const customStyles = {
   content: {
     top: '50%',
@@ -14,16 +16,20 @@ const customStyles = {
   },
 };
 
-// Make sure to bind modal to your appElement (https://reactcommunity.org/react-modal/accessibility/)
-//Modal.setAppElement('#yourAppElement');
-
 export default function ReportUserModal({afterOpenModal, closeModal, modalIsOpen, userReported}) {
     const [selected, setSelected] = useState("ha")
 
     function report() {
         console.log(selected);
-        
-        toast.success("Segnalazione completata.", {onClose: () => {closeModal(); setSelected("ha")}})
+        axiosConfig.post('api/reports/', {userReported, selected})
+        .then(res => {
+            console.log(res)
+            toast.success("Segnalazione completata.", {onClose: () => {closeModal(); setSelected("ha")}})
+        })
+        .catch(err => {
+            console.log(err)
+            toast.error(ErrorMap[err["response"]["data"]]);
+        })
     }
 
     const causes ={

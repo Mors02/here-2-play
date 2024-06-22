@@ -1,7 +1,5 @@
 from django.shortcuts import render
 from rest_framework import generics
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.authentication import SessionAuthentication
 from .models import Game
 from .serializers import GameSerializer
 from rest_framework.response import Response
