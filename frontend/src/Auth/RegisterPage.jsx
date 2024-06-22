@@ -1,4 +1,5 @@
 import React, { Component, useEffect, useState } from "react";
+//import axios from "axios";
 import axios from "axios";
 import { useForm } from 'react-hook-form';
 import { Stack, Grid, TextField, Button } from "@mui/material";
@@ -12,9 +13,8 @@ import { ToastContainer, toast } from 'react-toastify';
 
 
 
-function LoginPage() {
+function RegisterPage() {
     const [error, setError] = useState("");
-    const { loggedIn } = useCurrentUser();
     const navigate = useNavigate();
     const {loggedIn, user} = useCurrentUser();
     const { login } = useAuth();
@@ -39,22 +39,28 @@ function LoginPage() {
     function onSubmit(e) {
         e.preventDefault();
         const data = getValues();
-        axios.post(`${process.env.REACT_APP_BASE_URL}/api/login/`, data, {
-            xsrfCookieName: "csrftoken",
-            xsrfHeaderName: "X-CSRFToken",
-            withCredentials: true,
-        }).then(response => {
+        if (data.password == data.confirmPassword) {
+            axios.post(`${process.env.REACT_APP_BASE_URL}/api/register/`, data, {
+                xsrfCookieName: "csrftoken",
+                xsrfHeaderName: "X-CSRFToken",
+                withCredentials: true,
+            }).then(response => {
                 console.log(response)
-                if (response.data) {
-                    toast.success("Login effettuato con successo.", {onClose: () => {login(); navigate("/")}})                   
+                if (response.message) {
+                    toast.success("Registrazione effettuato con successo.", {onClose: () => {login(); navigate("/login")}})                   
                 }
             })
-            .catch(error => {
+            .catch(error => {               
                 let errorType = error["response"]["data"];
                 setValue('password', null)
-                setError(ErrorMap[errorType]);
-                toast.error(ErrorMap[errorType]);
+                setValue('confirmPassword', null)
+                setError(ErrorMap[errorType])
+                toast.error(ErrorMap[errorType])
             });
+        } else {
+            toast.error("Le password non corrispondono!")
+        }
+        
         
     }
 
@@ -70,16 +76,22 @@ function LoginPage() {
                     <h2>Login</h2>
                     <form onSubmit={e => onSubmit(e)}>
                         <p>
+                            <TextField label="Username" type="text" defaultValue="" {...register("username")} variant="standard" />
+                        </p>
+                        <p>
                             <TextField label="Email" type="email" defaultValue="" {...register("email")} variant="standard" />
                         </p>
                         <p>
                             <TextField label="Password" type="password" defaultValue="" {...register("password")} variant="standard" />
                         </p>
                         <p>
-                            <Button type="submit" variant="contained" color="info">Entra</Button>
+                            <TextField label="Conferma Password" type="password" defaultValue="" {...register("confirmPassword")} variant="standard" />
                         </p>
                         <p>
-                           <span>Non sei ancora registrato?</span><a href="/register"> Registrati.</a>
+                            <Button type="submit" variant="contained" color="info">Registrati</Button>
+                        </p>
+                        <p>
+                           <span>Sei già registrato?</span><a href="/login"> Entra.</a>
                         </p>
                     </form>
                     {error != ""? <p class="">{error}</p> : <></>}
@@ -90,4 +102,4 @@ function LoginPage() {
     ); 
 }
 
-export default LoginPage;
+export default RegisterPage;

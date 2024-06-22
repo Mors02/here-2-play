@@ -5,6 +5,7 @@ import LoginPage from "../Auth/LoginPage";
 import YourGamesPage from "../Pages/YourGamesPage"
 import PublishGamePage from "../Pages/PublishGamePage";
 import GameDetailsPage from "../Pages/GameDetailsPage";
+import RegisterPage from "../Auth/RegisterPage";
 
 function AppRoutes() {
     return (
@@ -15,6 +16,7 @@ function AppRoutes() {
             <Route path="/your-games" element={<YourGamesPage />}></Route>
             <Route path="/publish" element={<PublishGamePage />}></Route>
             <Route path="/games/:gameId" element={<GameDetailsPage />}></Route>
+            <Route path="/register" element={<RegisterPage />}></Route>
         </Routes>
     )
 }
