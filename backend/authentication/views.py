@@ -137,10 +137,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
 #Classe per autenticare con la mail gli utenti
 class EmailBackend(ModelBackend):
-    def authenticate(self, request, username = None, password = None, **kwargs):
+    def authenticate(self, request, username=None, password=None, **kwargs):
         UserModel = get_user_model()
         try:
-            user = UserModel.objects.get(email = username)
+            user = UserModel.objects.get(email=username)
         except UserModel.DoesNotExist:
             return None
         else:

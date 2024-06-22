@@ -1,5 +1,4 @@
 import React, { Component, useEffect, useState } from "react";
-//import axios from "axios";
 import axios from "axios";
 import { useForm } from 'react-hook-form';
 import { Stack, Grid, TextField, Button } from "@mui/material";
@@ -12,8 +11,6 @@ import 'react-toastify/dist/ReactToastify.min.css';
 import { ToastContainer, toast } from 'react-toastify';
 import ErrorLabel from "../../Component/ErrorLabel";
 import { axiosConfig } from "../../config/axiosConfig";
-
-
 
 function LoginPage() {
     const [error, setError] = useState("");

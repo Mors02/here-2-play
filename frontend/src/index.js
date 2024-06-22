@@ -5,19 +5,24 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { AuthProvider } from "./config/AuthContext";
 import ToastProvider from './config/ToastProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <AuthProvider>   
+  <AuthProvider>    
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <ToastProvider>
         <BrowserRouter>
           <React.StrictMode>
-            <App />
+              <App />
           </React.StrictMode>
         </BrowserRouter>
-    </AuthProvider>
-  
+      </ToastProvider>
+    </LocalizationProvider>
+  </AuthProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -2,21 +2,20 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import make_password
 from .models import UserProfile
-
-UserModel = get_user_model()
+from django.contrib.auth.models import User
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserModel
+        model = User
         fields = '__all__'
 
     def create(self, clean_data, role):
-        alreadyRegistered = UserModel.objects.filter(email=clean_data["email"]).exists()
+        alreadyRegistered = User.objects.filter(email=clean_data["email"]).exists()
         if (alreadyRegistered):
             return None
         else:
             #se non trova lo user allora lo creiamo
-            user = UserModel.objects.create_user(
+            user = User.objects.create_user(
                 email = clean_data["email"],                 
                 username = clean_data["username"],
                 password = clean_data["password"]
@@ -51,7 +50,7 @@ class UserEditSerializer(serializers.Serializer):
     def edit(self, user, data):     
         #check if new email is already used
         try:
-            alreadyRegistered = UserModel.objects.filter(email=data["email"]).get()
+            alreadyRegistered = User.objects.filter(email=data["email"]).get()
         except:
             #no user found, go on with the validation
             alreadyRegistered = user
@@ -61,7 +60,7 @@ class UserEditSerializer(serializers.Serializer):
         
         #check if new username is already used
         try:
-            alreadyRegistered = UserModel.objects.filter(username=data["username"]).get()
+            alreadyRegistered = User.objects.filter(username=data["username"]).get()
         except:
             alreadyRegistered = user
         #and its not our user
@@ -83,7 +82,7 @@ class UserEditSerializer(serializers.Serializer):
                 self.context["message"] = "ERR_DIFFERENT_PASSWORDS"
 
         if (self.context["message"] == ""):
-            editedUser = UserModel.objects.filter(pk=user.pk).get()
+            editedUser = User.objects.filter(pk=user.pk).get()
             editedUser.username = data["username"]
             editedUser.email = data["email"]
             editedUser.first_name = data["first_name"]
