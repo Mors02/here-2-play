@@ -6,13 +6,8 @@ import axios from "axios";
 import { useAuth } from "../config/AuthContext";
 import { toast } from 'react-toastify';
 import useCurrentUser from "../config/UseCurrentUser";
-import { useAuth } from "../config/AuthContext";
-import { toast } from 'react-toastify';
-import useCurrentUser from "../config/UseCurrentUser";
 
 function Sidebar(props) {
-    const {onSelect} = props;
-    const {user, loggedIn} = useCurrentUser();
     const {onSelect} = props;
     const {user, loggedIn} = useCurrentUser();
     const navigate = useNavigate();
@@ -20,20 +15,9 @@ function Sidebar(props) {
     const [, forceUpdate] = useReducer(x => x + 1, 0);
 
     function handleLogout(e) {
-    const {logout} = useAuth();
-    const [, forceUpdate] = useReducer(x => x + 1, 0);
-
-    function handleLogout(e) {
         onSelect()
         axiosConfig.post("/api/logout/", {"refresh_token": getRefreshToken()})
-        axiosConfig.post("/api/logout/", {"refresh_token": getRefreshToken()})
         .then(res => {
-            logout();
-            localStorage.clear();
-            axiosConfig.defaults.headers.common['Authorization'] = null;
-            toast.success("Logout effettuato.", {onClose: () =>{forceUpdate(); navigate("/")}})
-        }).catch(err => {
-            console.log(err)
             logout();
             localStorage.clear();
             axiosConfig.defaults.headers.common['Authorization'] = null;
@@ -46,13 +30,12 @@ function Sidebar(props) {
     return (
         <Stack class="float-right w-52 h- bg-slate-500 min-h-dvh">
            <h3 class="text-xl m-10">Menu laterale</h3>
-           
+
             <nav class="mx-10">
                 <Stack>
-                    <Link to="/">Homepage</Link>
-                    <Link to="/your-games">Your Games</Link>
+                    <Link to="/" onClick={() => onSelect()}>Homepage</Link>
                     {loggedIn?
-                    <Link to="/user" onClick={onSelect}>Profilo</Link>: <></>
+                    <Link to={"/user/"+user.id} onClick={onSelect}>Profilo</Link>: <></>
                     }
                     { 
                         loggedIn

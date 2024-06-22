@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { TextField, Button, Stack, InputAdornment } from "@mui/material"
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { useForm } from 'react-hook-form';
-import { axiosConfig, getCookie } from '../axiosConfig';
+import { axiosConfig, getCookie } from '../config/axiosConfig';
 
 function PublishGamePage() {
     const [showDiscount, setShowDiscount] = useState(false)

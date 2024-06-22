@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { axiosConfig } from "../axiosConfig";
+import { axiosConfig } from "../config/axiosConfig";
 import { useParams } from "react-router-dom";
 
 function GameDetailsPage() {

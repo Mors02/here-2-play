@@ -1,4 +1,4 @@
-import { axiosConfig } from '../axiosConfig';
+import { axiosConfig } from '../config/axiosConfig';
 import { React, useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 import { Button } from '@mui/material';
