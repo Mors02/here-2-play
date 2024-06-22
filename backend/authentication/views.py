@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model, login, logout
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import UserEditSerializer, UserRegisterSerializer, UserLoginSerializer, UserSerializer
+from .serializers import UserEditSerializer, UserRegisterSerializer, UserLoginSerializer, UserSerializer, UserInfoSerializer
 from rest_framework import permissions, status
 from django.contrib.auth.backends import ModelBackend
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -92,7 +92,9 @@ class UserView(APIView):
         serializer = UserSerializer(profile)        
         return Response(serializer.data, status = status.HTTP_200_OK)
 
-class UserViewSet(viewsets.ViewSet):
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+
     def get_permissions(self):
         if (self.action == "update"):
             permission_classes = (permissions.IsAuthenticated,)
@@ -102,9 +104,13 @@ class UserViewSet(viewsets.ViewSet):
         return [permission() for permission in permission_classes]
     
     def retrieve(self, request, pk=None):
-        user = User.objects.get(pk=pk)
-        print(user)
-        pass
+        try:
+            user = User.objects.get(id=pk)
+            serializer = UserInfoSerializer(user)
+            print(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
     def update(self, request, pk=None):
         data = request.data        

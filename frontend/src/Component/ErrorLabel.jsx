@@ -5,7 +5,7 @@ export default function ErrorLabel({text}) {
 
     return(
         <>{text? 
-            <Container class="bg-red-300 rounded-md text-center shadow-xl my-4">
+            <Container className="bg-red-300 rounded-md text-center shadow-xl my-4">
                 <Typography variant="caption" color={"red"}>
                     {text}
                 </Typography>
