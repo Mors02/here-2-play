@@ -82,10 +82,13 @@ class UserEdit(APIView):
                                               "first_name": data["first_name"],
                                               "last_name": data["last_name"],
                                               "email": data["email"]},
-                                        context={"user": request.user})
+                                        context={"user": request.user, "message": ""})
         if (serializer.is_valid(raise_exception=True)):
             serializer.edit(user=request.user, data=request.data)
-            print(serializer.context)
+
+            if (serializer.context["message"] != ""):
+                return Response(serializer.context["message"], status=status.HTTP_400_BAD_REQUEST)
+            
             login(request, serializer.context["user"], 'authentication.views.EmailBackend')
             return Response(serializer.data, status=status.HTTP_200_OK)
         #check if oldpassword is correct
