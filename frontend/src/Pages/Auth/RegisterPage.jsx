@@ -52,7 +52,7 @@ function RegisterPage() {
                 toast.success("Registrazione effettuato con successo.", {onClose: () => {navigate("/login")}})                   
             })
             .catch(error => {               
-                let errorType = error["response"]["data"];
+                let errorType = error["response"]? error["response"]["data"] : "ERR_SERVER_ERROR";
                 setError(ErrorMap[errorType])
                 toast.error(ErrorMap[errorType])
             });

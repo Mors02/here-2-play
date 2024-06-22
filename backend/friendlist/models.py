@@ -2,6 +2,8 @@ from django.db import models
 from authentication.models import User
 
 class UserReport(models.Model):
+    class Meta:
+        db_table = "user_reports"
     HARASSMENT = "ha"
     SPAM = "sp"
     BOT = "bo"

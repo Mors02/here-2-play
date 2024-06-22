@@ -19,6 +19,7 @@ function AppRoutes() {
             <Route path="/games/:gameId" element={<GameDetailsPage />}></Route>
             <Route path="/register" element={<RegisterPage />}></Route>
             <Route path="/user/:id" element={<UserPage />}></Route>
+            <Route path="/user/" element={<UserEditPage />}></Route>
         </Routes>
     )
 }

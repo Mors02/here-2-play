@@ -4,6 +4,8 @@ from django.contrib.auth.hashers import make_password
 from .models import UserProfile
 from django.contrib.auth.models import User
 
+UserModel = get_user_model()
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
