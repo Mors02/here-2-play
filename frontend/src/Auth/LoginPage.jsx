@@ -4,7 +4,14 @@ import { useForm } from 'react-hook-form';
 import { Stack, Grid, TextField, Button } from "@mui/material";
 import CenterBox from "../Component/CenterBox";
 import { ErrorMap } from "../config/enums";
+import { ErrorMap } from "../config/enums";
 import { useNavigate } from "react-router-dom";
+import useCurrentUser from "../config/UseCurrentUser";
+import { useAuth } from "../config/AuthContext";
+import 'react-toastify/dist/ReactToastify.min.css';
+import { ToastContainer, toast } from 'react-toastify';
+import ErrorLabel from "../Component/ErrorLabel";
+import { axiosConfig } from "../config/axiosConfig";
 import useCurrentUser from "../config/UseCurrentUser";
 import { useAuth } from "../config/AuthContext";
 import 'react-toastify/dist/ReactToastify.min.css';
@@ -16,8 +23,13 @@ import { axiosConfig } from "../config/axiosConfig";
 
 function LoginPage() {
     const [error, setError] = useState("");
-    const { loggedIn } = useCurrentUser();
     const navigate = useNavigate();
+    const {loggedIn, user} = useCurrentUser();
+    const { login } = useAuth();
+    
+    //if already logged in
+    if (loggedIn) {
+        console.log(loggedIn)
     const {loggedIn, user} = useCurrentUser();
     const { login } = useAuth();
     
@@ -37,6 +49,25 @@ function LoginPage() {
     function onSubmit(e) {
         e.preventDefault();
         const data = getValues();
+        axios.post(`${process.env.REACT_APP_BASE_URL}/api/login/`, data).then(response => {
+                //console.log(response)
+                setError()
+                const data = response.data
+                console.log(data, data.access)
+                localStorage.setItem('access_token', data.access);
+                localStorage.setItem('refresh_token', data.refresh);
+                axiosConfig.defaults.headers.common['Authorization'] = 
+                                                `JWT ${data['access']}`;
+                toast.success("Login effettuato con successo.", {onClose: () => {login(); navigate("/")}})                   
+                
+            })
+            .catch(error => {
+                let errorType = error["response"]["data"];
+                setValue('password', null)
+                setError(ErrorMap[errorType]);
+                toast.error(ErrorMap[errorType]);
+            });
+        
         axios.post(`${process.env.REACT_APP_BASE_URL}/api/login/`, data).then(response => {
                 //console.log(response)
                 setError()
@@ -83,8 +114,13 @@ function LoginPage() {
                     <p>
                         <span>Non sei ancora registrato?</span><a href="/register"> Registrati.</a>
                     </p>
+                    <ErrorLabel text={error} />
+                    <p>
+                        <span>Non sei ancora registrato?</span><a href="/register"> Registrati.</a>
+                    </p>
                 </Stack>
             </CenterBox>
+             {/* Container in cui verranno renderizzati i toast */}
              {/* Container in cui verranno renderizzati i toast */}
         </Grid>
     ); 

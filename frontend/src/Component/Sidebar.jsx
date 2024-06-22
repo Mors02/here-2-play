@@ -6,8 +6,13 @@ import axios from "axios";
 import { useAuth } from "../config/AuthContext";
 import { toast } from 'react-toastify';
 import useCurrentUser from "../config/UseCurrentUser";
+import { useAuth } from "../config/AuthContext";
+import { toast } from 'react-toastify';
+import useCurrentUser from "../config/UseCurrentUser";
 
 function Sidebar(props) {
+    const {onSelect} = props;
+    const {user, loggedIn} = useCurrentUser();
     const {onSelect} = props;
     const {user, loggedIn} = useCurrentUser();
     const navigate = useNavigate();
@@ -15,9 +20,20 @@ function Sidebar(props) {
     const [, forceUpdate] = useReducer(x => x + 1, 0);
 
     function handleLogout(e) {
+    const {logout} = useAuth();
+    const [, forceUpdate] = useReducer(x => x + 1, 0);
+
+    function handleLogout(e) {
         onSelect()
         axiosConfig.post("/api/logout/", {"refresh_token": getRefreshToken()})
+        axiosConfig.post("/api/logout/", {"refresh_token": getRefreshToken()})
         .then(res => {
+            logout();
+            localStorage.clear();
+            axiosConfig.defaults.headers.common['Authorization'] = null;
+            toast.success("Logout effettuato.", {onClose: () =>{forceUpdate(); navigate("/")}})
+        }).catch(err => {
+            console.log(err)
             logout();
             localStorage.clear();
             axiosConfig.defaults.headers.common['Authorization'] = null;
