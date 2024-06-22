@@ -3,6 +3,7 @@ import Layout from "./Component/Layout";
 import Sidebar from "./Component/Sidebar";
 import Homepage from './Home/Homepage';
 import AppRoutes from "./Routing/Route";
+import { ToastContainer } from "react-toastify";
 
 function App() {
     return (

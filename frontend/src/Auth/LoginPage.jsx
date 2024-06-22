@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { Component, useEffect, useState } from "react";
 import axios from "axios";
 import { useForm } from 'react-hook-form';
 import { Stack, Grid, TextField, Button } from "@mui/material";
 import CenterBox from "../Component/CenterBox";
-import { ErrorMap } from "../enums";
+import { ErrorMap } from "../config/enums";
 import { useNavigate } from "react-router-dom";
-import { getCookie } from "../axiosConfig";
-import useCurrentUser from "./UseCurrentUser";
+import useCurrentUser from "../config/UseCurrentUser";
+import { useAuth } from "../config/AuthContext";
+import 'react-toastify/dist/ReactToastify.min.css';
+import { ToastContainer, toast } from 'react-toastify';
 
 
 
@@ -28,7 +30,6 @@ function LoginPage() {
     function onSubmit(e) {
         e.preventDefault();
         const data = getValues();
-
         axios.post(`${process.env.REACT_APP_BASE_URL}/api/login/`, data, {
             xsrfCookieName: "csrftoken",
             xsrfHeaderName: "X-CSRFToken",
@@ -66,12 +67,14 @@ function LoginPage() {
                             <TextField label="Password" type="password" defaultValue="" {...register("password")} variant="standard" />
                         </p>
                         <p>
-                            <Button type="submit" variant="contained" color="info">Entra</Button>
+                            <Button onClick={onSubmit} variant="contained" color="info">Entra</Button>
                         </p>
                     </form>
                     {error != ""? <p class="">{error}</p> : <></>}
                 </Stack>
+
             </CenterBox>
+            <ToastContainer /> {/* Container in cui verranno renderizzati i toast */}
         </Grid>
     ); 
 }

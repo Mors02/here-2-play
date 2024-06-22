@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { axiosConfig, getCookie } from '../axiosConfig';
+import { axiosConfig, getCookie } from './axiosConfig';
 
 export default function useCurrentUser() {
   const [auth, setAuth] = useState();
