@@ -6,12 +6,29 @@ import useCurrentUser from "../config/UseCurrentUser";
 import moment from 'moment';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
+import { FaPen } from "react-icons/fa";
+import { MdReport } from "react-icons/md";
+import ReportUserModal from "../Modals/ReportUserModal";
 
 export default function UserPage() {
     const [retrievedUser, setUser] = useState()
     const {user, loading} = useCurrentUser()
     const {id} = useParams()
     const [loadingPage, setLoading] = useState(true)
+
+    const [modalIsOpen, setIsOpen] = useState(false);
+
+    function openModal() {
+      setIsOpen(true);
+    }
+  
+    function afterOpenModal() {
+      // references are now sync'd and can be accessed.
+    }
+  
+    function closeModal() {
+      setIsOpen(false);
+    }
 
     function dateDiff(start) {
         const startDate = moment(start);
@@ -59,23 +76,29 @@ export default function UserPage() {
                         <Typography className="inline" variant="h3" >{retrievedUser.username} </Typography>
                         <Typography className="inline"> Registrato da {dateDiff(retrievedUser.date_joined)} </Typography>
                         {user && id == user.id?
-                            <Button variant="contained" sx={{marginTop: "11px", marginRight:"24px", float: "right"}} onClick={() => window.location.replace('/user')}>Modifica profilo</Button> :
-                            <></>
+                            <Button variant="contained" sx={{marginTop: "11px", marginRight:"24px", float: "right"}} onClick={() => window.location.replace('/user')}><FaPen /> Modifica profilo</Button> :
+                            <Button variant="contained" color="error" sx={{marginTop: "11px", marginRight:"24px", float: "right"}} onClick={() => openModal()}><MdReport /> Segnala</Button>
                         }
                     </Box>
                 </Box>
+                <ReportUserModal 
+                    afterOpenModal={afterOpenModal} 
+                    closeModal={closeModal} 
+                    modalIsOpen={modalIsOpen} 
+                    userReported={retrievedUser}
+                />
                 <Box className=" w-4/5 h-screen mx-auto" sx={{borderLeft:"1px solid #aaa", borderRight:"1px solid #aaa"}}>
                     <Tabs>
                         <TabList>
-                        <Tab>Libreria</Tab>
-                        <Tab>Giochi Pubblicati</Tab>
+                            <Tab>Libreria</Tab>
+                            <Tab>Giochi Pubblicati</Tab>
                         </TabList>
 
                         <TabPanel>
-                        <h2>Libreria</h2>
+                            <h2>Libreria</h2>
                         </TabPanel>
                         <TabPanel>
-                        <h2>Giochi pubblicati</h2>
+                            <h2>Giochi pubblicati</h2>
                         </TabPanel>
                     </Tabs>
                 </Box>
