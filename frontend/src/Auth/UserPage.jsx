@@ -12,7 +12,7 @@ import ErrorLabel from "../Component/ErrorLabel";
 
 
 function UserPage() {
-    const {user, loading, loggedIn} = useCurrentUser();
+    const {user, role, loading, loggedIn} = useCurrentUser();
     const [err, setError] = useState();
     const navigate = useNavigate();
     
@@ -44,7 +44,7 @@ function UserPage() {
         <Container>
             <CenterBox>
                 <Typography variant="h3">
-                    Ciao, {user.username}
+                    Ciao, {user.username}! Sei un {role.name}
                 </Typography>
                 <UserForm title={"Modifica dati"} onSubmit={onSubmit} isEdit={true} user={user}/>
                 <ErrorLabel text={err} />
