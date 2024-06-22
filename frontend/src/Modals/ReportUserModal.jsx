@@ -14,9 +14,6 @@ const customStyles = {
   },
 };
 
-// Make sure to bind modal to your appElement (https://reactcommunity.org/react-modal/accessibility/)
-//Modal.setAppElement('#yourAppElement');
-
 export default function ReportUserModal({afterOpenModal, closeModal, modalIsOpen, userReported}) {
     const [selected, setSelected] = useState("ha")
 
