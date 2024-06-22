@@ -1,27 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { axiosConfig } from "../axiosConfig"
+import GameList from '../Component/GameList';
 
 function Homepage() {
-    const [games, setGames] = useState([])
-
-    useEffect(() => {
-        axiosConfig.get("/api/games")
-        .then((res) =>
-            setGames(res.data)
-        )
-    }, [])
 
     return (
-        <div>
-            <h1>Store homepage</h1>
+        <div className='p-6'>
+            <h1 className='mb-4'>Store homepage</h1>
 
-            {
-                games.map(val => 
-                    <div>
-                        {val.title}
-                    </div>
-                )
-            }
+            <GameList />
         </div>
     );
 }
