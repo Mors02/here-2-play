@@ -23,6 +23,7 @@ function GameList() {
 
         return filteredGames.map(game => 
             <div key={game.id} onClick={() => navigate("/games/" + game.id)} className='bg-red-500 w-[15%] h-[250px] m-4'>
+                <img src={`../../../`} alt={game.title} />
                 { game.title }
             </div>
         )
