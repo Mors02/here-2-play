@@ -8,15 +8,15 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
-        <div className="App">
-          <ToastContainer autoClose={400} position="bottom-center" hideProgressBar/>
-          <header>
-            <div>
-              <Layout />            
-              <AppRoutes />
-            </div>
-          </header>
+    <div className="App">
+      <ToastContainer autoClose={400} position="bottom-center" hideProgressBar/>
+      <header>
+        <div>
+          <Layout />            
+          <AppRoutes />
         </div>
+      </header>
+    </div>
   );
 }
 

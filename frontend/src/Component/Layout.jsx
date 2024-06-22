@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from "react";
-import {axiosConfig, getCookie} from "../config/axiosConfig";
+import React, { useState, useEffect } from "react";
+import { axiosConfig, getCookie } from "../config/axiosConfig";
 import Sidebar from "./Sidebar";
 import { Container, Button, Box, Drawer, CircularProgress } from "@mui/material";
 import ReorderIcon from '@mui/icons-material/Reorder';
@@ -11,9 +11,7 @@ function Layout(props) {
     const {loggedIn, loading} = useCurrentUser();
     const { isAuthenticated, login, logout } = useAuth();
     
-
     return (
-        
         <Box>
             {!loading? <>
                 <Container class="min-h-12 bg-slate-500">
@@ -27,7 +25,7 @@ function Layout(props) {
                 </Drawer>
                 { props.children }  </> : <CircularProgress />
             }
-        </Box>              
+        </Box>             
     );
 }
 
