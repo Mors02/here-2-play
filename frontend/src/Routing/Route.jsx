@@ -7,6 +7,8 @@ import PublishGamePage from "../Pages/PublishGamePage";
 import GameDetailsPage from "../Pages/GameDetailsPage";
 import RegisterPage from "../Auth/RegisterPage";
 import UserPage from "../Auth/UserPage";
+import UserGamesPage from "../Pages/UserGamesPage"
+import PublishGamePage from "../Pages/PublishGamePage";
 
 function AppRoutes() {
     return (
@@ -19,6 +21,9 @@ function AppRoutes() {
             <Route path="/games/:gameId" element={<GameDetailsPage />}></Route>
             <Route path="/register" element={<RegisterPage />}></Route>
             <Route path="/user" element={<UserPage />}></Route>
+            {/* Forse c'è bisogno di fare un Protected Route per la creazione */}
+            <Route path="/your-games" element={<UserGamesPage />}></Route>
+            <Route path="/publish" element={<PublishGamePage />}></Route>
         </Routes>
     )
 }
