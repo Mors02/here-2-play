@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import make_password
+from .models import UserProfile
 from django.contrib.auth.models import User
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -18,6 +19,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
                 email = clean_data["email"],                 
                 username = clean_data["username"],
                 password = clean_data["password"]
+            )
+            profile = UserProfile.create(
+                user=user,                
             )
             #user.set_password(clean_data["password"])
             user.save()
@@ -40,12 +44,10 @@ class UserEditSerializer(serializers.Serializer):
     first_name = serializers.CharField(allow_null=True, allow_blank=True)
     last_name = serializers.CharField(allow_null=True, allow_blank=True)
 
-    def edit(self, user, data):
-        
-        
+    def edit(self, user, data):     
         #check if new email is already used
         try:
-            alreadyRegistered = UserModel.objects.filter(email=data["email"]).get()
+            alreadyRegistered = User.objects.filter(email=data["email"]).get()
         except:
             #no user found, go on with the validation
             alreadyRegistered = user
@@ -55,7 +57,7 @@ class UserEditSerializer(serializers.Serializer):
         
         #check if new username is already used
         try:
-            alreadyRegistered = UserModel.objects.filter(username=data["username"]).get()
+            alreadyRegistered = User.objects.filter(username=data["username"]).get()
         except:
             alreadyRegistered = user
         #and its not our user
@@ -77,7 +79,7 @@ class UserEditSerializer(serializers.Serializer):
                 self.context["message"] = "ERR_DIFFERENT_PASSWORDS"
 
         if (self.context["message"] == ""):
-            editedUser = UserModel.objects.filter(pk=user.pk).get()
+            editedUser = User.objects.filter(pk=user.pk).get()
             editedUser.username = data["username"]
             editedUser.email = data["email"]
             editedUser.first_name = data["first_name"]
