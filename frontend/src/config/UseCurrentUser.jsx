@@ -6,7 +6,7 @@ export default function useCurrentUser() {
   const [role, setRole] = useState();
   const [loading, setLoading] = useState(true);
     useEffect(() => {        
-        axiosConfig.get("/api/user/")
+        axiosConfig.get("/api/authuser/")
         .then(res => {        
             //console.log(res.data);    
             setUser(res.data.user);

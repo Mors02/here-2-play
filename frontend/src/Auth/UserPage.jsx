@@ -48,7 +48,7 @@ function UserPage() {
       };
     
     function onSubmit(e, values) {
-        axiosConfig.post('/api/user/edit/', values)
+        axiosConfig.put('/api/user/' + user.id +"/", values)
         .then(res => {
             setError()
             if (res.data && res.data.force_relogin)

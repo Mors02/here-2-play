@@ -5,7 +5,8 @@ urlpatterns = [
     path('register/', views.UserRegister.as_view(), name="register"),
     path('login/', views.UserLogin.as_view(), name="login"),
     path('logout/', views.UserLogout.as_view(), name="logout"),
-    path('user/edit/', views.UserEdit.as_view(), name='user-edit'),
+    path('user/<int:pk>/', views.UserViewSet.as_view({'put': 'update'}), name='user-update'),
+    path('user/<int:pk>/', views.UserViewSet.as_view({'get': 'retrieve'}), name='user-retrieve'),    
     path('user/change-role/', views.ChangeRole.as_view(), name="change-role"),
-    path('user/', views.UserView.as_view(), name='user'),    
+    path('authuser/', views.UserView.as_view(), name='user'),    
 ]
