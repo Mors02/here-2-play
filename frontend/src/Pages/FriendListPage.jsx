@@ -31,6 +31,7 @@ export default function FriendListPage({onClick}) {
 
     useEffect(() => {
         refreshFriendRequests()
+        refreshFriends()
     }, [])
 
     const handleChange = (event, newValue) => {        
@@ -42,6 +43,17 @@ export default function FriendListPage({onClick}) {
         .then((res) => {
             console.log(res.data)
             setFriendRequests(res.data)
+        })
+        .catch((err) => {
+            toast.error(ErrorMap["ERR_SERVER_ERROR"]);
+        })
+    }
+
+    function refreshFriends() {
+        axiosConfig.get("/api/friends/")
+        .then((res) => {
+            console.log(res.data)
+            setFriends(res.data)
         })
         .catch((err) => {
             toast.error(ErrorMap["ERR_SERVER_ERROR"]);
@@ -80,8 +92,22 @@ export default function FriendListPage({onClick}) {
             toast.error(ErrorMap[err["response"]["data"]])
         })
         .finally(() => {
-            refreshFriendRequests()   
+            refreshFriendRequests()
+            refreshFriends()   
         })
+    }
+
+    function deleteFriend(id) {
+        axiosConfig.delete("api/friends/"+id+"/")
+        .then(res => {
+            toast.success("Amicizia annullata correttamente.")
+        })
+        .catch(err => {
+            toast.error(ErrorMap[err["response"]["data"]])
+        })
+        .finally(
+            refreshFriends()
+        )
     }
 
     return (
@@ -98,9 +124,9 @@ export default function FriendListPage({onClick}) {
                 {friends.length == 0 && <Typography className="grid place-items-center justify-center !mt-4">Non hai nessun amico</Typography>}
                 {friends.map(friend => (
                         <Stack direction={"row"} className="border-solid border-b-2 border-black">
-                            <Typography variant="h6" className="pl-4 py-1" >{friend.name}</Typography>
+                            <Typography variant="h6" className="pl-4 py-1" >{friend.username}</Typography>
                             <CiChat1 className="ml-32 h-8 w-8 cursor-pointer" />
-                            <TbFriendsOff className="ml-2 h-8 w-8 cursor-pointer" color="red"/>
+                            <TbFriendsOff onClick={() => deleteFriend(friend.id)} className="ml-2 h-8 w-8 cursor-pointer" color="red"/>
                         </Stack>
                     ))}
             </PanelTab>

@@ -14,7 +14,7 @@ function Layout(props) {
     const {loggedIn, loading} = useCurrentUser();
     const [showFriends, setShowFriends] = useState(false);
     const location = window.location.href;
-    
+
     function toggleFriends(){
         setShowFriends(!showFriends)
     }
@@ -36,12 +36,12 @@ function Layout(props) {
 
             {loggedIn && shouldShowFriendlistInUrl(location)?
                 showFriends? 
-                    <Box className="bg-slate-400 fixed bottom-16 left-16 h-1/3 w-1/5 rounded-xl">
+                    <Box className="bg-slate-400 fixed bottom-12 left-12 h-1/3 w-1/5 rounded-xl">
                         
                         <FriendListPage onClick={() => toggleFriends()}/>
                     </Box> :
-                    <Box className="bg-slate-400 fixed bottom-16 left-16 min-h-12 min-w-12 rounded-3xl grid place-items-center justify-center cursor-pointer" onClick={() => toggleFriends()}>
-                        <FaUserFriends />
+                    <Box className="bg-slate-400 fixed bottom-12 left-12 min-h-16 min-w-16 rounded-full grid place-items-center justify-center cursor-pointer" onClick={() => toggleFriends()}>
+                        <FaUserFriends className="h-10 w-10" />
                     </Box> 
                 : <></>           
             }

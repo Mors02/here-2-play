@@ -42,7 +42,10 @@ class FriendRequestSerializer(serializers.ModelSerializer):
         requested = clean_data["user_requested"]
         try:
             #if a request already exists that is not denied, you cant create another
-            request = FriendRequest.objects.get((Q(user_requested_id=requested) & Q(user_requester_id=requester)) | (Q(user_requested_id=requester) & Q(user_requester_id=requested)) & ~Q(status=FriendRequest.DENIED))
+            request = FriendRequest.objects.get(
+                ((Q(user_requested_id=requested) & Q(user_requester_id=requester)) 
+                | (Q(user_requested_id=requester) & Q(user_requester_id=requested))) 
+                & ~Q(status=FriendRequest.DENIED))
             #request = FriendRequest.objects.get(Q(user_requested_id=requester) & Q(user_requester_id=requested) & ~Q(status=FriendRequest.DENIED))
             print(request)
             self.context["message"] = "ERROR"
@@ -71,6 +74,46 @@ class FriendRequestListSerializer(serializers.Serializer):
             {
                 "id": req.id,
                 "username": User.objects.get(id=req.user_requester.pk).username
+            }
+            for req in requestsObj
+        ]
+
+        self.context["requests"] = requestJson
+        return user
+
+class FriendshipSerializer(serializers.Serializer):
+    class Meta:
+        model = FriendRequest
+        fields = '__all__'
+
+    def create(self, data):
+        #create double friendship
+        friendship1 = Friendship(userA = data["userA"], userB = data["userB"])
+        friendship2 = Friendship(userB = data["userA"], userA = data["userB"])
+        friendship1.save()
+        friendship2.save()
+        return friendship1
+
+    def destroy(self, data):
+        Friendship.objects.get(userA = data["userA"], userB = data["userB"]).delete()
+        Friendship.objects.get(userB = data["userA"], userA = data["userB"]).delete()
+        FriendRequest.objects.get(((Q(user_requested_id=data["userA"]) & Q(user_requester_id=data["userB"])) 
+                | (Q(user_requested_id=data["userB"]) & Q(user_requester_id=data["userA"]))) 
+                & Q(status=FriendRequest.ACCEPTED)).delete()
+        
+        return None
+
+class FriendshipListSerializer(serializers.Serializer):
+    user = serializers.IntegerField()
+
+    def list(self, user):
+        
+        requestsObj = Friendship.objects.filter(userA_id=user)
+        
+        requestJson = [
+            {
+                "id": req.userB.pk,
+                "username": User.objects.get(id=req.userB.pk).username
             }
             for req in requestsObj
         ]

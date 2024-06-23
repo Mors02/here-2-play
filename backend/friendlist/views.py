@@ -2,10 +2,10 @@ from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from .serializer import UserReportSerializer, GameReportSerializer, FriendRequestSerializer, FriendRequestListSerializer
+from .serializer import UserReportSerializer, GameReportSerializer, FriendRequestSerializer, FriendRequestListSerializer, FriendshipSerializer, FriendshipListSerializer
 from authentication.models import User
 from games.models import Game
-from .models import FriendRequest
+from .models import FriendRequest, Friendship
 from django.utils import timezone
 
 class UserReportsView(viewsets.ModelViewSet):
@@ -115,9 +115,46 @@ class FriendRequestView(viewsets.ModelViewSet):
                 friendRequest.status = FriendRequest.DENIED
             elif (data["status"] == "acc"):
                 friendRequest.status = FriendRequest.ACCEPTED
-            friendRequest.save()
+                friendData = {"userA": friendRequest.user_requested, 
+                              "userB": friendRequest.user_requester}
+                serializer = FriendshipSerializer(data=friendData)
+                friendRequest.save()
+                if (serializer.is_valid(raise_exception=True)):
+                    serializer.create(data=friendData)
+                    return Response(status=status.HTTP_201_CREATED)
+                return Response("ERR_SERVER_ERROR",status=status.HTTP_400_BAD_REQUEST)
             return Response(status=status.HTTP_200_OK)
         except FriendRequest.DoesNotExist:
             return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
+        
+class FriendshipView(viewsets.ModelViewSet):
+    def get_permissions(self):
+        permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
+    def destroy(self, request, pk=None):
+        try:
+            #check if the user exists
+            friend = User.objects.get(id=pk)
+            #check if they are friends
+            friendship = Friendship.objects.get(userA_id=request.user.pk, userB_id=pk)
+            friendData = {"userA": pk, "userB": request.user.pk}
+            serializer = FriendshipSerializer(data=friendData)
+            if (serializer.is_valid(raise_exception=True)):
+                serializer.destroy(friendData)
+                return Response(status=status.HTTP_200_OK)
+            return Response("ERR_SERVER_ERROR", status=status.HTTP_400_BAD_REQUEST)
+        except Friendship.DoesNotExist:
+            return Response("ERR_RESOURCE_NOT_FOUND", status.HTTP_404_NOT_FOUND)
+        except User.DoesNotExist:
+            return Response("ERR_USER_NOT_FOUND", status.HTTP_404_NOT_FOUND)
+
+
+    def list(self, request):
+        user = request.user.pk
+        serializer = FriendshipListSerializer(data={"user": user})
+        if (serializer.is_valid(raise_exception=True)):
+            serializer.list(user=user)
+            requests = serializer.context["requests"]
+        return Response(requests, status=status.HTTP_200_OK)
         
