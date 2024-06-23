@@ -15,15 +15,10 @@ export default function UserPage() {
     const {user, loading} = useCurrentUser()
     const {id} = useParams()
     const [loadingPage, setLoading] = useState(true)
-
     const [modalIsOpen, setIsOpen] = useState(false);
 
     function openModal() {
       setIsOpen(true);
-    }
-  
-    function afterOpenModal() {
-      // references are now sync'd and can be accessed.
     }
   
     function closeModal() {
@@ -81,8 +76,7 @@ export default function UserPage() {
                         }
                     </Box>
                 </Box>
-                <ReportUserModal 
-                    afterOpenModal={afterOpenModal} 
+                <ReportUserModal  
                     closeModal={closeModal} 
                     modalIsOpen={modalIsOpen} 
                     userReported={retrievedUser}
