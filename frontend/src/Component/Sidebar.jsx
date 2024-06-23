@@ -34,9 +34,7 @@ function Sidebar(props) {
             <nav className="mx-10">
                 <Stack>
                     <Link to="/" onClick={() => onSelect()}>Homepage</Link>
-                    {loggedIn?
-                    <Link to={"/user/"+user.id} onClick={onSelect}>Profilo</Link>: <></>
-                    }
+                    {loggedIn && <a href={"/user/"+user.id} onClick={onSelect}>Profilo</a>}
                     { 
                         loggedIn
                         ?  <Button onClick={(e) => handleLogout(e)}  variant="text" color="error" >Logout</Button>

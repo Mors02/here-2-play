@@ -16,15 +16,15 @@ const customStyles = {
   },
 };
 
-export default function ReportUserModal({afterOpenModal, closeModal, modalIsOpen, userReported}) {
-    const [selected, setSelected] = useState("ha")
+export default function ReportGameModal({afterOpenModal, closeModal, modalIsOpen, gameReported}) {
+    const [selected, setSelected] = useState("ex")
 
     function report() {
         console.log(selected);
-        axiosConfig.post('api/reports/user', {userReported, selected})
+        axiosConfig.post('api/reports/game/', {gameReported, selected})
         .then(res => {
             console.log(res)
-            toast.success("Segnalazione completata.", {onClose: () => {closeModal(); setSelected("ha")}})
+            toast.success("Segnalazione completata.", {onClose: () => {closeModal(); setSelected("ex")}})
         })
         .catch(err => {
             console.log(err)
@@ -33,10 +33,10 @@ export default function ReportUserModal({afterOpenModal, closeModal, modalIsOpen
     }
 
     const causes ={
-        "ha": "Molestie",
-        "sp": "Spam",
-        "bo": "È un bot",
-        "sc": "È un truffatore",
+        "ex": "Contenuti sessuali",
+        "ha": "Incitamento all'odio",
+        "ra": "Razzismo",
+        "sc": "Truffa",
         "ot": "Altro"
     }
   return (
@@ -47,7 +47,7 @@ export default function ReportUserModal({afterOpenModal, closeModal, modalIsOpen
         style={customStyles}
         contentLabel="Example Modal"
       >
-            <Typography variant='h4' className='text-center'>Segnalazione {userReported.username}</Typography>
+            <Typography variant='h4' className='text-center'>Segnalazione {gameReported.name}</Typography>
             <Box>
                 <Stack>
                     <FormControl>
