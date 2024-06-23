@@ -32,9 +32,11 @@ class Game(models.Model):
     def __str__(self):
         return self.title + " - " + self.description + " - " + str(self.price)
     
-# Haven't been tested yet
 class GameAttachment(models.Model):
-    image = models.ImageField(upload_to="images/attachments/", default=None)
+    def upload_to(instance, filename):
+        return 'game_attachments/{filename}'.format(filename=filename)
+    
+    image_url = models.ImageField(upload_to=upload_to, default=None)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
     class Meta:

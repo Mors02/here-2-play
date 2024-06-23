@@ -9,9 +9,8 @@ import 'react-toastify/dist/ReactToastify.min.css';
 import { toast } from "react-toastify";
 import { ErrorMap } from "../../config/enums";
 import ErrorLabel from "../../Component/ErrorLabel";
-import { confirmAlert } from 'react-confirm-alert'; // Import
+import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
-
 
 function UserEditPage() {
     const {user, role, loading, loggedIn} = useCurrentUser();
