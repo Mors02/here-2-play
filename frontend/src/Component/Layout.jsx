@@ -5,12 +5,20 @@ import { Container, Button, Box, Drawer, CircularProgress } from "@mui/material"
 import ReorderIcon from '@mui/icons-material/Reorder';
 import useCurrentUser from "../config/UseCurrentUser";
 import { useAuth } from "../config/AuthContext";
+import { FaUserFriends } from "react-icons/fa";
+import { shouldShowFriendlistInUrl } from "../Routing/Route";
+import FriendListPage from "../Pages/FriendListPage";
 
 function Layout(props) {
     const [open, toggleDrawer] = useState(false);
     const {loggedIn, loading} = useCurrentUser();
-    const { isAuthenticated, login, logout } = useAuth();
+    const [showFriends, setShowFriends] = useState(false);
+    const location = window.location.href;
     
+    function toggleFriends(){
+        setShowFriends(!showFriends)
+    }
+
     return (
         <Box>
             {!loading? <>
@@ -21,9 +29,21 @@ function Layout(props) {
                     </div>
                 </Container>
                 <Drawer open={open} onClose={() => toggleDrawer(false) } anchor="right">
-                    <Sidebar authUser={isAuthenticated} onSelect={() => toggleDrawer(false)}/>
+                    <Sidebar onSelect={() => toggleDrawer(false)}/>
                 </Drawer>
                 { props.children }  </> : <CircularProgress />
+            }
+
+            {loggedIn && shouldShowFriendlistInUrl(location)?
+                showFriends? 
+                    <Box className="bg-slate-400 fixed bottom-16 left-16 h-1/3 w-1/5 rounded-xl">
+                        
+                        <FriendListPage onClick={() => toggleFriends()}/>
+                    </Box> :
+                    <Box className="bg-slate-400 fixed bottom-16 left-16 min-h-12 min-w-12 rounded-3xl grid place-items-center justify-center cursor-pointer" onClick={() => toggleFriends()}>
+                        <FaUserFriends />
+                    </Box> 
+                : <></>           
             }
         </Box>             
     );

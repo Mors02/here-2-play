@@ -8,8 +8,9 @@ import GameDetailsPage from "../Pages/GameDetailsPage";
 import RegisterPage from "../Pages/Auth/RegisterPage";
 import UserEditPage from "../Pages/Auth/UserEditPage";
 import UserPage from "../Pages/UserPage";
+import { blockedUrls } from "../config/enums";
 
-function AppRoutes() {
+export default function AppRoutes() {
     return (
         <Routes>
             <Route path="/" element={<Homepage />}></Route>
@@ -24,4 +25,8 @@ function AppRoutes() {
     )
 }
 
-export default AppRoutes
+export function shouldShowFriendlistInUrl(url) {
+    if (blockedUrls.some(s => (process.env.REACT_APP_FRONTEND_URL + "" + s == url)))
+        return false;
+    return true;
+}

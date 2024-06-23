@@ -2,10 +2,10 @@ from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from .serializer import UserReportSerializer, GameReportSerializer
+from .serializer import UserReportSerializer, GameReportSerializer, FriendRequestSerializer, FriendRequestListSerializer
 from authentication.models import User
 from games.models import Game
-import pytz
+from .models import FriendRequest
 from django.utils import timezone
 
 class UserReportsView(viewsets.ModelViewSet):
@@ -72,3 +72,52 @@ class GameReportsView(viewsets.ModelViewSet):
     def list(self, request, pk=None):
         pass
 
+class FriendRequestView(viewsets.ModelViewSet):
+    def get_permissions(self):
+        permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+    
+    def create(self, request):
+        try:
+            #check if user exists
+            friend = User.objects.get(username=request.data["username"])
+            if (friend.pk == request.user.pk):
+                return Response("ERR_SELF_FRIEND", status=status.HTTP_400_BAD_REQUEST)
+
+            clean_data = {"user_requester": request.user.pk, "user_requested": friend.pk, "date": timezone.now()}
+            serializer = FriendRequestSerializer(data=clean_data, context={"message": ""})
+            if (serializer.is_valid(raise_exception=True)):
+                serializer.create(clean_data=clean_data)
+                print(serializer.context["message"])
+                if (serializer.context["message"] != ""):
+                    return Response("ERR_ALREADY_REQUESTED", status=status.HTTP_409_CONFLICT)
+                print(serializer.data)
+                return Response(status=status.HTTP_200_OK)
+
+            return Response("ERR_SERVER_ERROR", status=status.HTTP_400_BAD_REQUEST)  
+        except User.DoesNotExist:
+            return Response("ERR_USER_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
+
+
+    def list(self, request):
+        user = request.user.pk
+        serializer = FriendRequestListSerializer(data={"user": user})
+        if (serializer.is_valid(raise_exception=True)):
+            serializer.list(user=user)
+            requests = serializer.context["requests"]
+        return Response(requests, status=status.HTTP_200_OK)
+
+    def partial_update(self, request, pk=None):
+        data = request.data
+        try:
+            friendRequest = FriendRequest.objects.get(id=pk)
+            if (data["status"] == "den"):
+                friendRequest.status = FriendRequest.DENIED
+            elif (data["status"] == "acc"):
+                friendRequest.status = FriendRequest.ACCEPTED
+            friendRequest.save()
+            return Response(status=status.HTTP_200_OK)
+        except FriendRequest.DoesNotExist:
+            return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
+
+        
