@@ -140,7 +140,7 @@ export default function FriendListPage({onClick}) {
                 {friends.length == 0 && <Typography className="grid place-items-center justify-center !mt-4">Non hai nessun amico</Typography>}
                 {friends.map(friend => (
                         <Stack direction={"row"} className="border-solid border-b-2 border-black">
-                            <Typography variant="h6" className="pl-4 py-1" >{friend.username}</Typography>
+                            <Typography variant="h6" className="pl-4 py-1" ><a href={"/user/"+friend.id}>{friend.username}</a></Typography>
                             <CiChat1 className="ml-32 h-8 w-8 cursor-pointer" />
                             <TbFriendsOff onClick={() => deleteFriend(friend.username, friend.id)} className="ml-2 h-8 w-8 cursor-pointer" color="red"/>
                         </Stack>
