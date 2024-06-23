@@ -111,19 +111,22 @@ class FriendRequestView(viewsets.ModelViewSet):
         data = request.data
         try:
             friendRequest = FriendRequest.objects.get(id=pk)
+
             if (data["status"] == "den"):
                 friendRequest.status = FriendRequest.DENIED
+                friendRequest.save()
+                return Response(status=status.HTTP_200_OK)
+            
             elif (data["status"] == "acc"):
                 friendRequest.status = FriendRequest.ACCEPTED
-                friendData = {"userA": friendRequest.user_requested, 
-                              "userB": friendRequest.user_requester}
+                friendData = {"userA": friendRequest.user_requested, "userB": friendRequest.user_requester}
                 serializer = FriendshipSerializer(data=friendData)
                 friendRequest.save()
                 if (serializer.is_valid(raise_exception=True)):
                     serializer.create(data=friendData)
                     return Response(status=status.HTTP_201_CREATED)
-                return Response("ERR_SERVER_ERROR",status=status.HTTP_400_BAD_REQUEST)
-            return Response(status=status.HTTP_200_OK)
+                
+            return Response("ERR_SERVER_ERROR",status=status.HTTP_400_BAD_REQUEST)
         except FriendRequest.DoesNotExist:
             return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
         

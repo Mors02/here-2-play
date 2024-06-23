@@ -7,6 +7,8 @@ import { axiosConfig } from "../config/axiosConfig";
 import { toast } from "react-toastify";
 import { ErrorMap } from "../config/enums";
 import { FaCheck } from "react-icons/fa6";
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; 
 //import { TabPanel, Tabs, TabList, Tab } from "react-tabs";
 
 export function PanelTab(props) {
@@ -97,17 +99,31 @@ export default function FriendListPage({onClick}) {
         })
     }
 
-    function deleteFriend(id) {
-        axiosConfig.delete("api/friends/"+id+"/")
-        .then(res => {
-            toast.success("Amicizia annullata correttamente.")
-        })
-        .catch(err => {
-            toast.error(ErrorMap[err["response"]["data"]])
-        })
-        .finally(
-            refreshFriends()
-        )
+    function deleteFriend(username, id) {
+        confirmAlert({
+            title: 'Vuoi annullare l\'amicizia con '+ username +'?',
+            message: 'Potrai fare una nuova richiesta di amicizia quando vuoi.',
+            buttons: [
+            {
+                label: 'Procedi',
+                onClick: () => {
+                    axiosConfig.delete("api/friends/"+id+"/")
+                    .then(res => {
+                        toast.success("Amicizia annullata correttamente.")
+                    })
+                    .catch(err => {
+                        toast.error(ErrorMap[err["response"]["data"]])
+                    })
+                    .finally(() => {
+                        refreshFriends()
+                    })
+                }
+            },
+            {
+                label: 'Indietro'
+            }
+            ]
+        });        
     }
 
     return (
@@ -126,7 +142,7 @@ export default function FriendListPage({onClick}) {
                         <Stack direction={"row"} className="border-solid border-b-2 border-black">
                             <Typography variant="h6" className="pl-4 py-1" >{friend.username}</Typography>
                             <CiChat1 className="ml-32 h-8 w-8 cursor-pointer" />
-                            <TbFriendsOff onClick={() => deleteFriend(friend.id)} className="ml-2 h-8 w-8 cursor-pointer" color="red"/>
+                            <TbFriendsOff onClick={() => deleteFriend(friend.username, friend.id)} className="ml-2 h-8 w-8 cursor-pointer" color="red"/>
                         </Stack>
                     ))}
             </PanelTab>

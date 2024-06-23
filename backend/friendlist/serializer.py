@@ -68,7 +68,7 @@ class FriendRequestListSerializer(serializers.Serializer):
 
     def list(self, user):
         
-        requestsObj = FriendRequest.objects.filter(user_requested_id=user, status=FriendRequest.PENDING).select_related("user_requester")
+        requestsObj = FriendRequest.objects.filter(user_requested_id=user, status=FriendRequest.PENDING)
         
         requestJson = [
             {
