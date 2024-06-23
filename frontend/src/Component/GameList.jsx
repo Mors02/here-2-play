@@ -10,9 +10,9 @@ function GameList() {
 
     useEffect(() => {
         axiosConfig.get("/api/games")
-            .then((res) =>
+            .then((res) => {
                 setGames(res.data)
-            )
+            })
     }, [])
 
     function Games() {
@@ -21,11 +21,12 @@ function GameList() {
 
         filteredGames = games.length > maxHomepageGames ? games.slice(0, maxHomepageGames) : games
 
-        return filteredGames.map(game => 
-            <div key={game.id} onClick={() => navigate("/games/" + game.id)} className='bg-red-500 w-[15%] h-[250px] m-4'>
-                <img src={`../../../`} alt={game.title} />
-                { game.title }
-            </div>
+        return filteredGames.map(game => {
+                return <div key={game.id} onClick={() => navigate("/games/" + game.id)} className='bg-red-500 w-[15%] h-[250px] m-4'>
+                    <img src={process.env.REACT_APP_BASE_URL + game.image_url} />
+                    { game.title }
+                </div>
+            }
         )
     }
 

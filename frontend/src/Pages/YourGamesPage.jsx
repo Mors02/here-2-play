@@ -5,18 +5,22 @@ import { Button } from '@mui/material';
 
 function UserGamesPage() {
     const [games, setGames] = useState([])
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        axiosConfig.get('/api/games/')
+        axiosConfig.get('/api/your-games/')
             .then(
-                (res) => {setGames(res.data); console.log(res.data)}
+                (res) => {
+                    setGames(res.data); console.log(res.data)
+                    setLoading(false)
+                }
             )
     }, [])
 
     return (
         <div>
             {
-                games.map((val) =>
+                !loading && games.map((val) =>
                     <p>{val.title} - {val.price} €</p>
                 )
             }

@@ -5,5 +5,6 @@ from . import views
 urlpatterns = [
     path('games/', views.GameViewSet.as_view({'get': 'list'})),
     path('games/<int:pk>/', views.GameViewSet.as_view({'get': 'retrieve'})),
+    path('games/create/', views.GameViewSet.as_view({'put': 'create'})),
     path("your-games/", views.YourGameList.as_view()),
 ]

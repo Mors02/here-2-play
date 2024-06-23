@@ -27,7 +27,7 @@ class GameViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     def create(self, request):
-        clean_data = {"title": request.data["title"], "description": request.data["description"], "publisher": self.request.user.pk, "price": request.data["price"]} #TODO: VALIDATE DATA
+        clean_data = {"title": request.data["title"], "description": request.data["description"], "publisher": self.request.user.pk, "price": request.data["price"], "image_url": request.data["image_url"]} #TODO: VALIDATE DATA
         print(clean_data)
         serializer = GameSerializer(data=clean_data)
         if serializer.is_valid(raise_exception = True):
@@ -47,4 +47,4 @@ class YourGameList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Game.objects.filter(published=self.request.user)
+        return Game.objects.filter(publisher=self.request.user)

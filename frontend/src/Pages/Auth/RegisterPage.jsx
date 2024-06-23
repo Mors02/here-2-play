@@ -67,26 +67,26 @@ function RegisterPage() {
             direction="column"
             alignItems="center"
             justifyContent="center"
-            class="flex items-center min-h-screen bg-slate-300 justify-center">
+            className="flex items-center min-h-screen bg-slate-300 justify-center">
             <CenterBox>
                 {showRoles?
                 <Container>
                     <Button variant="contained" onClick={() => setShowRoles(false)}><FaAngleLeft />Indietro</Button>
                     <Stack direction={"row"}>
                         <RoleButton selected={selectedButton} 
-                            icon={<IoGameController class={iconClass}/>} 
+                            icon={<IoGameController className={iconClass}/>} 
                             onClick={() => clickRoleButton('player')} 
                             name='Giocatore'
                             slug="player"
                             description={"Compra e gioca tutti i giochi che vuoi. Più semplice di così!"} />
                         <RoleButton selected={selectedButton} 
-                            icon={<FaComputer class={iconClass}/>} 
+                            icon={<FaComputer className={iconClass}/>} 
                             onClick={() => clickRoleButton('developer')} 
                             name="Developer" 
                             slug="developer"
                             description={"Carica i tuoi giochi sullo store per milioni di giocatori pronti a giocarlo."} />
                     </Stack>
-                    {selectedButton? <Button onClick={sendData} class="mt-12" variant="contained">Completa registrazione.</Button> : <></>}
+                    {selectedButton? <Button onClick={sendData} className="mt-12" variant="contained">Completa registrazione.</Button> : <></>}
                 </Container>
                 :
                 <>
