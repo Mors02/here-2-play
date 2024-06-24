@@ -14,7 +14,7 @@ export default function UserPage() {
     const [retrievedUser, setUser] = useState()
     const {user, loading} = useCurrentUser()
     const {id} = useParams()
-    const [loadingPage, setLoading] = useState(true)
+    const [loadingPage, setLoading] = useState(true);
     const [modalIsOpen, setIsOpen] = useState(false);
 
     function openModal() {
@@ -50,6 +50,7 @@ export default function UserPage() {
     useEffect(() => {
         axiosConfig.get('/api/user/'+id+"/")
         .then(res => {
+            console.log(res.data)
             setLoading(false);
             setUser(res.data);
             console.log(res);
@@ -62,7 +63,7 @@ export default function UserPage() {
     
 
     return (
-        <Box className="w-screen">
+        <Box className="w-screen overflow-x-hidden">
         {
             loadingPage || loading? <LinearProgress /> :
             <>
@@ -90,6 +91,7 @@ export default function UserPage() {
 
                         <TabPanel>
                             <h2>Libreria</h2>
+                            {retrievedUser.games.map(game => (<p>{game.details.title}</p>))}
                         </TabPanel>
                         <TabPanel>
                             <h2>Giochi pubblicati</h2>
