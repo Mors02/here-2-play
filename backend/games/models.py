@@ -3,17 +3,6 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-class Discount(models.Model):
-    percentage = models.PositiveIntegerField()
-    start_date = models.DateField()
-    end_date = models.DateField()
-
-    class Meta:
-        db_table = "discounts"
-    
-    def __str__(self):
-        return self.percentage
-
 class Game(models.Model):
     def covers(instance, filename):
         return 'game_covers/{filename}'.format(filename=filename)
@@ -28,7 +17,6 @@ class Game(models.Model):
     image = models.ImageField(upload_to=covers, default=None)
     uploaded_file = models.FileField(upload_to=files, default=None)
     publisher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="games")
-    discount = models.ForeignKey(Discount, blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:
         db_table = "games"
@@ -45,3 +33,15 @@ class GameAttachment(models.Model):
 
     class Meta:
         db_table = "game_attachments"
+
+class Discount(models.Model):
+    percentage = models.PositiveIntegerField()
+    start_date = models.DateField()
+    end_date = models.DateField()
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='discounts_game')
+
+    class Meta:
+        db_table = "discounts"
+    
+    def __str__(self):
+        return str(self.percentage)

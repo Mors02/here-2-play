@@ -11,4 +11,7 @@ urlpatterns = [
 
     path('games/<int:pk>/attachments/', views.GameAttachmentViewSet.as_view({'get': 'list'})),
     path('attachments/<int:pk>/', views.GameAttachmentViewSet.as_view({'delete': 'destroy'})),
+
+    path('games/<int:pk>/discounts/', views.DiscountViewSet.as_view({'post': 'create'})),
+    path('discounts/<int:pk>/', views.DiscountViewSet.as_view({'delete': 'destroy'})),
 ]
