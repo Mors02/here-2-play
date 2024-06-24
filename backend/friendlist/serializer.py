@@ -47,7 +47,6 @@ class FriendRequestSerializer(serializers.ModelSerializer):
                 | (Q(user_requested_id=requester) & Q(user_requester_id=requested))) 
                 & ~Q(status=FriendRequest.DENIED))
             #request = FriendRequest.objects.get(Q(user_requested_id=requester) & Q(user_requester_id=requested) & ~Q(status=FriendRequest.DENIED))
-            print(request)
             self.context["message"] = "ERROR"
         #    return None
         except FriendRequest.DoesNotExist:

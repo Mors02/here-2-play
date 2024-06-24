@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import make_password
 from .models import UserProfile
 from django.contrib.auth.models import User
+from orders.serializers import GamesBoughtSerializer
 
 UserModel = get_user_model()
 
@@ -109,6 +110,8 @@ class UserSerializer(serializers.ModelSerializer):
         depth = 1  
 
 class UserInfoSerializer(serializers.ModelSerializer):
+    games = GamesBoughtSerializer(source="games_bought_user", many=True, read_only=True)
+
     class Meta:
         model = UserModel
-        fields = ["username", "date_joined"]
+        fields = ["username", "date_joined", "id", "games"]

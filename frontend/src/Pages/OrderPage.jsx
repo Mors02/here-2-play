@@ -1,0 +1,144 @@
+import { Typography, Button, Box, Stack } from "@mui/material";
+import React, { useEffect, useReducer, useState } from "react";
+import { axiosConfig } from "../config/axiosConfig";
+import { toast } from "react-toastify";
+import { ErrorMap } from "../config/enums";
+import PaymentModal from "../Modals/PaymentModal";
+
+export default function OrderPage() {
+    const initialState =  {totalCost: 0}
+    const initializer = initialState => initialState
+    const [games, setGames] = useState([])
+    const [order, setOrder] = useState({})
+    const [loading, isLoading] = useState(true)
+    const [state, dispatch] = useReducer(reducer, initialState, initializer);
+    const [showModal, setShowModal] = useState(false)
+
+    const openModal = () => setShowModal(true)
+    const closeModal = () => setShowModal(false)
+
+    useEffect(() => {
+        dispatch({type: "reset", totalCost: initialState})
+        refreshGames()
+    }, [])
+    
+    function reducer (state, action) {
+        if (action.type == "reset")
+            return initializer(action.totalCost)
+        return {totalCost: state.totalCost + action.price}
+    }
+    
+    function refreshGames() {
+        axiosConfig.get('api/orders/')
+        .then((res) => {
+            if (res.data == "")
+                return
+            if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                throw new Error(res["response"]["data"])
+            setOrder(res.data)
+            setGames(res.data.games)
+            res.data.games.map(game => {
+                let price = game.details.price;
+                dispatch({price: +price, type: "add"})
+            })
+            isLoading(false)
+        })
+        .catch(err => {
+            toast.error(ErrorMap[err.message])
+            console.log(err)
+        })
+    }
+
+    function deleteGame(id) {
+        axiosConfig.delete('api/orders/game/' + id + "/")
+        .then(res => {
+            if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                throw new Error(res["response"]["data"])
+        })
+        .catch(err => {
+            toast.error(ErrorMap[err.message])
+            console.log(err)
+        })
+        .finally(() => {
+            dispatch({type: "reset", totalCost: initialState})
+            refreshGames()
+        })
+    }
+    const normalStyle = "border-b-2 min-w-60 min-h-16 border-black py-8"
+    return (
+        <Box>
+            <Typography variant="h6">Carrello</Typography>
+            <Stack className="flex justify-start max-h-full overflow-auto ">               
+                {games.map((game, index) => (
+                    <Box className={index==0? normalStyle + " border-t-2" : normalStyle}>
+                        <Typography>{game.details.title}</Typography>
+                        <Typography className="float-right">€ {game.details.price}</Typography>
+                        <Button onClick={() => deleteGame(game.id)}color={"error"} variant={"contained"}>Rimuovi</Button>
+                    </Box>
+                ))}
+            </Stack>
+            <Stack>
+                {/* il costo totale va dimezzato perché in strict mode */}
+                {games.length == 0 && <Typography variant="h3">Il tuo carrello è vuoto. Riempilo!</Typography>}
+                <Typography variant="h5" className="float-right">Subtotale: € {!loading? (state.totalCost).toFixed(2) : 0}</Typography>
+                <Button variant="contained" onClick={() => openModal()} disabled={games.length == 0}>Completa ordine</Button>
+            </Stack>
+            <PaymentModal modalIsOpen={showModal} openModal={openModal} closeModal={closeModal} order={order}/>
+        </Box>
+    )
+}
+
+export function OrderDropdown() {
+    const [games, setGames] = useState([])
+    const [loading, isLoading] = useState(true)
+    const [state, dispatch] = useReducer((state, action) => {return {totalCost: state.totalCost + action.price}}, {totalCost: 0});
+
+    useEffect(() => {
+        axiosConfig.get('api/orders/')
+        .then((res) => {
+            if (res.data == "") {
+                return
+            }
+                
+            setGames(res.data.games)
+            res.data.games.map(game => {
+                let price = game.details.price;
+                dispatch({price: +price})
+                console.log(state.totalCost)
+            })
+            isLoading(false)
+        })
+        .catch(err => {
+            console.log(err)
+        })
+
+    }, [])
+    // const games = [
+    //     {"name": "asdasd"},
+    //     {"name": "asdasd"},
+    //     {"name": "asdasd"},
+    //     {"name": "asdasd"}
+        
+    // ];
+    const normalStyle = "border-b-2 min-w-60 min-h-16 border-black "
+
+    return(
+        <Box className="bg-slate-400 shadow-lg w-64 grid justify-center place-items-center p-2 h-screen overflow-x-hidden">
+            <Typography variant="h6">Carrello</Typography>
+            <Stack className="flex justify-start max-h-full overflow-auto ">
+                {games.length == 0 && <Typography variant="h3">Vuoto...</Typography>}              
+                {games.map((game, index) => (
+                    <Box className={index==0? normalStyle + " border-t-2" : normalStyle}>
+                        <Typography>{game.details.title}</Typography>
+                        <Typography className="float-right">€ {game.details.price}</Typography>
+                    </Box>
+                ))}
+            </Stack>
+            <Stack>
+                {/* il costo totale va dimezzato perché in strict mode */}
+                <Typography variant="h5">Subtotale: € {!loading? (state.totalCost/2).toFixed(2) : 0}</Typography>
+                <a href="/cart"><Button variant="contained">Vai alla pagina del carrello</Button></a>
+            </Stack>
+        </Box>
+    );
+}

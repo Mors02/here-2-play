@@ -6,6 +6,7 @@ import { MdReport } from "react-icons/md";
 import ReportGameModal from "../Modals/ReportGameModal";
 import { toast } from "react-toastify";
 import { ErrorMap } from "../config/enums";
+import 'react-toastify/dist/ReactToastify.min.css';
 
 function GameDetailsPage() {
     const { gameId } = useParams()
@@ -32,6 +33,19 @@ function GameDetailsPage() {
             })
     }, [])
 
+    function addGame() {
+        axiosConfig.post('api/orders/add-game/', {game_id: gameId})
+            .then(res => {
+                if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")
+                    throw new Error(res["response"]["data"])
+                console.log(res.data)
+                toast.success("Gioco aggiunto al carrello.")
+            })
+            .catch(err => {
+                toast.error(ErrorMap[err.message])
+            })
+    }
+
     return (
         <div>
              {
@@ -47,6 +61,7 @@ function GameDetailsPage() {
                         modalIsOpen={modalIsOpen} 
                         gameReported={game}
                     />
+                    <Button variant="contained" onClick={() => addGame()}color="info">Aggiungi al carrello</Button>
                 </>  
                 : 
                 <></>
