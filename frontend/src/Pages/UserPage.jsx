@@ -9,6 +9,7 @@ import 'react-tabs/style/react-tabs.css';
 import { FaPen } from "react-icons/fa";
 import { MdReport } from "react-icons/md";
 import ReportUserModal from "../Modals/ReportUserModal";
+import YourGames from "../Component/YourGames"
 
 export default function UserPage() {
     const [retrievedUser, setUser] = useState()
@@ -67,7 +68,7 @@ export default function UserPage() {
         {
             loadingPage || loading? <LinearProgress /> :
             <>
-                <Box className="bg-slate-400 p-2 ">
+                <Box className="bg-slate-400 p-2">
                     <Box>
                         <Typography className="inline" variant="h3" >{retrievedUser.username} </Typography>
                         <Typography className="inline"> Registrato da {dateDiff(retrievedUser.date_joined)} </Typography>
@@ -94,12 +95,11 @@ export default function UserPage() {
                             {retrievedUser.games.map(game => (<p>{game.details.title}</p>))}
                         </TabPanel>
                         <TabPanel>
-                            <h2>Giochi pubblicati</h2>
+                            <YourGames />
                         </TabPanel>
                     </Tabs>
                 </Box>
             </>
-        
         }
         </Box>
     )

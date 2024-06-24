@@ -6,7 +6,7 @@ export default function RoleButton({icon, selected, onClick, slug, name, descrip
     const selectedClass = "bg-slate-200 border-4 border-solid border-black rounded-md shadow-2xl min-h-64 w-64 m-3 px-3"
     return (
         <Container>
-            <Button onClick={onClick} class={selected == slug? selectedClass : normalClass}>
+            <Button onClick={onClick} className={selected == slug? selectedClass : normalClass}>
                 {icon}               
                 <Typography variant="h3">{name}</Typography>
                 <Typography>{description}</Typography>

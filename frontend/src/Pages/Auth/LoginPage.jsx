@@ -61,7 +61,7 @@ function LoginPage() {
             direction="column"
             alignItems="center"
             justifyContent="center"
-            class="flex items-center min-h-screen bg-slate-300 justify-center">
+            className="flex items-center min-h-screen bg-slate-300 justify-center">
             <CenterBox>
                 <Stack direction="column">
                     <h2>Login</h2>
