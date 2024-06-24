@@ -4,12 +4,14 @@ from .models import Game, Discount, GameAttachment
 class GameAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = GameAttachment
-        fields = ["id", "image_url", "game"]
+        fields = ["id", "image", "game"]
     
 class GameSerializer(serializers.ModelSerializer):
+    attachments = GameAttachmentSerializer(source="game_attachments_game", many=True, read_only=True)
+
     class Meta:
         model = Game
-        fields = ["id", "title", "description", "upload_date", "publisher", "discount", "price", 'image_url']
+        fields = ["id", "title", "description", "upload_date", "publisher", "discount", "price", 'image', 'uploaded_file', 'attachments']
         extra_kargs = {"publisher": {"read_only": True}}
 
 class DiscountSerializer(serializers.ModelSerializer):

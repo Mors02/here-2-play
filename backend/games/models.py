@@ -15,14 +15,18 @@ class Discount(models.Model):
         return self.percentage
 
 class Game(models.Model):
-    def upload_to(instance, filename):
+    def covers(instance, filename):
         return 'game_covers/{filename}'.format(filename=filename)
+    
+    def files(instance, filename):
+        return 'game_files/{filename}'.format(filename=filename)
 
     title = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
     upload_date = models.DateTimeField(auto_now_add=True)
-    image_url = models.ImageField(upload_to=upload_to, default=None)
+    image = models.ImageField(upload_to=covers, default=None)
+    uploaded_file = models.FileField(upload_to=files, default=None)
     publisher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="games")
     discount = models.ForeignKey(Discount, blank=True, null=True, on_delete=models.CASCADE)
 
@@ -33,11 +37,11 @@ class Game(models.Model):
         return self.title + " - " + self.description + " - " + str(self.price)
     
 class GameAttachment(models.Model):
-    def upload_to(instance, filename):
+    def attachments(instance, filename):
         return 'game_attachments/{filename}'.format(filename=filename)
     
-    image_url = models.ImageField(upload_to=upload_to, default=None)
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to=attachments, default=None)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="game_attachments_game")
 
     class Meta:
         db_table = "game_attachments"
