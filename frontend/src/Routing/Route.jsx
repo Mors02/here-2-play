@@ -9,6 +9,7 @@ import RegisterPage from "../Pages/Auth/RegisterPage";
 import UserEditPage from "../Pages/Auth/UserEditPage";
 import UserPage from "../Pages/UserPage";
 import { blockedUrls } from "../config/enums";
+import OrderPage from "../Pages/OrderPage";
 
 export default function AppRoutes() {
     return (
@@ -21,6 +22,7 @@ export default function AppRoutes() {
             <Route path="/register" element={<RegisterPage />}></Route>
             <Route path="/user/:id" element={<UserPage />}></Route>
             <Route path="/user/" element={<UserEditPage />}></Route>
+            <Route path="/cart" element={<OrderPage />}></Route>
         </Routes>
     )
 }

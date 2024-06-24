@@ -9,5 +9,6 @@ urlpatterns = [
     path('api/', include('authentication.urls')),
     path('api/', include('games.urls')),
     path('api/', include('friendlist.urls')),
+    path('api/', include('orders.urls')),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name="token_refresh")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -8,7 +8,10 @@ const ErrorMap = {
     "ERR_RESOURCE_NOT_FOUND": "Non trovato.",
     "ERR_USER_NOT_FOUND": "User non trovato.",
     "ERR_ALREADY_REQUESTED": "Hai già inviato una richiesta di amicizia.",
-    "ERR_SELF_FRIEND": "Non puoi essere amico di te stesso."
+    "ERR_SELF_FRIEND": "Non puoi essere amico di te stesso.",
+    "ERR_STUPID": "Lo user è stupido.",
+    "ERR_ALREADY_IN_CART": "Il gioco è già nel carrello",
+    "ERR_ALREADY_BOUGHT" : "Il gioco è già nella libreria"
 }
 
 const blockedUrls = [

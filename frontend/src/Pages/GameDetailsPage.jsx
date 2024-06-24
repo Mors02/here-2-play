@@ -16,6 +16,7 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import SwipeableViews from 'react-swipeable-views';
 import { autoPlay } from 'react-swipeable-views-utils';
 import { Colors } from '../config/Colors.js'
+import 'react-toastify/dist/ReactToastify.min.css';
 
 const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
@@ -122,27 +123,39 @@ function GameDetailsPage() {
         )
     }
 
+    function addGame() {
+        axiosConfig.post('api/orders/add-game/', {game_id: gameId})
+            .then(res => {
+                if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")
+                    throw new Error(res["response"]["data"])
+                console.log(res.data)
+                toast.success("Gioco aggiunto al carrello.")
+            })
+            .catch(err => {
+                toast.error(ErrorMap[err.message])
+            })
+    }
+
+    if (!loading)
     return (
         <Box>
-            {
-                !loading && (
-                <div className="p-10 flex flex-col gap-4">
-                    <h1 className="font-bold">{game.title}</h1>
-                    <img className="h-[300px] w-[500px] object-cover" src={process.env.REACT_APP_BASE_URL + game.image} />
-                    <p>Descrizione: {game.description}</p>
-                    <p>Prezzo: {game.price}</p>
-                    <p>Giorno di pubblicazione: {game.upload_date}</p>
-                    
-                    { attachments?.length > 0 && <Attachments /> }
-            
-                    <Button variant="contained" color="error" onClick={() => openModal()}><MdReport className="mr-2" />Segnala</Button>
-                    <ReportGameModal 
-                        closeModal={closeModal} 
-                        modalIsOpen={modalIsOpen} 
-                        gameReported={game}
-                    />
-                </div>
-            )}
+            <div className="p-10 flex flex-col gap-4">
+                <h1 className="font-bold">{game.title}</h1>
+                <img className="h-[300px] w-[500px] object-cover" src={process.env.REACT_APP_BASE_URL + game.image} />
+                <p>Descrizione: {game.description}</p>
+                <p>Prezzo: {game.price}</p>
+                <p>Giorno di pubblicazione: {game.upload_date}</p>
+
+                { attachments?.length > 0 && <Attachments /> }
+
+                <Button variant="contained" onClick={() => addGame()}color="info">Aggiungi al carrello</Button>
+                <Button variant="contained" color="error" onClick={() => openModal()}><MdReport className="mr-2" />Segnala</Button>
+                <ReportGameModal 
+                    closeModal={closeModal} 
+                    modalIsOpen={modalIsOpen} 
+                    gameReported={game}
+                />
+            </div>
         </Box>
     )
 }
