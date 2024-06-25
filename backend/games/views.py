@@ -2,11 +2,11 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.authentication import SessionAuthentication
-from .models import Game, GameAttachment, Discount, Review
-from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer
+from .models import Game, GameAttachment, Discount, Review, Tag
+from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer
 from rest_framework.response import Response
 from rest_framework import permissions, status, viewsets
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from django.shortcuts import get_object_or_404
 from django.utils.dateparse import parse_date
 from authentication.models import User
@@ -188,3 +188,21 @@ class GameAttachmentViewSet(viewsets.ModelViewSet):
 
         attachment.delete()
         return Response(status=status.HTTP_200_OK)
+    
+class TagViewSet(viewsets.ModelViewSet):
+    def get_permissions(self):
+        if (self.action in ['destroy', 'create']):
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+    
+    def list(self, request):
+        tags = TagSerializer(Tag.objects.all(), many=True).data
+        return Response(tags, status=status.HTTP_200_OK)
+
+    def create(self, request):
+        pass
+
+    def destroy(self, request, pk=None):
+        pass

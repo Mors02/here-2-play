@@ -1,4 +1,4 @@
-import { Typography, Box, FormControl, FormLabel, TextareaAutosize, Grid, Stack, Rating, Button } from "@mui/material";
+import { Typography, Box, FormControl, FormLabel, TextareaAutosize, Grid, Stack, Rating, Button, getTablePaginationUtilityClass } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import StarIcon from '@mui/icons-material/Star';
 import { toast } from "react-toastify";
@@ -28,7 +28,7 @@ export default function ReviewSection({game}) {
             toast.error(ErrorMap[err.message])
             setLoading(false)
         })
-    }, [])
+    }, [])    
 
     function sendReview() {
         if (rating == 0) {

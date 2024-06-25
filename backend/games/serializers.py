@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Game, Discount, GameAttachment, Review
+from .models import Game, Discount, GameAttachment, Review, Tag
 
 class GameAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,3 +34,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         review = Review(**data)
         review.save()
         return review
+    
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = '__all__'

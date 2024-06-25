@@ -110,8 +110,14 @@ class UserSerializer(serializers.ModelSerializer):
         depth = 1  
 
 class UserInfoSerializer(serializers.ModelSerializer):
-    games = GamesBoughtSerializer(source="games_bought_user", many=True, read_only=True)
 
+    class Meta:
+        model = UserModel
+        fields = ["username", "date_joined", "id"]
+
+class UserInfoWithGamesSerializer(serializers.ModelSerializer):
+    games = GamesBoughtSerializer(source="games_bought_user", many=True, read_only=True)
+    
     class Meta:
         model = UserModel
         fields = ["username", "date_joined", "id", "games"]

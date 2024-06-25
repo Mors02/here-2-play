@@ -60,3 +60,25 @@ class Review(models.Model):
     class Meta:
         db_table = "reviews"
         unique_together = ('game', 'user')
+
+class Tag(models.Model):
+    slug = models.TextField(max_length=50)
+    name = models.TextField(max_length=50)
+
+    def __str__(self):
+        return (self.name)
+    
+    class Meta:
+        db_table = "tags"
+
+class GameTags(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="game_tags_game")
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, related_name="game_tags_tag")
+    count = models.PositiveIntegerField()
+
+    class Meta:
+        db_table = "game_tags"
+    
+    def __str__(self):
+        return (self.tag +" -> "+ self.game.title)
+

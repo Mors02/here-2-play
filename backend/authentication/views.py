@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model, login, logout
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import UserEditSerializer, UserRegisterSerializer, UserLoginSerializer, UserSerializer, UserInfoSerializer
+from .serializers import UserEditSerializer, UserRegisterSerializer, UserLoginSerializer, UserSerializer, UserInfoSerializer, UserInfoWithGamesSerializer
 from rest_framework import permissions, status
 from django.contrib.auth.backends import ModelBackend
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -106,7 +106,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         try:
             user = User.objects.get(id=pk)
-            serializer = UserInfoSerializer(user)
+            serializer = UserInfoWithGamesSerializer(user)
             print(serializer.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
