@@ -95,7 +95,7 @@ function GameDetailsPage() {
                 >
                     {
                         attachments.map(game => 
-                            <img key={game.id} className="rounded-md overflow-hidden object-cover m-auto aspect-[1920/1080]" src={process.env.REACT_APP_BASE_URL + game.image} />
+                            <img key={game.id} className="rounded-md overflow-hidden object-cover m-auto aspect-[1920/1080] w-full" src={process.env.REACT_APP_BASE_URL + game.image} />
                         )
                     }
                 </AutoPlaySwipeableViews>
