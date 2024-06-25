@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { axiosConfig } from "../config/axiosConfig";
-import { Button, Divider, Stack, Typography } from "@mui/material";
+import { Button, Divider, Stack, Typography, Typography } from "@mui/material";
 import { MdReport } from "react-icons/md";
 import ReportGameModal from "../Modals/ReportGameModal";
 import { toast } from "react-toastify";
@@ -19,6 +19,8 @@ import { Colors } from '../config/Colors.js'
 import 'react-toastify/dist/ReactToastify.min.css';
 import Rating from '@mui/material/Rating';
 import moment from 'moment';
+import useCurrentUser from "../config/UseCurrentUser.jsx";
+import ReviewSection from "../Component/ReviewSection.jsx";
 
 const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
@@ -33,6 +35,7 @@ function GameDetailsPage() {
     const [game, setGame] = useState([])
     const { gameId } = useParams()
     const navigate = useNavigate()
+    const {user} = useCurrentUser()
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
