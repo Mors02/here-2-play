@@ -83,7 +83,7 @@ export default function UserPage() {
                     modalIsOpen={modalIsOpen} 
                     userReported={retrievedUser}
                 />
-                <Box className=" w-4/5 h-screen mx-auto" sx={{borderLeft:"1px solid #aaa", borderRight:"1px solid #aaa"}}>
+                <Box className="h-screen" sx={{borderLeft:"1px solid #aaa", borderRight:"1px solid #aaa"}}>
                     <Tabs>
                         <TabList>
                             <Tab>Libreria</Tab>

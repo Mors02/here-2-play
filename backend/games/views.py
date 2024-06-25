@@ -125,8 +125,10 @@ class YourGameList(generics.ListAPIView):
     serializer_class = GameSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        return Game.objects.filter(publisher=self.request.user)
+    def list(self, request):
+        data = Game.objects.filter(publisher=self.request.user)
+        serializer = GameSerializer(data, many=True)
+        return Response(serializer.data)
     
 class GameAttachmentViewSet(viewsets.ModelViewSet):
     def list(self, request, pk=None):

@@ -8,6 +8,9 @@ import { axiosConfig, getCookie } from '../config/axiosConfig';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { ToastContainer, toast } from 'react-toastify';
+import { ErrorMap } from '../config/enums'
+import EditDrawer from '../Component/EditDrawer';
+import Box from '@mui/material/Box';
 
 function PublishGamePage() {
     const [image, setImage] = useState()
@@ -25,10 +28,10 @@ function PublishGamePage() {
         e.preventDefault()
 
         if (!image)
-            return toast.error('L\'immagine di copertina è richiesto')
+            return toast.error(ErrorMap['ERR_COVER_REQUIRED'])
             
         if (!attachments)
-            return toast.error('Gli allegati del gioco sono richiesti')
+            return toast.error(ErrorMap['ERR_ATTACHMENTS_REQUIRED'])
 
         setLoading(true)
 
@@ -77,73 +80,64 @@ function PublishGamePage() {
 
     function ListAttachments() {
         return (
-            <ul>
+            <EditDrawer>
                 {
                     Object.keys(attachments).map(
                         key => <li>{attachments[key].name}</li>
                     )
                 }
-            </ul>
+            </EditDrawer>
         )
     }
 
     return (
         <form className='p-10' onSubmit={e => onSubmit(e)}>
             <Stack direction="column" spacing={2}>
-                <TextField {...register('title')} label="Title" variant="outlined" required />
-                <TextField {...register('description')} label="Description" variant="outlined" multiline rows={3} required />
+                <TextField {...register('title')} label="Titolo" variant="outlined" required />
+                <TextField {...register('description')} label="Descrizione" variant="outlined" multiline rows={3} required />
                 <TextField {...register('price')} label="Prezzo" type="number" variant="outlined" required />
 
-                {/* <Button onClick={() => setShowDiscount(!showDiscount)} variant={showDiscount ? "outline" : "contained"}>Add a discount</Button> */}
+                <Box className="grid grid-cols-2 gap-4">
+                    <Button variant="contained" component="label" startIcon={<CloudUploadIcon />}>
+                        {
+                            file?.name ?? 'Carica File'
+                        }
+                        <input type="file" 
+                            onChange={e => handleFileUpload(e)}
+                            hidden 
+                        />
+                    </Button>
 
-                {/* {
-                    showDiscount && 
-                    <div>
-                        <TextField label="Percentage" InputProps={{
-                            endAdornment: <InputAdornment position="end">%</InputAdornment>
-                        }}/>
-                        <DatePicker label="Start" />
-                        <DatePicker label="End" />
-                    </div>
-                } */}
+                    <Button variant="contained" component="label" startIcon={<CloudUploadIcon />}>
+                        {
+                            image?.name ?? 'Carica Copertina'
+                        }
+                        <input type="file" 
+                            accept="image/jpeg,image/png,image/gif" 
+                            onChange={e => handleImageUpload(e)}
+                            hidden 
+                        />
+                    </Button>
+                </Box>
+                
+                <Box>
+                    <Button className='w-full' variant="contained" component="label" startIcon={<CloudUploadIcon />}>
+                        Carica Allegati
+                        <input type="file" 
+                            accept="image/jpeg,image/png,image/gif" 
+                            onChange={e => handleAttachmentsUpload(e)}
+                            multiple
+                            hidden 
+                        />
+                    </Button>
 
-                <Button variant="contained" component="label" startIcon={<CloudUploadIcon />}>
-                    {
-                        file?.name ?? 'Upload Game File'
-                    }
-                    <input type="file" 
-                        onChange={e => handleFileUpload(e)}
-                        hidden 
-                    />
-                </Button>
-
-                <Button variant="contained" component="label" startIcon={<CloudUploadIcon />}>
-                    {
-                        image?.name ?? 'Upload Game Cover'
-                    }
-                    <input type="file" 
-                        accept="image/jpeg,image/png,image/gif" 
-                        onChange={e => handleImageUpload(e)}
-                        hidden 
-                    />
-                </Button>
-
-                <Button variant="contained" component="label" startIcon={<CloudUploadIcon />}>
-                    Upload Game Attachments
-                    <input type="file" 
-                        accept="image/jpeg,image/png,image/gif" 
-                        onChange={e => handleAttachmentsUpload(e)}
-                        multiple
-                        hidden 
-                    />
-                </Button>
-
-                { attachments && <ListAttachments /> }
+                    { attachments && <ListAttachments /> }
+                </Box>
 
                 {
                     loading
                     ? <LoadingButton loading variant="outlined">Loading</LoadingButton>
-                    : <Button type="submit" variant="contained" disabled={loading}>Publish</Button>
+                    : <Button type="submit" color="success" variant="contained" disabled={loading}>Pubblica</Button>
                 }
             </Stack>
         </form>
