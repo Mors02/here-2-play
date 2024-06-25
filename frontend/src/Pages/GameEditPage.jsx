@@ -53,7 +53,7 @@ function GameEditPage() {
                     return toast.error('Gioco non trovato!') 
                 }
 
-                if (res.data.publisher != user.id) {
+                if (res.data.publisher.id != user.id) {
                     navigate('/')
                     return toast.error('Non hai i permessi per modificare il gioco!') 
                 }
@@ -310,7 +310,7 @@ function GameEditPage() {
                 <Stack direction="column" spacing={2}>
                     <TextField defaultValue={game.title} {...register('title')} label="Title" variant="outlined" required />
                     <TextField defaultValue={game.description} {...register('description')} label="Description" variant="outlined" multiline rows={3} required />
-                    <TextField defaultValue={game.price} {...register('price')} label="Prezzo" type="number" variant="outlined" required />
+                    <TextField defaultValue={game.price} {...register('price')} label="Prezzo" variant="outlined" required />
 
                     { activeDiscounts.length > 0 && <ActiveDiscounts /> }
 

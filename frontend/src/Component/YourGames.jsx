@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import GameList from './GameList';
 import useCurrentUser from '../config/UseCurrentUser';
 
-function UserGamesPage() {
+function UserGamesPage({ retrievedUser }) {
     const [games, setGames] = useState([])
     const { user, userLoading } = useCurrentUser()
     const navigate = useNavigate()
@@ -15,17 +15,17 @@ function UserGamesPage() {
     useEffect(() => {
         axiosConfig.get('/api/your-games/')
             .then(res => {
-                    setGames(res.data)
-                }
-            )
+                setGames(res.data)
+            }
+        )
     }, [])
-
+    
     function handleClick(game) {
-        if (game.publisher == user.id)
+        if (game.publisher.id == user.id)
             return navigate('/games/' + game.id + '/edit')
         return navigate('/games/' + game.id)
     }
-
+    
     if (!userLoading)
     return (
         <Box className='px-10 py-8'>

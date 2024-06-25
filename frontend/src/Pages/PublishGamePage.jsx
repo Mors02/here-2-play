@@ -95,7 +95,7 @@ function PublishGamePage() {
             <Stack direction="column" spacing={2}>
                 <TextField {...register('title')} label="Titolo" variant="outlined" required />
                 <TextField {...register('description')} label="Descrizione" variant="outlined" multiline rows={3} required />
-                <TextField {...register('price')} label="Prezzo" type="number" variant="outlined" required />
+                <TextField {...register('price')} label="Prezzo" variant="outlined" required />
 
                 <Box className="grid grid-cols-2 gap-4">
                     <Button variant="contained" component="label" startIcon={<CloudUploadIcon />}>
