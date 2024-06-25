@@ -2,13 +2,14 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.authentication import SessionAuthentication
-from .models import Game, GameAttachment, Discount
-from .serializers import GameSerializer, GameAttachmentSerializer
+from .models import Game, GameAttachment, Discount, Review
+from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer
 from rest_framework.response import Response
 from rest_framework import permissions, status, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
 from django.utils.dateparse import parse_date
+from authentication.models import User
 
 class DiscountViewSet(viewsets.ModelViewSet):
     def create(self, request, pk):
@@ -42,6 +43,51 @@ class DiscountViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+class ReviewViewSet(viewsets.ModelViewSet):
+    def get_permissions(self):
+        permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+    
+    def retrieve(self, request, pk=None):
+        try:
+            user = request.user
+            review = Review.objects.get(user_id=user.pk, game_id=pk)
+            revData = ReviewSerializer(review).data
+            return Response(revData, status=status.HTTP_200_OK)
+        except Review.DoesNotExist:
+            return Response("", status=status.HTTP_204_NO_CONTENT)          
+    
+    def create(self, request, pk=None):
+        print(request.data)
+        data = request.data
+        if data["rating"] < 0.5 or data["rating"] > 5:
+            return Response("ERR_NO_RATING", status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = User.objects.get(id=request.user.pk)
+            game = Game.objects.get(id=pk)
+            
+            serializer = ReviewSerializer(data={**data, 'user': user.pk, 'game': game.pk})
+            if (serializer.is_valid(raise_exception=True)):
+                serializer.create(data={**data, 'user': user, 'game': game})
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Game.DoesNotExist:
+            return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_400_BAD_REQUEST)
+        return Response("ERR_SERVER_ERROR", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def partial_update(self, request, pk=None, rev_pk=None):
+        try:
+            data = request.data
+            review = Review.objects.get(id=rev_pk)
+            if data["rating"] < 0.5 or data["rating"] > 5:
+                return Response("ERR_NO_RATING", status=status.HTTP_400_BAD_REQUEST)
+            review.rating = data["rating"]
+            review.body = data["body"]
+            review.save()
+            revData = ReviewSerializer(review).data
+            return Response(revData, status=status.HTTP_200_OK)
+        except Review.DoesNotExist:
+            return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)  
+        pass
 
 class GameViewSet(viewsets.ModelViewSet):
     def get_permissions(self):

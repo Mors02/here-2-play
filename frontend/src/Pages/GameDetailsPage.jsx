@@ -154,7 +154,7 @@ function GameDetailsPage() {
 
                 <Button variant="contained" onClick={() => addGame()}color="info">Aggiungi al carrello</Button>
                 <Button variant="contained" color="error" onClick={() => openModal()}><MdReport className="mr-2" />Segnala</Button>
-                {!loading && game.publisher.id != user.id && <ReviewSection />}
+                {!loading && game.publisher.id != user.id && <ReviewSection game={game.id}/>}
                 <ReportGameModal 
                     closeModal={closeModal} 
                     modalIsOpen={modalIsOpen} 

@@ -14,4 +14,7 @@ urlpatterns = [
 
     path('games/<int:pk>/discounts/', views.DiscountViewSet.as_view({'post': 'create'})),
     path('discounts/<int:pk>/', views.DiscountViewSet.as_view({'delete': 'destroy'})),
+
+    path('games/<int:pk>/reviews/', views.ReviewViewSet.as_view({'post': 'create', 'get': 'retrieve'})),
+    path('games/<int:pk>/reviews/<int:rev_pk>', views.ReviewViewSet.as_view({'patch': 'partial_update'}))
 ]

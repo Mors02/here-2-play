@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Game, Discount, GameAttachment
+from .models import Game, Discount, GameAttachment, Review
 
 class GameAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,3 +24,13 @@ class GameSerializer(serializers.ModelSerializer):
     def get_publisher(self, obj):
         from authentication.serializers import UserInfoSerializer
         return UserInfoSerializer(obj.publisher).data
+
+class ReviewSerializer(serializers.ModelSerializer):    
+    class Meta:
+        model = Review
+        fields = ["id", "user", "game", "rating", "body"]
+
+    def create(self, data):
+        review = Review(**data)
+        review.save()
+        return review

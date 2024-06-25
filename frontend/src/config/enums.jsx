@@ -11,7 +11,8 @@ const ErrorMap = {
     "ERR_SELF_FRIEND": "Non puoi essere amico di te stesso.",
     "ERR_STUPID": "Lo user è stupido.",
     "ERR_ALREADY_IN_CART": "Il gioco è già nel carrello",
-    "ERR_ALREADY_BOUGHT" : "Il gioco è già nella libreria"
+    "ERR_ALREADY_BOUGHT" : "Il gioco è già nella libreria",
+    "ERR_NO_RATING": "Non hai valutato il gioco."
 }
 const blockedUrls = []
 
