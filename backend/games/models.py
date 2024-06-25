@@ -5,6 +5,16 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 User = get_user_model()
 
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'categories'
+
+    def __str__(self):
+        return self.name
+
 class Game(models.Model):
     def covers(instance, filename):
         return 'game_covers/{filename}'.format(filename=filename)
@@ -19,6 +29,7 @@ class Game(models.Model):
     image = models.ImageField(upload_to=covers, default=None)
     uploaded_file = models.FileField(upload_to=files, default=None)
     publisher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="games_publisher")
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True, related_name="games_category")
 
     class Meta:
         db_table = "games"

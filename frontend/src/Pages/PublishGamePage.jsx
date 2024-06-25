@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { React, useEffect, useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
-import { TextField, Button, Stack, InputAdornment } from "@mui/material"
+import { TextField, Button, Stack, InputAdornment, Select, FormControl } from "@mui/material"
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { useForm } from 'react-hook-form';
 import { axiosConfig, getCookie } from '../config/axiosConfig';
@@ -11,10 +11,13 @@ import { ToastContainer, toast } from 'react-toastify';
 import { ErrorMap } from '../config/enums'
 import EditDrawer from '../Component/EditDrawer';
 import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 
 function PublishGamePage() {
     const [image, setImage] = useState()
     const [attachments, setAttachments] = useState()
+    const [categories, setCategories] = useState()
     const [file, setFile] = useState()
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
@@ -23,6 +26,17 @@ function PublishGamePage() {
         register,
         getValues,
     } = useForm()
+
+    useEffect(() => {
+        setLoading(true)
+
+        axiosConfig.get('/api/categories/')
+            .then(res => {
+                console.log(res.data)
+                setCategories(res.data)
+                setLoading(false)
+            })
+    }, [])
 
     function onSubmit(e) {
         e.preventDefault()
@@ -41,6 +55,7 @@ function PublishGamePage() {
         uploadData.append('price', getValues('price'))
         uploadData.append('image', image, image.name)
         uploadData.append('file', file)
+        uploadData.append('category_id', getValues('category_id'))
 
         Object.keys(attachments)
             .map(
@@ -90,12 +105,25 @@ function PublishGamePage() {
         )
     }
 
+    if (!loading)
     return (
         <form className='p-10' onSubmit={e => onSubmit(e)}>
             <Stack direction="column" spacing={2}>
                 <TextField {...register('title')} label="Titolo" variant="outlined" required />
                 <TextField {...register('description')} label="Descrizione" variant="outlined" multiline rows={3} required />
-                <TextField {...register('price')} label="Prezzo" variant="outlined" required />
+                <Box className="grid grid-cols-2 gap-4">
+                    <TextField {...register('price')} label="Prezzo" variant="outlined" required />
+                    <FormControl>
+                        <InputLabel>Categoria *</InputLabel>
+                        <Select label="Categoria" {...register('category_id')} required>
+                        {
+                            categories && categories.map(category => 
+                                <MenuItem value={category.id}>{category.name}</MenuItem>
+                            )
+                        }
+                        </Select>
+                    </FormControl>
+                </Box>
 
                 <Box className="grid grid-cols-2 gap-4">
                     <Button variant="contained" component="label" startIcon={<CloudUploadIcon />}>

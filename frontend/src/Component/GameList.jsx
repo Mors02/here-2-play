@@ -32,13 +32,14 @@ function Game({game, handleClick}) {
     const [entered, setEntered] = useState(false)
     const hoverClass = "bg-slate-700 absolute bottom-0 w-full py-2 text-center bg-opacity-80 rounded-t-lg transition ease-linear"
     const normalClass = "bg-slate-700 absolute bottom-0 w-full py-2 text-center bg-opacity-20 rounded-t-lg transition ease-linear"
+    
     return (
-            <Box className="relative" key={game.id} onClick={() => handleClick(game)} onMouseEnter={() => setEntered(true)} onMouseLeave={() => setEntered(false)}>
-                <img className='aspect-[600/900] object-cover' src={process.env.REACT_APP_BASE_URL + (game.image ?? game.details.image)} />
-                <Box className={entered ? hoverClass : normalClass}>
-                    <Typography variant="h4" className='text-white cursor-default'>{game.title}</Typography>
-                </Box>
+        <Box className="relative" key={game.id} onClick={() => handleClick(game)} onMouseEnter={() => setEntered(true)} onMouseLeave={() => setEntered(false)}>
+            <img className='aspect-[600/900] object-cover' src={process.env.REACT_APP_BASE_URL + (game.image ?? game.details.image)} />
+            <Box className={entered ? hoverClass : normalClass}>
+                <Typography variant="h4" className='text-white cursor-default'>{game.title}</Typography>
             </Box>
+        </Box>
     )}
 
 export default GameList;

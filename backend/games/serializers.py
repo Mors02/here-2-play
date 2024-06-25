@@ -1,5 +1,10 @@
 from rest_framework import serializers
-from .models import Game, Discount, GameAttachment, Review, Tag, GameTags
+from .models import Game, Discount, GameAttachment, Category, Review, Tag, GameTags
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
 
 class GameAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,13 +41,13 @@ class GameTagSerializer(serializers.ModelSerializer):
 class GameSerializer(serializers.ModelSerializer):
     attachments = GameAttachmentSerializer(source="game_attachments_game", many=True, read_only=True)
     discounts = DiscountSerializer(source="discounts_game", many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
     publisher = serializers.SerializerMethodField()
     tags = serializers.SerializerMethodField()
-    #tags = GameTagSerializer(source="game_tags_game", many=True, read_only=True)
 
     class Meta:
         model = Game
-        fields = ["id", "title", "description", "upload_date", "publisher", "price", 'image', 'uploaded_file', 'attachments', 'discounts', 'tags']
+        fields = ["id", "title", "description", "upload_date", "publisher", "price", 'image', 'uploaded_file', 'attachments', 'discounts', 'category', 'tags']
         extra_kargs = {"publisher": {"read_only": True}}
 
     def get_publisher(self, obj):

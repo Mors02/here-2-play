@@ -173,6 +173,7 @@ function GameDetailsPage() {
                             <b>Prezzo: </b>
                             <Price />
                         </Typography>
+                        <Typography><b>Categoria: </b>{game.category.name}</Typography>
                         <Typography><b>Data di Pubblicazione: </b>{moment(game.upload_date).format('DD/MM/YYYY')}</Typography>
                         <Typography>
                             <b>Sviluppatore: </b>
