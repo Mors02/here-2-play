@@ -23,7 +23,7 @@ function GameList() {
 
         return filteredGames.map(game => {
                 return (
-                    <div key={game.id} onClick={() => navigate("/games/" + game.id)} className='bg-red-500 w-[15%] h-[250px] m-4'>
+                    <div key={game.id} onClick={() => window.location.replace("/games/" + game.id)} className='bg-red-500 w-[15%] h-[250px] m-4'>
                         <img src={process.env.REACT_APP_BASE_URL + game.image} />
                     </div>
                 )
