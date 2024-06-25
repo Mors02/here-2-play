@@ -1,4 +1,4 @@
-import { Typography, Box, FormControl, FormLabel, TextareaAutosize, Grid, Stack, Rating, Button, getTablePaginationUtilityClass } from "@mui/material";
+import { Typography, Box, FormControl, FormLabel, TextareaAutosize, Grid, Stack, Rating, Button, MenuItem, Select, Chip } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import StarIcon from '@mui/icons-material/Star';
 import { toast } from "react-toastify";
@@ -12,37 +12,53 @@ export default function ReviewSection({game}) {
     const [rating, setRating] = useState(0)
     const [hover, setHover] = React.useState(-1);
     const [loadingPage, setLoading] = useState(true);
-    const [review, setReview] = useState()
+    const [review, setReview] = useState("");
+    const [tags, setTags] = useState([]);
+    const [selectedTags, setSelectedTags] = useState([]);
     const {user} = useCurrentUser();
 
     useEffect(() => {
+        getTags()
         axiosConfig.get("api/games/"+game+"/reviews")
         .then(res => {
             if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
                 throw new Error(res["response"]["data"])
-            if (res.data != undefined)
+            if (res.data != "")
                 setValues(res.data)
             setLoading(false)
         })
         .catch(err => {
             toast.error(ErrorMap[err.message])
             setLoading(false)
-        })
+        })        
     }, [])    
+
+    function getTags() {
+        axiosConfig.get("api/tags/")
+        .then(res => {
+            if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                throw new Error(res["response"]["data"])
+            setTags(res.data)
+        })
+        .catch(err => {
+            toast.error(ErrorMap[err.message])
+        })
+    }
 
     function sendReview() {
         if (rating == 0) {
             toast.error(ErrorMap["ERR_NO_RATING"])
             return
         }
-        console.log(review)
-        if (review != undefined)
+        console.log(rating)
+        if (review != "")
             updateReview()
         else
             createReview()
     }
 
     function updateReview() {
+        console.log(review)
         axiosConfig.patch("api/games/"+game+"/reviews/"+review.id, {body, rating})
         .then(res => {
             if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
@@ -56,7 +72,7 @@ export default function ReviewSection({game}) {
     }
 
     function createReview() {
-        axiosConfig.post("api/games/"+game+"/reviews/", {body, rating})
+        axiosConfig.post("api/games/"+game+"/reviews/", {body, rating, tags: selectedTags})
         .then(res => {
             if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
                 throw new Error(res["response"]["data"])
@@ -68,10 +84,28 @@ export default function ReviewSection({game}) {
         })
     }
 
-    function setValues(data) {
+    function setValues(data) {        
         setReview(data)
         setBody(data.body)
         setRating(data.rating)
+    }
+
+    function handleChange(event) {
+        console.log(event.target.value)
+        if (event.target.value.length > 4 )
+            return toast.error(ErrorMap["ERR_TOO_MANY_TAGS"])
+        setSelectedTags(event.target.value);
+        console.log(selectedTags)
+    }
+
+    function SelectedChip({selected}) {
+        return (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+              {selected.map((value) => (
+                <Chip key={value.id} label={value.name} />
+              ))}
+            </Box>
+          )
     }
 
     return (
@@ -100,6 +134,21 @@ export default function ReviewSection({game}) {
                             />
                         </Stack>
                     </Box>
+                    {!review && <Box className="w-2/5">
+                        <Stack>
+                            <FormLabel><Typography variant="h5">Consiglia i tags</Typography></FormLabel>
+                            <Select
+                                value={selectedTags}
+                                onChange={handleChange}
+                                renderValue={(selected) => (<SelectedChip selected={selected} />)}
+                                multiple 
+                            >
+                                {
+                                    tags.map(tag => <MenuItem value={tag}>{tag.name}</MenuItem>)
+                                }
+                            </Select>
+                        </Stack>
+                    </Box>}
                 </Box>
                 <Box className="text-center">
                     <Button className="w-1/3" variant="contained" onClick={() => sendReview()}>Invia</Button>

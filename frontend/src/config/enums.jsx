@@ -12,7 +12,8 @@ const ErrorMap = {
     "ERR_STUPID": "Lo user è stupido.",
     "ERR_ALREADY_IN_CART": "Il gioco è già nel carrello",
     "ERR_ALREADY_BOUGHT" : "Il gioco è già nella libreria",
-    "ERR_NO_RATING": "Non hai valutato il gioco."
+    "ERR_NO_RATING": "Non hai valutato il gioco.",
+    "ERR_TOO_MANY_TAGS": "Puoi scegliere al massimo 4 tags."
 }
 const blockedUrls = []
 

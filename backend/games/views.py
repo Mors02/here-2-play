@@ -3,7 +3,7 @@ from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.authentication import SessionAuthentication
 from .models import Game, GameAttachment, Discount, Review, Tag
-from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer
+from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer
 from rest_framework.response import Response
 from rest_framework import permissions, status, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
@@ -58,17 +58,27 @@ class ReviewViewSet(viewsets.ModelViewSet):
             return Response("", status=status.HTTP_204_NO_CONTENT)          
     
     def create(self, request, pk=None):
-        print(request.data)
         data = request.data
         if data["rating"] < 0.5 or data["rating"] > 5:
             return Response("ERR_NO_RATING", status=status.HTTP_400_BAD_REQUEST)
         try:
             user = User.objects.get(id=request.user.pk)
             game = Game.objects.get(id=pk)
-            
+
+            #create the tags or update the old ones
+            tags=data["tags"]
+            print(tags)
+            for tag in tags:
+                tagObj = Tag.objects.get(id=tag["id"])
+                tagSerializer = GameTagSerializer(data={"tag": tag["id"], "game": game.pk, "count": 0})
+                if (tagSerializer.is_valid(raise_exception=True)):
+                    print(tagSerializer.data)
+                    tagSerializer.createOrUpdate({"tag": tagObj, "game": game, "count": 1})
+
+            #save the review        
             serializer = ReviewSerializer(data={**data, 'user': user.pk, 'game': game.pk})
             if (serializer.is_valid(raise_exception=True)):
-                serializer.create(data={**data, 'user': user, 'game': game})
+                serializer.create(data={'body': data['body'], 'rating': data['rating'], 'user': user, 'game': game})
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Game.DoesNotExist:
             return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_400_BAD_REQUEST)
