@@ -187,6 +187,7 @@ function GameDetailsPage() {
                     <Box className="flex gap-4 absolute right-4 bottom-4">
                         <Button variant="contained" onClick={() => addGame()} color="info">Aggiungi al carrello</Button>
                         <Button variant="contained" color="error" onClick={() => openModal()}><MdReport className="mr-2" />Segnala</Button>
+                        {!loading && game.publisher.id != user.id && <ReviewSection game={game.id}/>}
                         <ReportGameModal 
                             closeModal={closeModal} 
                             modalIsOpen={modalIsOpen} 
