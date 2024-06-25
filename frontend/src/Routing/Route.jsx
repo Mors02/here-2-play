@@ -8,7 +8,7 @@ import GameEditPage from "../Pages/GameEditPage";
 import RegisterPage from "../Pages/Auth/RegisterPage";
 import UserEditPage from "../Pages/Auth/UserEditPage";
 import UserPage from "../Pages/UserPage";
-import { blockedUrls } from "../config/enums";
+import { validUrls } from "../config/enums";
 import OrderPage from "../Pages/OrderPage";
 
 export default function AppRoutes() {
@@ -28,7 +28,13 @@ export default function AppRoutes() {
 }
 
 export function shouldShowFriendlistInUrl(url) {
-    if (blockedUrls.some(s => (process.env.REACT_APP_FRONTEND_URL + "" + s == url)))
-        return false;
-    return true;
+    
+    if (validUrls.some(s => {
+        const reg = new RegExp(s)
+        url = url.replace(process.env.REACT_APP_FRONTEND_URL, "")
+        console.log(s, url, reg.test(url.replace(process.env.REACT_APP_FRONTEND_URL, "")))
+        return reg.test(url)
+    }))
+        return true;
+    return false;
 }
