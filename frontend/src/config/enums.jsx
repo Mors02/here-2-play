@@ -13,11 +13,11 @@ const ErrorMap = {
     "ERR_ALREADY_IN_CART": "Il gioco è già nel carrello",
     "ERR_ALREADY_BOUGHT" : "Il gioco è già nella libreria"
 }
+const blockedUrls = []
 
-const blockedUrls = [
-    "/user",
-    "/login",
-    "/register"
+const validUrls = [
+    "^/$",
+    '^/user/[0-9]+$',
 ]
 
-export {ErrorMap, blockedUrls}
+export {ErrorMap, blockedUrls, validUrls}
