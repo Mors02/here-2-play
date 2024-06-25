@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { axiosConfig } from "../config/axiosConfig";
-import { Button, Divider, Stack, Typography, Typography } from "@mui/material";
+import { Button, Divider, Stack, Typography } from "@mui/material";
 import { MdReport } from "react-icons/md";
 import ReportGameModal from "../Modals/ReportGameModal";
 import { toast } from "react-toastify";
@@ -187,7 +187,6 @@ function GameDetailsPage() {
                     <Box className="flex gap-4 absolute right-4 bottom-4">
                         <Button variant="contained" onClick={() => addGame()} color="info">Aggiungi al carrello</Button>
                         <Button variant="contained" color="error" onClick={() => openModal()}><MdReport className="mr-2" />Segnala</Button>
-                        {!loading && game.publisher.id != user.id && <ReviewSection game={game.id}/>}
                         <ReportGameModal 
                             closeModal={closeModal} 
                             modalIsOpen={modalIsOpen} 
@@ -196,6 +195,7 @@ function GameDetailsPage() {
                     </Box>
                 </Box>
             </Box>
+            {!loading && game.publisher.id != user.id && <ReviewSection game={game.id}/>}
         </Stack>
     )
 }
