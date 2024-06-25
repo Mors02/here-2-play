@@ -15,11 +15,11 @@ const ErrorMap = {
     'ERR_COVER_REQUIRED': 'L\'immagine di copertina è richiesto',
     'ERR_ATTACHMENTS_REQUIRED': 'Gli allegati del gioco sono richiesti',
 }
+const blockedUrls = []
 
-const blockedUrls = [
-    '/user',
-    '/login',
-    '/register'
+const validUrls = [
+    "^/$",
+    '^/user/[0-9]+$',
 ]
 
-export {ErrorMap, blockedUrls}
+export {ErrorMap, blockedUrls, validUrls}
