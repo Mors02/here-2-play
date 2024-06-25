@@ -19,6 +19,8 @@ import { Colors } from '../config/Colors.js'
 import 'react-toastify/dist/ReactToastify.min.css';
 import Rating from '@mui/material/Rating';
 import moment from 'moment';
+import useCurrentUser from "../config/UseCurrentUser.jsx";
+import ReviewSection from "../Component/ReviewSection.jsx";
 
 const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
@@ -33,6 +35,7 @@ function GameDetailsPage() {
     const [game, setGame] = useState([])
     const { gameId } = useParams()
     const navigate = useNavigate()
+    const {user} = useCurrentUser()
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -92,7 +95,7 @@ function GameDetailsPage() {
                 >
                     {
                         attachments.map(game => 
-                            <img key={game.id} className="rounded-md overflow-hidden object-cover m-auto aspect-[1920/1080]" src={process.env.REACT_APP_BASE_URL + game.image} />
+                            <img key={game.id} className="rounded-md overflow-hidden object-cover m-auto aspect-[1920/1080] w-full" src={process.env.REACT_APP_BASE_URL + game.image} />
                         )
                     }
                 </AutoPlaySwipeableViews>
@@ -193,6 +196,7 @@ function GameDetailsPage() {
                     </Box>
                 </Box>
             </Box>
+            {!loading && game.publisher.id != user.id && <ReviewSection game={game.id}/>}
         </Stack>
     )
 }

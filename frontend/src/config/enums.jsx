@@ -14,6 +14,8 @@ const ErrorMap = {
     'ERR_ALREADY_BOUGHT' : 'Il gioco è già nella libreria',
     'ERR_COVER_REQUIRED': 'L\'immagine di copertina è richiesto',
     'ERR_ATTACHMENTS_REQUIRED': 'Gli allegati del gioco sono richiesti',
+    'ERR_NO_RATING': 'Non hai valutato il gioco.',
+    'ERR_TOO_MANY_TAGS': 'Puoi scegliere al massimo 4 tags.'
 }
 const blockedUrls = []
 

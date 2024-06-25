@@ -1,5 +1,7 @@
 from django.db import models
+from authentication.models import User
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 User = get_user_model()
 
@@ -56,3 +58,38 @@ class Discount(models.Model):
     
     def __str__(self):
         return str(self.percentage)
+    
+class Review(models.Model):
+    rating = models.FloatField(validators=[MaxValueValidator(5), MinValueValidator(0.5)])
+    body = models.TextField(max_length=500, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews_user")
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="reviews_game")
+
+    def __str__(self):
+        return (self.game.title + " - " + self.rating + " - " + self.body)
+    
+    class Meta:
+        db_table = "reviews"
+        unique_together = ('game', 'user')
+
+class Tag(models.Model):
+    slug = models.TextField(max_length=50)
+    name = models.TextField(max_length=50)
+
+    def __str__(self):
+        return (self.name)
+    
+    class Meta:
+        db_table = "tags"
+
+class GameTags(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="game_tags_game")
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, related_name="game_tags_tag")
+    count = models.PositiveIntegerField()
+
+    class Meta:
+        db_table = "game_tags"
+    
+    def __str__(self):
+        return (self.tag +" -> "+ self.game.title)
+
