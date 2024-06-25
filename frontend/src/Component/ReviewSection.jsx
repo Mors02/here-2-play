@@ -1,8 +1,10 @@
-import { Typography } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import React from "react";
 
 export default function ReviewSection() {
     return (
-        <Typography>Lascia una recensione</Typography>
+        <Box className="bg-slate-600">
+            <Typography variant="h4">Lascia una recensione</Typography>
+        </Box>
     )
 }
