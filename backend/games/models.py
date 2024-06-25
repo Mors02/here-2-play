@@ -16,7 +16,7 @@ class Game(models.Model):
     upload_date = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to=covers, default=None)
     uploaded_file = models.FileField(upload_to=files, default=None)
-    publisher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="games")
+    publisher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="games_publisher")
 
     class Meta:
         db_table = "games"

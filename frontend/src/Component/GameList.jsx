@@ -1,40 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { axiosConfig } from "../config/axiosConfig"
-import { Grid } from "@mui/material"
-import axios from 'axios';
 import { useNavigate } from 'react-router';
+import Box from '@mui/material/Box';
 
-function GameList() {
-    const [games, setGames] = useState([])
-    const navigate = useNavigate()
-
-    useEffect(() => {
-        axiosConfig.get("/api/games")
-            .then((res) => {
-                setGames(res.data)
-            })
-    }, [])
-
+function GameList({ games, handleClick, maxCount=1000 }) {
     function Games() {
-        const maxHomepageGames = process.env.REACT_APP_MAX_HOMEPAGE_GAMES
+        const maxHomepageGames = maxCount
         let filteredGames = []
 
         filteredGames = games.length > maxHomepageGames ? games.slice(0, maxHomepageGames) : games
 
         return filteredGames.map(game => {
                 return (
-                    <div key={game.id} onClick={() => window.location.replace("/games/" + game.id)} className='bg-red-500 w-[15%] h-[250px] m-4'>
-                        <img src={process.env.REACT_APP_BASE_URL + game.image} />
-                    </div>
+                    <Box key={game.id} onClick={() => handleClick(game)}>
+                        <img className='aspect-[600/900] object-cover' src={process.env.REACT_APP_BASE_URL + game.image} />
+                    </Box>
                 )
             }
         )
     }
 
     return (
-        <div className='bg-slate-500 flex flex-wrap m-auto'>
+        <Box className='grid sm:grid-cols-3 md:grid-cols-5 gap-4'>
             <Games />
-        </div>
+        </Box>
     )
 }
 
