@@ -44,10 +44,10 @@ function Layout(props) {
 
             {loggedIn && shouldShowFriendlistInUrl(location)?
                 showFriends? 
-                    <Box className="bg-slate-400 fixed bottom-12 left-12 h-1/3 w-1/5 rounded-xl">
+                    <Box className="bg-slate-400 fixed bottom-12 left-12 h-1/3 w-1/5 rounded-xl z-50">
                         <FriendListPage onClick={() => toggleFriends()}/>
                     </Box> :
-                    <Box className="bg-slate-400 fixed bottom-12 left-12 min-h-16 min-w-16 rounded-full grid place-items-center justify-center cursor-pointer" onClick={() => toggleFriends()}>
+                    <Box className="bg-slate-400 fixed bottom-12 left-12 min-h-16 min-w-16 rounded-full grid place-items-center justify-center cursor-pointer z-50" onClick={() => toggleFriends()}>
                         <FaUserFriends className="h-10 w-10" />
                     </Box> 
                 : <></>           

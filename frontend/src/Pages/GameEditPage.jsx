@@ -53,7 +53,7 @@ function GameEditPage() {
                     return toast.error('Gioco non trovato!') 
                 }
 
-                if (res.data.publisher != user.id) {
+                if (res.data.publisher.id != user.id) {
                     navigate('/')
                     return toast.error('Non hai i permessi per modificare il gioco!') 
                 }
@@ -294,7 +294,7 @@ function GameEditPage() {
                                 <TableCell align="center">{moment(discount.end_date).format('DD/MM/YYYY')}</TableCell>
                                 <TableCell align="center">{discount.percentage}%</TableCell>
                                 <TableCell align="center">{game.price - (game.price * discount.percentage / 100)}</TableCell>
-                                <TableCell><MdDelete onClick={() => deleteDiscount(discount.id)} color="red" size={20} className="my-auto" /></TableCell>
+                                <TableCell><MdDelete onClick={() => deleteDiscount(discount.id)} color="red" size={20} className="my-auto cursor-pointer" /></TableCell>
                             </TableRow>
                         )
                     }

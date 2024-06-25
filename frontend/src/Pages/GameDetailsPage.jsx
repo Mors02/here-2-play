@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { axiosConfig } from "../config/axiosConfig";
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { MdReport } from "react-icons/md";
 import ReportGameModal from "../Modals/ReportGameModal";
 import { toast } from "react-toastify";
@@ -17,6 +17,8 @@ import SwipeableViews from 'react-swipeable-views';
 import { autoPlay } from 'react-swipeable-views-utils';
 import { Colors } from '../config/Colors.js'
 import 'react-toastify/dist/ReactToastify.min.css';
+import useCurrentUser from "../config/UseCurrentUser.jsx";
+import ReviewSection from "../Component/ReviewSection.jsx";
 
 const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
@@ -30,6 +32,7 @@ function GameDetailsPage() {
     const [game, setGame] = useState([])
     const { gameId } = useParams()
     const navigate = useNavigate()
+    const {user} = useCurrentUser()
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -49,7 +52,7 @@ function GameDetailsPage() {
         return axiosConfig.get('/api/games/' + gameId)
             .then((res) => {
                 setGame(res.data)
-
+                console.log(res.data)
                 axiosConfig.get('api/games/' + res.data.id + '/attachments')
                     .then(res => {
                         setAttachments(res.data)
@@ -135,12 +138,13 @@ function GameDetailsPage() {
                 toast.error(ErrorMap[err.message])
             })
     }
-
+    
     if (!loading)
     return (
         <Box>
             <div className="p-10 flex flex-col gap-4">
-                <h1 className="font-bold">{game.title}</h1>
+                <Typography variant="h4" className="font-bold">{game.title}</Typography>
+                <a href={"/user/"+game.publisher.id}><Typography variant="h5">{game.publisher.username}</Typography></a>
                 <img className="h-[300px] w-[500px] object-cover" src={process.env.REACT_APP_BASE_URL + game.image} />
                 <p>Descrizione: {game.description}</p>
                 <p>Prezzo: {game.price}</p>
@@ -150,6 +154,7 @@ function GameDetailsPage() {
 
                 <Button variant="contained" onClick={() => addGame()}color="info">Aggiungi al carrello</Button>
                 <Button variant="contained" color="error" onClick={() => openModal()}><MdReport className="mr-2" />Segnala</Button>
+                {!loading && game.publisher.id != user.id && <ReviewSection />}
                 <ReportGameModal 
                     closeModal={closeModal} 
                     modalIsOpen={modalIsOpen} 
