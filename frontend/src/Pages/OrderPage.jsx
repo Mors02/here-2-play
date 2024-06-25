@@ -4,6 +4,18 @@ import { axiosConfig } from "../config/axiosConfig";
 import { toast } from "react-toastify";
 import { ErrorMap } from "../config/enums";
 import PaymentModal from "../Modals/PaymentModal";
+import moment from "moment";
+
+function applyDiscounts(games) {
+    games.map(game => {
+        game.details.discounts.some(discount => {
+            let today = moment()
+            if (today.isAfter(moment(discount.start_date)) && today.isBefore(moment(discount.end_date))) {
+                game.details.price = +(game.details.price - (game.details.price * discount.percentage / 100)).toFixed(2)
+            }
+        })
+    })
+}
 
 export default function OrderPage() {
     const initialState =  {totalCost: 0}
@@ -36,6 +48,7 @@ export default function OrderPage() {
             if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
                 throw new Error(res["response"]["data"])
             setOrder(res.data)
+            applyDiscounts(res.data.games)
             setGames(res.data.games)
             res.data.games.map(game => {
                 let price = game.details.price;
@@ -72,7 +85,7 @@ export default function OrderPage() {
                 {games.map((game, index) => (
                     <Box className={index==0? normalStyle + " border-t-2" : normalStyle}>
                         <Typography>{game.details.title}</Typography>
-                        <Typography className="float-right">€ {game.details.price}</Typography>
+                        <Typography className="float-right">€ {(game.details.price).toFixed(2)}</Typography>
                         <Button onClick={() => deleteGame(game.id)}color={"error"} variant={"contained"}>Rimuovi</Button>
                     </Box>
                 ))}
@@ -95,23 +108,24 @@ export function OrderDropdown() {
 
     useEffect(() => {
         axiosConfig.get('api/orders/')
-        .then((res) => {
-            if (res.data == "") {
-                return
-            }
-                
-            setGames(res.data.games)
-            res.data.games.map(game => {
-                let price = game.details.price;
-                dispatch({price: +price})
-                console.log(state.totalCost)
-            })
-            isLoading(false)
-        })
-        .catch(err => {
-            console.log(err)
-        })
+            .then((res) => {
+                if (res.data == "") {
+                    return
+                }
 
+                applyDiscounts(res.data.games)
+                    
+                setGames(res.data.games)
+                res.data.games.map(game => {
+                    let price = game.details.price;
+                    dispatch({price: +price})
+                    console.log(state.totalCost)
+                })
+                isLoading(false)
+            })
+            .catch(err => {
+                console.log(err)
+            })
     }, [])
     // const games = [
     //     {"name": "asdasd"},
@@ -135,8 +149,7 @@ export function OrderDropdown() {
                 ))}
             </Stack>
             <Stack>
-                {/* il costo totale va dimezzato perché in strict mode */}
-                <Typography variant="h5">Subtotale: € {!loading? (state.totalCost/2).toFixed(2) : 0}</Typography>
+                <Typography variant="h5">Subtotale: € {!loading ? (state.totalCost).toFixed(2) : 0}</Typography>
                 <a href="/cart"><Button variant="contained">Vai alla pagina del carrello</Button></a>
             </Stack>
         </Box>

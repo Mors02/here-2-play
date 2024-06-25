@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { axiosConfig } from "../config/axiosConfig";
-import { Button } from "@mui/material";
+import { Button, Divider, Stack, Typography } from "@mui/material";
 import { MdReport } from "react-icons/md";
 import ReportGameModal from "../Modals/ReportGameModal";
 import { toast } from "react-toastify";
@@ -17,6 +17,8 @@ import SwipeableViews from 'react-swipeable-views';
 import { autoPlay } from 'react-swipeable-views-utils';
 import { Colors } from '../config/Colors.js'
 import 'react-toastify/dist/ReactToastify.min.css';
+import Rating from '@mui/material/Rating';
+import moment from 'moment';
 
 const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
@@ -27,6 +29,7 @@ function GameDetailsPage() {
     const [attachments, setAttachments] = useState()
     const [activeStep, setActiveStep] = useState(0)
     const [maxLength, setMaxLength] = useState()
+    const [discount, setDiscount] = useState()
     const [game, setGame] = useState([])
     const { gameId } = useParams()
     const navigate = useNavigate()
@@ -43,27 +46,31 @@ function GameDetailsPage() {
         setActiveStep(step);
     };
 
-    function update() {
+    function updateData() {
         setLoading(true)
 
         return axiosConfig.get('/api/games/' + gameId)
             .then((res) => {
+                console.log(res.data)
+                
                 setGame(res.data)
+                setAttachments(res.data.attachments)
+                setMaxLength(res.data.attachments.length)
 
-                axiosConfig.get('api/games/' + res.data.id + '/attachments')
-                    .then(res => {
-                        setAttachments(res.data)
-                        setMaxLength(res.data.length)
-                        setLoading(false)
-                    })
-            })
-            .catch(err => {
-                navigate('/your-games')
+                res.data.discounts.some(discount => {
+                    let today = moment()
+                    if (today.isAfter(moment(discount.start_date)) && today.isBefore(moment(discount.end_date))) {
+                        setDiscount(discount)
+                        return true
+                    }
+                })
+
+                setLoading(false)
             })
     }
 
     useEffect(() => {
-        update()
+        updateData()
     }, [])
 
     function openModal() {
@@ -76,7 +83,7 @@ function GameDetailsPage() {
 
     function Attachments() {
         return (
-            <Box className="border-4 rounded-md">
+            <Box>
                 <AutoPlaySwipeableViews
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={activeStep}
@@ -84,13 +91,9 @@ function GameDetailsPage() {
                     enableMouseEvents
                 >
                     {
-                        attachments.map(game => {
-                            return (
-                                <Box key={game.id}>
-                                    <img className="h-[500px] object-cover m-auto" src={process.env.REACT_APP_BASE_URL + game.image} />
-                                </Box>
-                            )
-                        })
+                        attachments.map(game => 
+                            <img key={game.id} className="rounded-md overflow-hidden object-cover m-auto aspect-[1920/1080]" src={process.env.REACT_APP_BASE_URL + game.image} />
+                        )
                     }
                 </AutoPlaySwipeableViews>
                 <MobileStepper
@@ -99,7 +102,7 @@ function GameDetailsPage() {
                     position="static"
                     activeStep={activeStep}
                     nextButton={
-                        <Button size="small" className="!mb-[-4px]" onClick={handleNext} disabled={activeStep === maxLength - 1}>
+                        <Button size="small" className="!mb-[-2px]" onClick={handleNext} disabled={activeStep === maxLength - 1}>
                             Next
                             {theme.direction === 'rtl' ? (
                             <KeyboardArrowLeft />
@@ -109,7 +112,7 @@ function GameDetailsPage() {
                         </Button>
                     }
                     backButton={
-                        <Button size="small" className="!mb-[-4px]" onClick={handleBack} disabled={activeStep === 0}>
+                        <Button size="small" className="!mb-[-2px]" onClick={handleBack} disabled={activeStep === 0}>
                             {theme.direction === 'rtl' ? (
                             <KeyboardArrowRight />
                             ) : (
@@ -128,7 +131,6 @@ function GameDetailsPage() {
             .then(res => {
                 if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")
                     throw new Error(res["response"]["data"])
-                console.log(res.data)
                 toast.success("Gioco aggiunto al carrello.")
             })
             .catch(err => {
@@ -136,27 +138,61 @@ function GameDetailsPage() {
             })
     }
 
+    function Price() {
+        if (discount) {
+            return (
+                <Box className="flex gap-3">
+                    <Typography className="line-through">{game.price}</Typography>
+                    <Typography>{(game.price - (game.price * discount.percentage / 100)).toFixed(2)}€</Typography>
+                    <Typography className="rounded text-[#7CFC00] bg-[#228B22] px-1">-{discount.percentage}%</Typography>
+                </Box>
+            )
+        }
+        return game.price
+    }
+
     if (!loading)
     return (
-        <Box>
-            <div className="p-10 flex flex-col gap-4">
-                <h1 className="font-bold">{game.title}</h1>
-                <img className="h-[300px] w-[500px] object-cover" src={process.env.REACT_APP_BASE_URL + game.image} />
-                <p>Descrizione: {game.description}</p>
-                <p>Prezzo: {game.price}</p>
-                <p>Giorno di pubblicazione: {game.upload_date}</p>
+        <Stack spacing={4} className="px-[10%] lg:px-[15%]">
+            <Divider className="text-3xl !mt-8"><b>{game.title}</b></Divider>
 
-                { attachments?.length > 0 && <Attachments /> }
+            <Box className="bg-gray-100 border-4 border-[#f3f4f6] rounded-md">
+                <Attachments />
+            </Box>
+            
+            <Box className="bg-gray-100 rounded-md flex !mb-10">
+                <img className="aspect-[600/900] w-2/5 object-cover rounded-l" src={process.env.REACT_APP_BASE_URL + game.image} />
+                <Box className="p-6 w-full relative">
+                    <Stack className="w-full" spacing={1}>
+                        <Divider><b>{game.title}</b></Divider>
+                        <Typography><b>Descrizione: </b>{game.description}</Typography>
+                        <Typography className="flex gap-2">
+                            <b>Prezzo: </b>
+                            <Price />
+                        </Typography>
+                        <Typography><b>Data di Pubblicazione: </b>{moment(game.upload_date).format('DD/MM/YYYY')}</Typography>
+                        <Typography>
+                            <b>Sviluppatore: </b>
+                            <a className="text-blue-500" href={"/user/" + game.publisher.id}>{game.publisher.username}</a>
+                        </Typography>
+                        <Typography>
+                            <b>Valutazione Media: </b>
+                            {/* <Rating className="" defaultValue={2.5} precision={0.5} readOnly /> */}
+                        </Typography>
+                    </Stack>
 
-                <Button variant="contained" onClick={() => addGame()}color="info">Aggiungi al carrello</Button>
-                <Button variant="contained" color="error" onClick={() => openModal()}><MdReport className="mr-2" />Segnala</Button>
-                <ReportGameModal 
-                    closeModal={closeModal} 
-                    modalIsOpen={modalIsOpen} 
-                    gameReported={game}
-                />
-            </div>
-        </Box>
+                    <Box className="flex gap-4 absolute right-4 bottom-4">
+                        <Button variant="contained" onClick={() => addGame()} color="info">Aggiungi al carrello</Button>
+                        <Button variant="contained" color="error" onClick={() => openModal()}><MdReport className="mr-2" />Segnala</Button>
+                        <ReportGameModal 
+                            closeModal={closeModal} 
+                            modalIsOpen={modalIsOpen} 
+                            gameReported={game}
+                        />
+                    </Box>
+                </Box>
+            </Box>
+        </Stack>
     )
 }
 

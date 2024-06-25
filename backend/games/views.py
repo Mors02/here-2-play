@@ -11,12 +11,20 @@ from django.shortcuts import get_object_or_404
 from django.utils.dateparse import parse_date
 
 class DiscountViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    
     def create(self, request, pk):
         start = parse_date(request.data['discount_start'])
         end = parse_date(request.data['discount_end'])
 
-        if (end < start):
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if end < start:
+            return Response('ERR_INVALID_DATES', status=status.HTTP_400_BAD_REQUEST)
+        
+        if int(request.data['discount_percentage']) <= 0 or int(request.data['discount_percentage']) > 100:
+            return Response('ERR_INVALID_PERCENTAGE', status=status.HTTP_400_BAD_REQUEST)
+        
+        if end - start > 30:
+            return Response('ERR_DISCOUNT_EXCEEDED_30_DAYS', status=status.HTTP_400_BAD_REQUEST)
 
         active_discount = Discount.objects.filter(game_id=pk).filter(end_date__gt=start)
 
@@ -131,6 +139,8 @@ class YourGameList(generics.ListAPIView):
         return Response(serializer.data)
     
 class GameAttachmentViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    
     def list(self, request, pk=None):
         data = GameAttachment.objects.filter(game_id=pk)
         serializer = GameAttachmentSerializer(data, many=True)

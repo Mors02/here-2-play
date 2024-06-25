@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { axiosConfig } from "../config/axiosConfig";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { Container, LinearProgress, Typography, Button, Box } from "@mui/material";
 import useCurrentUser from "../config/UseCurrentUser";
 import moment from 'moment';
@@ -10,11 +10,13 @@ import { FaPen } from "react-icons/fa";
 import { MdReport } from "react-icons/md";
 import ReportUserModal from "../Modals/ReportUserModal";
 import YourGames from "../Component/YourGames"
+import GameList from "../Component/GameList";
 
 export default function UserPage() {
     const [retrievedUser, setUser] = useState()
     const {user, loading} = useCurrentUser()
-    const {id} = useParams()
+    const navigate = useNavigate()
+    const { id } = useParams()
     const [loadingPage, setLoading] = useState(true);
     const [modalIsOpen, setIsOpen] = useState(false);
 
@@ -62,6 +64,9 @@ export default function UserPage() {
         });
     }, [])
     
+    function handleClick(game) {
+        return navigate('/games/' + game.id)
+    }
 
     return (
         <Box className="w-screen overflow-x-hidden">
@@ -91,11 +96,12 @@ export default function UserPage() {
                         </TabList>
 
                         <TabPanel>
-                            <h2>Libreria</h2>
-                            {retrievedUser.games.map(game => (<p>{game.details.title}</p>))}
+                            <Box className="px-10 py-8">
+                                <GameList games={retrievedUser.games} handleClick={handleClick} />
+                            </Box>
                         </TabPanel>
                         <TabPanel>
-                            <YourGames />
+                            <YourGames user={retrievedUser} />
                         </TabPanel>
                     </Tabs>
                 </Box>

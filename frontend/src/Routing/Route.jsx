@@ -32,7 +32,7 @@ export function shouldShowFriendlistInUrl(url) {
     if (validUrls.some(s => {
         const reg = new RegExp(s)
         url = url.replace(process.env.REACT_APP_FRONTEND_URL, "")
-        console.log(s, url, reg.test(url.replace(process.env.REACT_APP_FRONTEND_URL, "")))
+        // console.log(s, url, reg.test(url.replace(process.env.REACT_APP_FRONTEND_URL, "")))
         return reg.test(url)
     }))
         return true;

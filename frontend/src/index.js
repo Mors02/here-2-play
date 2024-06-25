@@ -16,9 +16,7 @@ root.render(
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <ToastProvider>
         <BrowserRouter>
-          <React.StrictMode>
-              <App />
-          </React.StrictMode>
+          <App />
         </BrowserRouter>
       </ToastProvider>
     </LocalizationProvider>
