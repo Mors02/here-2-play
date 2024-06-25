@@ -8,6 +8,7 @@ import { shouldShowFriendlistInUrl } from "../Routing/Route";
 import FriendListPage from "../Pages/FriendListPage";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { OrderDropdown } from "../Pages/OrderPage";
+import { Link } from "react-router-dom";
 
 function Layout(props) {
     const [open, toggleDrawer] = useState(false);
@@ -25,7 +26,7 @@ function Layout(props) {
             {!loading? <>
                 <Box className="min-h-12 bg-slate-500 ">
                     <Box className="p-5">
-                        LOGO HERE
+                        <Link to="/">LOGO HERE</Link>
                         <Stack direction={"row"} className="float-right w-60 flex justify-end">
                             <ShoppingCartIcon fontSize="large" className="cursor-pointer" onClick={() => setDropdownVisibile(true)}/>
                             <ReorderIcon fontSize="large" className="cursor-pointer ml-20" onClick={() => toggleDrawer(true)}/>

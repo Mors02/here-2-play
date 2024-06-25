@@ -2,12 +2,46 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.authentication import SessionAuthentication
-from .models import Game, GameAttachment
+from .models import Game, GameAttachment, Discount
 from .serializers import GameSerializer, GameAttachmentSerializer
 from rest_framework.response import Response
 from rest_framework import permissions, status, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
+from django.utils.dateparse import parse_date
+
+class DiscountViewSet(viewsets.ModelViewSet):
+    def create(self, request, pk):
+        start = parse_date(request.data['discount_start'])
+        end = parse_date(request.data['discount_end'])
+
+        if (end < start):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        active_discount = Discount.objects.filter(game_id=pk).filter(end_date__gt=start)
+
+        if active_discount:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        discount = Discount(
+            percentage=request.data['discount_percentage'],
+            start_date=start,
+            end_date=end,
+            game_id=pk
+        )
+
+        discount.save()
+        
+        return Response(status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, pk=None):
+        discount = Discount.objects.get(pk=pk)
+
+        if discount.game.publisher.id == request.user.id:
+            discount.delete()
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
 class GameViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
@@ -101,5 +135,10 @@ class GameAttachmentViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     def destroy(self, request, pk=None):
-        GameAttachment.objects.get(id=pk).delete()
+        attachment = GameAttachment.objects.get(id=pk)
+
+        if attachment.game.publisher.id != request.user.id:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        attachment.delete()
         return Response(status=status.HTTP_200_OK)

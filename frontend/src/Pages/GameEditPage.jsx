@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
 import Box from '@mui/material/Box';
 import useCurrentUser from "../config/UseCurrentUser";
-import { TextField, Button, Stack, InputAdornment, Typography } from "@mui/material"
+import { TextField, Button, Stack, InputAdornment, Typography, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material"
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useForm } from 'react-hook-form';
 import { TiDelete } from "react-icons/ti";
@@ -13,6 +13,9 @@ import Divider from '@mui/material/Divider';
 import { RiDiscountPercentFill } from "react-icons/ri";
 import EditDrawer from "../Component/EditDrawer";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { MdDelete } from "react-icons/md";
+import { IoAddOutline } from "react-icons/io5";
+import moment from 'moment';
 
 function GameEditPage() {
     const [pageLoading, setPageLoading] = useState()
@@ -22,7 +25,10 @@ function GameEditPage() {
     const [attachments, setAttachments] = useState([])
     const [newAttachments, setNewAttachments] = useState([])
     const [showDiscount, setShowDiscount] = useState(false)
+
     const [activeDiscounts, setActiveDiscounts] = useState([])
+    const [discountStart, setDiscountStart] = useState()
+    const [discountEnd, setDiscountEnd] = useState()
 
     const { gameId } = useParams()
     const { user, loading } = useCurrentUser()
@@ -31,7 +37,7 @@ function GameEditPage() {
     const {
         register,
         getValues,
-        setValues
+        setValue
     } = useForm()
 
     function updateData() {
@@ -53,7 +59,16 @@ function GameEditPage() {
                 }
                 
                 setAttachments(res.data.attachments)
+
+                setActiveDiscounts(
+                    res.data.discounts.map(discount => {
+                        if (discount.end_date > moment().format('YYYY-MM-DD')) {
+                            return discount
+                        }
+                    })
+                )
                 setGame(res.data)
+                setValue('discount_percentage', '')
                 setPageLoading(false)
             })
     }
@@ -68,8 +83,7 @@ function GameEditPage() {
     }
 
     function handleAttachmentsUpload(e) {
-        if (e.target.files[0])
-            setNewAttachments(e.target.files)
+        setNewAttachments(e.target.files)
     }
 
     function handleFileUpload(e) {
@@ -80,14 +94,14 @@ function GameEditPage() {
     function ListAttachments() {
         return (
             <Box>
-                <Divider>Vecchi Allegati</Divider>
+                <Divider>Allegati Attuali</Divider>
                 <Box className="grid grid-cols-4 gap-4 mt-4">
                 {
                     Object.keys(attachments).map(
                         key => (
-                            <Box className="relative border border-red-500">
+                            <Box className="relative border border-gray-500">
                                 <img className="aspect-[1920/1080] object-cover m-auto" src={process.env.REACT_APP_BASE_URL + attachments[key].image} />
-                                <TiDelete className="absolute top-3 right-3" size={30} color="red" onClick={() => deleteAttachment(attachments[key].id)} />
+                                <TiDelete className="absolute top-2 right-2" size={25} color="red" onClick={() => deleteAttachment(attachments[key].id)} />
                             </Box>
                         )
                     )
@@ -175,10 +189,10 @@ function GameEditPage() {
         uploadData.append('description', getValues('description'))
         uploadData.append('price', getValues('price'))
 
-        if (image)
+        if (image?.name)
             uploadData.append('image', image, image.name)
 
-        if (file)
+        if (file?.name)
             uploadData.append('file', file)
 
         if (newAttachments.length > 0)
@@ -204,7 +218,90 @@ function GameEditPage() {
                     return toast.success('Gioco modificato con successo!')
                 return toast.error('Errore durante la modifica!')
             })
-            .catch(err => console.log(err))
+    }
+
+    function createDiscount() {
+        if (discountStart >= discountEnd)
+            return toast.error('Le date per lo sconto sono scorrette!')
+
+        if (getValues('discount_percentage') && discountStart && discountEnd) {
+            setPageLoading(true)
+
+            const discountData = new FormData()
+            discountData.append('discount_percentage', getValues('discount_percentage'))
+            discountData.append('discount_start', discountStart)
+            discountData.append('discount_end', discountEnd)
+
+            axiosConfig.post('/api/games/' + gameId + '/discounts/', discountData)
+                .then(res => {
+                    setPageLoading(false)
+                    if (res.status == 201) {
+                        updateData()
+
+                        toast.success('Sconto creato con successo!')
+                    } else if (res?.response?.status == 400)
+                        toast.error('I periodi di sconto non possono incrociarsi con quelli già attivi!')
+                    else
+                        toast.error('Creazione sconto fallita!')
+                })
+        }
+    }
+
+    function deleteDiscount(id) {
+        confirmAlert({
+            title: 'Sei sicuro di voler cancellare questo sconto?',
+            buttons: [
+                {
+                    label: 'Procedi',
+                    onClick: () => {
+                        axiosConfig.delete('/api/discounts/' + id + '/')
+                        .then(res => {
+                            if (res.status == 200) {
+                                updateData()
+                                return toast.success('Sconto cancellato con successo!')
+                            }
+                            return toast.error('Non è stato possibile cancellare lo sconto')
+                        })
+                    }
+                },
+                {
+                    label: 'Indietro'
+                }
+            ]
+        })
+    }
+
+    function ActiveDiscounts() {
+        return (
+            <Box>
+                <Divider>Sconti Attivi</Divider>
+
+                <Table className="bg-gray-100 rounded mt-4">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell align="center"><b>Inizio</b></TableCell>
+                            <TableCell align="center"><b>Fine</b></TableCell>
+                            <TableCell align="center"><b>Percentuale</b></TableCell>
+                            <TableCell align="center"><b>Prezzo Scontato</b></TableCell>
+                            <TableCell></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                    {
+                        activeDiscounts.map(discount =>
+                            <TableRow className="border-t-1" key={discount.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                <TableCell align="center">{moment(discount.start_date).format('DD/MM/YYYY')}</TableCell>
+                                <TableCell align="center">{moment(discount.end_date).format('DD/MM/YYYY')}</TableCell>
+                                <TableCell align="center">{discount.percentage}%</TableCell>
+                                <TableCell align="center">{game.price - (game.price * discount.percentage / 100)}</TableCell>
+                                <TableCell><MdDelete onClick={() => deleteDiscount(discount.id)} color="red" size={20} className="my-auto" /></TableCell>
+                            </TableRow>
+                        )
+                    }
+                    </TableBody>
+                </Table>
+            </Box>
+        )
     }
 
     if (!pageLoading && game) {
@@ -215,21 +312,26 @@ function GameEditPage() {
                     <TextField defaultValue={game.description} {...register('description')} label="Description" variant="outlined" multiline rows={3} required />
                     <TextField defaultValue={game.price} {...register('price')} label="Prezzo" type="number" variant="outlined" required />
 
+                    { activeDiscounts.length > 0 && <ActiveDiscounts /> }
+
                     <Box>
                         <Button onClick={() => setShowDiscount(!showDiscount)} variant="contained" className="w-full" component="label" startIcon={<RiDiscountPercentFill />}>
                             Aggiungi Sconto
                         </Button>
 
                         {
-                            (activeDiscounts.length > 0 || showDiscount) && (
+                            showDiscount && (
                                 <EditDrawer>
-                                    <Box className="flex gap-4">
-                                        <TextField label="Percentage" InputProps={{
-                                            endAdornment: <InputAdornment position="end">%</InputAdornment>
-                                        }}/>
-                                        <DatePicker label="Start" />
-                                        <DatePicker label="End" />
-                                    </Box>
+                                    <Stack gap={2}>
+                                        <Box className="flex gap-4">
+                                            <TextField className="grow" label="Percentuale" type="number" {...register('discount_percentage')} InputProps={{
+                                                endAdornment: <InputAdornment position="end">%</InputAdornment>
+                                            }}/>
+                                            <DatePicker className="grow" onChange={e => setDiscountStart(moment(e).format('YYYY-MM-DD'))} label="Inizio" />
+                                            <DatePicker className="grow" onChange={e => setDiscountEnd(moment(e).format('YYYY-MM-DD'))} label="Fine" />
+                                            <Button className="h-fit !my-auto" variant="contained" onClick={() => createDiscount()}>Inserisci</Button>
+                                        </Box>
+                                    </Stack>
                                 </EditDrawer>
                             )
                         }
