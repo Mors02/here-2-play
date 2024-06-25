@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.authentication import SessionAuthentication
-from .models import Game, GameAttachment, Discount
-from .serializers import GameSerializer, GameAttachmentSerializer
+from .models import Game, GameAttachment, Discount, Category
+from .serializers import GameSerializer, GameAttachmentSerializer, CategorySerializer
 from rest_framework.response import Response
 from rest_framework import permissions, status, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -77,7 +77,8 @@ class GameViewSet(viewsets.ModelViewSet):
                 publisher_id=self.request.user.pk,
                 price=request.data["price"],
                 image=request.data["image"],
-                uploaded_file=request.data["file"]
+                uploaded_file=request.data["file"],
+                category_id=request.data["category_id"]
             )
         game.save()
 
@@ -102,6 +103,7 @@ class GameViewSet(viewsets.ModelViewSet):
         game.title = request.data['title']
         game.description = request.data['description']
         game.price = request.data['price']
+        game.category_id = request.data['category_id']
 
         if 'image' in request.data:
             game.image = request.data['image']
@@ -154,3 +156,11 @@ class GameAttachmentViewSet(viewsets.ModelViewSet):
 
         attachment.delete()
         return Response(status=status.HTTP_200_OK)
+    
+class CategoryViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        data = Category.objects.all()
+        serializer = CategorySerializer(data, many=True)
+        return Response(serializer.data)

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
 import Box from '@mui/material/Box';
 import useCurrentUser from "../config/UseCurrentUser";
-import { TextField, Button, Stack, InputAdornment, Typography, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material"
+import { TextField, Button, Stack, InputAdornment, Typography, Table, TableHead, TableRow, TableCell, TableBody, Select, FormControl } from "@mui/material"
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useForm } from 'react-hook-form';
 import { TiDelete } from "react-icons/ti";
@@ -14,7 +14,8 @@ import { RiDiscountPercentFill } from "react-icons/ri";
 import EditDrawer from "../Component/EditDrawer";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { MdDelete } from "react-icons/md";
-import { IoAddOutline } from "react-icons/io5";
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 import moment from 'moment';
 
 function GameEditPage() {
@@ -22,6 +23,8 @@ function GameEditPage() {
     const [game, setGame] = useState()
     const [image, setImage] = useState()
     const [file, setFile] = useState()
+    const [allCategories, setAllCategories] = useState()
+    const [category, setCategory] = useState()
     const [attachments, setAttachments] = useState([])
     const [newAttachments, setNewAttachments] = useState([])
     const [showDiscount, setShowDiscount] = useState(false)
@@ -47,7 +50,6 @@ function GameEditPage() {
 
         axiosConfig.get('/api/games/' + gameId)
             .then(res => {
-                console.log(res.data)
                 if (res?.response?.status == 404) {
                     navigate('/')
                     return toast.error('Gioco non trovato!') 
@@ -69,8 +71,15 @@ function GameEditPage() {
                 )
                 setGame(res.data)
                 setValue('discount_percentage', '')
-                setPageLoading(false)
+                setCategory(res.data.category.id)
             })
+
+        axiosConfig.get('/api/categories/')
+            .then(res => {
+                setAllCategories(res.data)
+            })
+
+        setPageLoading(false)
     }
 
     useEffect(() => {
@@ -188,6 +197,7 @@ function GameEditPage() {
         uploadData.append('title', getValues('title'))
         uploadData.append('description', getValues('description'))
         uploadData.append('price', getValues('price'))
+        uploadData.append('category_id', category)
 
         if (image?.name)
             uploadData.append('image', image, image.name)
@@ -304,13 +314,29 @@ function GameEditPage() {
         )
     }
 
+    function handleCategory() {
+
+    }
+
     if (!pageLoading && game) {
         return (
             <form className='p-10' onSubmit={e => onSubmit(e)}>
                 <Stack direction="column" spacing={2}>
                     <TextField defaultValue={game.title} {...register('title')} label="Title" variant="outlined" required />
                     <TextField defaultValue={game.description} {...register('description')} label="Description" variant="outlined" multiline rows={3} required />
-                    <TextField defaultValue={game.price} {...register('price')} label="Prezzo" variant="outlined" required />
+                    <Box className="grid grid-cols-2 gap-4">
+                        <TextField defaultValue={game.price} {...register('price')} label="Prezzo" variant="outlined" required />
+                        <FormControl>
+                            <InputLabel>Categoria *</InputLabel>
+                            <Select label="Categoria" value={category} onChange={e => setCategory(e.target.value)} required>
+                            {
+                                allCategories && allCategories.map(category => 
+                                    <MenuItem value={category.id}>{category.name}</MenuItem>
+                                )
+                            }
+                            </Select>
+                        </FormControl>
+                    </Box>
 
                     { activeDiscounts.length > 0 && <ActiveDiscounts /> }
 

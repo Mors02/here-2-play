@@ -13,7 +13,7 @@ function GameList({ games, handleClick, maxCount=1000 }) {
         return filteredGames.map(game => {
                 return (
                     <Box key={game.id} onClick={() => handleClick(game)}>
-                        <img className='aspect-[600/900] object-cover' src={process.env.REACT_APP_BASE_URL + (game.image ?? game.details.image)} />
+                        <img className='aspect-[600/900] w-full object-cover' src={process.env.REACT_APP_BASE_URL + (game.image ?? game.details.image)} />
                     </Box>
                 )
             }

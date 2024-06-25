@@ -14,4 +14,6 @@ urlpatterns = [
 
     path('games/<int:pk>/discounts/', views.DiscountViewSet.as_view({'post': 'create'})),
     path('discounts/<int:pk>/', views.DiscountViewSet.as_view({'delete': 'destroy'})),
+
+    path('categories/', views.CategoryViewSet.as_view({'get': 'list'})),
 ]
