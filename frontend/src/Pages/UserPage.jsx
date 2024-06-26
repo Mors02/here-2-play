@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { axiosConfig } from "../config/axiosConfig";
 import { useNavigate, useParams } from "react-router";
-import { Container, LinearProgress, Typography, Button, Box } from "@mui/material";
+import { Container, LinearProgress, Typography, Button, Box, Stack } from "@mui/material";
 import useCurrentUser from "../config/UseCurrentUser";
 import moment from 'moment';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
@@ -74,13 +74,18 @@ export default function UserPage() {
             loadingPage || loading? <LinearProgress /> :
             <>
                 <Box className="bg-slate-400 p-2">
-                    <Box>
-                        <Typography className="inline" variant="h3" >{retrievedUser.username} </Typography>
-                        <Typography className="inline"> Registrato da {dateDiff(retrievedUser.date_joined)} </Typography>
+                    <Box className="flex">
+                        <Stack direction={"row"} className="place-items-center w-full">
+                            <img className="object-cover w-16 h-16 rounded-full inline m-3" src={process.env.REACT_APP_BASE_URL + retrievedUser.profile_picture} />
+                            <Typography variant="h3" >{retrievedUser.username} </Typography>
+                            <Typography className="pl-4 pt-4"> Registrato da {dateDiff(retrievedUser.date_joined)} </Typography>
+                        </Stack>
+                        <Box>
                         {user && id == user.id?
                             <Button variant="contained" sx={{marginTop: "11px", marginRight:"24px", float: "right"}} onClick={() => window.location.replace('/user')}><FaPen /> Modifica profilo</Button> :
                             <Button variant="contained" color="error" sx={{marginTop: "11px", marginRight:"24px", float: "right"}} onClick={() => openModal()}><MdReport /> Segnala</Button>
                         }
+                        </Box>
                     </Box>
                 </Box>
                 <ReportUserModal  

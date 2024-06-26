@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import UserReport, GameReport, FriendRequest, Friendship
 from django.db.models import Q
-from authentication.models import User
+from authentication.models import User, UserProfile
 
 class UserReportSerializer(serializers.ModelSerializer):
     class Meta:
@@ -72,7 +72,9 @@ class FriendRequestListSerializer(serializers.Serializer):
         requestJson = [
             {
                 "id": req.id,
-                "username": User.objects.get(id=req.user_requester.pk).username
+                "username": User.objects.get(id=req.user_requester.pk).username,
+                "user_id": req.user_requester.pk,
+                "profile_picture": UserProfile.objects.get(user_id=req.user_requester.pk).profile_picture.url
             }
             for req in requestsObj
         ]
@@ -112,7 +114,8 @@ class FriendshipListSerializer(serializers.Serializer):
         requestJson = [
             {
                 "id": req.userB.pk,
-                "username": User.objects.get(id=req.userB.pk).username
+                "username": User.objects.get(id=req.userB.pk).username,
+                "profile_picture": UserProfile.objects.get(user_id=req.userB.pk).profile_picture.url
             }
             for req in requestsObj
         ]

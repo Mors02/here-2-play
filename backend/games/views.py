@@ -152,7 +152,7 @@ class GameViewSet(viewsets.ModelViewSet):
     
     def update(self, request, pk=None):
         game = get_object_or_404(Game, pk=pk)
-
+        print(request.data)
         if game.publisher.id != request.user.id:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 

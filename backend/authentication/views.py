@@ -8,6 +8,7 @@ from django.contrib.auth.backends import ModelBackend
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Role, UserProfile
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from .models import User
 
 # Classe per la registrazione degli utenti
@@ -113,14 +114,16 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     def update(self, request, pk=None):
-        data = request.data        
+        data = request.data
+        print(request.data)
         serializer = UserEditSerializer(data={"username": data["username"], 
                                               "password": request.user.password, 
                                               "pk": request.user.pk,
                                               "username": data["username"],
                                               "first_name": data["first_name"],
                                               "last_name": data["last_name"],
-                                              "email": data["email"]},
+                                              "email": data["email"],
+                                              "profile_picture": data["profile_picture"]},
                                         context={"user": request.user, 
                                                  "message": "", 
                                                  "changedPassword": False})
