@@ -87,6 +87,7 @@ function GameEditPage() {
     }, [loading])
 
     function handleImageUpload(e) {
+        console.log(e.target.files[0])
         if (e.target.files[0])
             setImage(e.target.files[0])
     }
@@ -210,7 +211,7 @@ function GameEditPage() {
                 .map(
                     key => uploadData.append('attachments', newAttachments[key], newAttachments[key].name)
                 )
-
+        console.log(uploadData)
         axiosConfig.put('/api/games/' + gameId + "/", uploadData, {
                 headers: {
                 'Content-Type': 'multipart/form-data'

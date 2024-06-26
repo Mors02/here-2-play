@@ -49,6 +49,7 @@ class UserEditSerializer(serializers.Serializer):
     password = serializers.CharField()
     first_name = serializers.CharField(allow_null=True, allow_blank=True)
     last_name = serializers.CharField(allow_null=True, allow_blank=True)
+    profile_picture = serializers.ImageField()
 
     def edit(self, user, data):     
         #check if new email is already used
@@ -94,6 +95,14 @@ class UserEditSerializer(serializers.Serializer):
                 self.context["changedPassword"] = True
                 editedUser.set_password(data["newPassword"])
             editedUser.save()
+
+            #change pfp
+            print(data["profile_picture"])
+            if ("profile_picture" in data):
+                profile = UserProfile.objects.get(user_id=user.pk)
+                profile.profile_picture = data["profile_picture"]
+                profile.save()
+
             self.context["user"] = editedUser
             return editedUser
         #user = authenticate(username = clean_data["email"], password=clean_data["password"])
@@ -106,7 +115,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         #fields = ("email", "username", "first_name", "last_name", "role")
-        fields = ["user", "role"]
+        fields = ["user", "role", "profile_picture"]
         depth = 1  
 
 class UserInfoSerializer(serializers.ModelSerializer):
@@ -117,7 +126,11 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
 class UserInfoWithGamesSerializer(serializers.ModelSerializer):
     games = GamesBoughtSerializer(source="games_bought_user", many=True, read_only=True)
-    
+    profile_picture = serializers.SerializerMethodField()
+
     class Meta:
         model = UserModel
-        fields = ["username", "date_joined", "id", "games"]
+        fields = ["username", "id", "games", "profile_picture"]
+
+    def get_profile_picture(self, obj):
+        return obj.user_profile_user.profile_picture.url

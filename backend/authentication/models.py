@@ -14,8 +14,14 @@ class Role(models.Model):
 
 
 class UserProfile(models.Model):
+    def pfps(instance, filename):
+        return 'profile_pictures/{filename}'.format(filename=filename)
+
+    DEFAULT_PFP = 'profile_pictures/default.jpeg'
+
     class Meta:
         db_table = "user_profiles"
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_profile_user")
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name="user_profile_role")
+    profile_picture = models.ImageField(upload_to=pfps, default=DEFAULT_PFP)

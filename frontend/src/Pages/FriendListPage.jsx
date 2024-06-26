@@ -43,7 +43,8 @@ export default function FriendListPage({onClick}) {
     function refreshFriendRequests() {
         axiosConfig.get("/api/friend-requests/")
         .then((res) => {
-            console.log(res.data)
+            if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                throw new Error(res["response"]["data"])
             setFriendRequests(res.data)
         })
         .catch((err) => {
@@ -54,6 +55,8 @@ export default function FriendListPage({onClick}) {
     function refreshFriends() {
         axiosConfig.get("/api/friends/")
         .then((res) => {
+            if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                throw new Error(res["response"]["data"])
             console.log(res.data)
             setFriends(res.data)
         })
@@ -70,12 +73,14 @@ export default function FriendListPage({onClick}) {
 
         axiosConfig.post("api/friend-requests/", {username})
             .then((res) => {
+                if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                    throw new Error(res["response"]["data"])
                 console.log(res)
                 toast.success("Richiesta inviata con successo.");
             })
             .catch((err) => {
                 console.log(err)
-                toast.error(ErrorMap[err["response"]["data"]])
+                toast.error(ErrorMap[err.message])
             })
         
     }
@@ -83,6 +88,8 @@ export default function FriendListPage({onClick}) {
     function closeRequest(id, status) {
         axiosConfig.patch("api/friend-requests/"+id, {status})
         .then(res => {
+            if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                throw new Error(res["response"]["data"])
             if (status=="den")
                 toast.success("Richiesta rifiutata.")
             else {
@@ -91,7 +98,7 @@ export default function FriendListPage({onClick}) {
         })
         .catch((err) => {
             console.log(err)
-            toast.error(ErrorMap[err["response"]["data"]])
+            toast.error(ErrorMap[err.message])
         })
         .finally(() => {
             refreshFriendRequests()
@@ -109,10 +116,12 @@ export default function FriendListPage({onClick}) {
                 onClick: () => {
                     axiosConfig.delete("api/friends/"+id+"/")
                     .then(res => {
+                        if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                            throw new Error(res["response"]["data"])
                         toast.success("Amicizia annullata correttamente.")
                     })
                     .catch(err => {
-                        toast.error(ErrorMap[err["response"]["data"]])
+                        toast.error(ErrorMap[err.message])
                     })
                     .finally(() => {
                         refreshFriends()
@@ -140,6 +149,8 @@ export default function FriendListPage({onClick}) {
                 {friends.length == 0 && <Typography className="grid place-items-center justify-center !mt-4">Non hai nessun amico</Typography>}
                 {friends.map(friend => (
                         <Stack direction={"row"} className="border-solid border-b-2 border-black">
+                            {console.log(friend)}
+                            <img className="object-cover rounded-full w-8 h-8 m-1" src={process.env.REACT_APP_BASE_URL + friend.profile_picture}/>
                             <Typography variant="h6" className="pl-4 py-1" ><a href={"/user/"+friend.id}>{friend.username}</a></Typography>
                             <CiChat1 className="ml-32 h-8 w-8 cursor-pointer" />
                             <TbFriendsOff onClick={() => deleteFriend(friend.username, friend.id)} className="ml-2 h-8 w-8 cursor-pointer" color="red"/>
@@ -154,7 +165,9 @@ export default function FriendListPage({onClick}) {
                 </Stack>
                 {friendRequests.map(request => (
                     <Stack direction={"row"} className="border-solid border-b-2 border-black">
-                        <Typography variant="h6" className="pl-4 py-1" >{request.username}</Typography>
+                        {console.log(request)}
+                        <img className="object-cover rounded-full w-8 h-8 m-1" src={process.env.REACT_APP_BASE_URL + request.profile_picture}/>
+                        <Typography variant="h6" className="pl-4 py-1" ><a href={"/user/"+request.user_id}>{request.username}</a></Typography>
                         <FaCheck className="ml-32 h-8 w-8 cursor-pointer" color="green" onClick={() => closeRequest(request.id, "acc")} />
                         <IoMdClose className="ml-2 h-8 w-8 cursor-pointer" color="red" onClick={() => closeRequest(request.id, "den")}/>
                     </Stack>
