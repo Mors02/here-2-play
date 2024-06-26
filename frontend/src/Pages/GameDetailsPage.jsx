@@ -21,6 +21,7 @@ import Rating from '@mui/material/Rating';
 import moment from 'moment';
 import useCurrentUser from "../config/UseCurrentUser.jsx";
 import ReviewSection from "../Component/ReviewSection.jsx";
+import { IoArrowBackCircle } from "react-icons/io5";
 
 const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
@@ -59,14 +60,7 @@ function GameDetailsPage() {
                 setGame(res.data)
                 setAttachments(res.data.attachments)
                 setMaxLength(res.data.attachments.length)
-
-                res.data.discounts.some(discount => {
-                    let today = moment()
-                    if (today.isAfter(moment(discount.start_date)) && today.isBefore(moment(discount.end_date))) {
-                        setDiscount(discount)
-                        return true
-                    }
-                })
+                setDiscount(res.data.discounts[0])
 
                 setPageLoading(false)
             })
@@ -154,16 +148,21 @@ function GameDetailsPage() {
         return game.price
     }
 
+    function handleTagClick(id) {
+        navigate('/', { state: { tagId: id } })
+    }
+
     if (!loading && !pageLoading)
     return (
-        <Stack spacing={4} className="px-[10%] lg:px-[15%]">
+        <Stack spacing={4} className="px-[10%] lg:px-[12%] relative">
+            <IoArrowBackCircle color="#63748B" size={50} className="absolute top-4 left-4 cursor-pointer" onClick={() => navigate(-1)} />
             <Divider className="text-3xl !mt-8"><b>{game.title}</b></Divider>
 
             <Box className="bg-gray-100 border-4 border-[#f3f4f6] rounded-md">
                 <Attachments />
             </Box>
             
-            <Box className="bg-gray-100 rounded-md flex !mb-10">
+            <Box className="bg-gray-100 rounded-md flex">
                 <img className="aspect-[600/900] w-2/5 object-cover rounded-l" src={process.env.REACT_APP_BASE_URL + game.image} />
                 <Box className="p-6 w-full relative">
                     <Stack className="w-full" spacing={1}>
@@ -173,7 +172,7 @@ function GameDetailsPage() {
                             <b>Prezzo: </b>
                             <Price />
                         </Typography>
-                        <Typography><b>Categoria: </b>{game.category? game.category.name : "CATEGORIA ELIMINATA"}</Typography>
+                        <Typography><b>Categoria: </b>{game.category? game.category.name : "(Categoria Eliminata)"}</Typography>
                         <Typography><b>Data di Pubblicazione: </b>{moment(game.upload_date).format('DD/MM/YYYY')}</Typography>
                         <Typography>
                             <b>Sviluppatore: </b>
@@ -183,18 +182,26 @@ function GameDetailsPage() {
                             <b>Valutazione Media: </b>
                             {/* <Rating className="" defaultValue={2.5} precision={0.5} readOnly /> */}
                         </Typography>
+                        <Box className="flex gap-2">
+                            <b>Tags: </b>
+                            {
+                                game?.tags.map(tag => 
+                                    <Typography onClick={() => handleTagClick(tag.tag.id)} className="bg-orange-400 hover:bg-opacity-60 transition ease-linear text-white px-2 rounded cursor-pointer">{tag.tag.name}</Typography>
+                                )
+                            }
+                        </Box>
                     </Stack>
-
-                    <Box className="flex gap-4 absolute right-4 bottom-4">
-                        <Button variant="contained" onClick={() => addGame()} color="info">Aggiungi al carrello</Button>
-                        <Button variant="contained" color="error" onClick={() => openModal()}><MdReport className="mr-2" />Segnala</Button>
-                        <ReportGameModal 
-                            closeModal={closeModal} 
-                            modalIsOpen={modalIsOpen} 
-                            gameReported={game}
-                        />
-                    </Box>
                 </Box>
+            </Box>
+
+            <Box className="grid grid-cols-2 gap-4 !mb-10">
+                <Button variant="contained" onClick={() => addGame()} color="info">Aggiungi al carrello</Button>
+                <Button variant="contained" color="error" onClick={() => openModal()}><MdReport className="mr-2" />Segnala</Button>
+                <ReportGameModal 
+                    closeModal={closeModal} 
+                    modalIsOpen={modalIsOpen} 
+                    gameReported={game}
+                />
             </Box>
 
             {   

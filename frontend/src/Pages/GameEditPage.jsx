@@ -17,6 +17,7 @@ import { MdDelete } from "react-icons/md";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import moment from 'moment';
+import { IoArrowBackCircle } from "react-icons/io5";
 
 function GameEditPage() {
     const [pageLoading, setPageLoading] = useState()
@@ -62,16 +63,10 @@ function GameEditPage() {
                 
                 setAttachments(res.data.attachments)
 
-                setActiveDiscounts(
-                    res.data.discounts.map(discount => {
-                        if (discount.end_date > moment().format('YYYY-MM-DD')) {
-                            return discount
-                        }
-                    })
-                )
+                setActiveDiscounts(res.data.discounts)
                 setGame(res.data)
                 setValue('discount_percentage', '')
-                setCategory(res.data.category.id)
+                setCategory(res.data.category?.id)
             })
 
         axiosConfig.get('/api/categories/')
@@ -300,12 +295,12 @@ function GameEditPage() {
                     <TableBody>
                     {
                         activeDiscounts.map(discount =>
-                            <TableRow className="border-t-1" key={discount.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                <TableCell align="center">{moment(discount.start_date).format('DD/MM/YYYY')}</TableCell>
-                                <TableCell align="center">{moment(discount.end_date).format('DD/MM/YYYY')}</TableCell>
-                                <TableCell align="center">{discount.percentage}%</TableCell>
-                                <TableCell align="center">{game.price - (game.price * discount.percentage / 100)}</TableCell>
-                                <TableCell><MdDelete onClick={() => deleteDiscount(discount.id)} color="red" size={20} className="my-auto cursor-pointer" /></TableCell>
+                            <TableRow className="border-t-1" key={discount?.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                <TableCell align="center">{moment(discount?.start_date).format('DD/MM/YYYY')}</TableCell>
+                                <TableCell align="center">{moment(discount?.end_date).format('DD/MM/YYYY')}</TableCell>
+                                <TableCell align="center">{discount?.percentage}%</TableCell>
+                                <TableCell align="center">{game.price - (game.price * discount?.percentage / 100)}</TableCell>
+                                <TableCell><MdDelete onClick={() => deleteDiscount(discount?.id)} color="red" size={20} className="my-auto cursor-pointer" /></TableCell>
                             </TableRow>
                         )
                     }
@@ -317,7 +312,9 @@ function GameEditPage() {
 
     if (!pageLoading && game) {
         return (
-            <form className='p-10' onSubmit={e => onSubmit(e)}>
+            <form className='px-[10%] lg:px-[12%] relative py-10' onSubmit={e => onSubmit(e)}>
+                <IoArrowBackCircle color="#63748B" size={50} className="absolute top-4 left-4 cursor-pointer" onClick={() => navigate(-1)} />
+
                 <Stack direction="column" spacing={2}>
                     <TextField defaultValue={game.title} {...register('title')} label="Title" variant="outlined" required />
                     <TextField defaultValue={game.description} {...register('description')} label="Description" variant="outlined" multiline rows={3} required />
