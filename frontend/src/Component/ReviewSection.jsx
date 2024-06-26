@@ -19,7 +19,7 @@ export default function ReviewSection({game}) {
 
     useEffect(() => {
         getTags()
-        axiosConfig.get("api/games/"+game+"/reviews")
+        axiosConfig.get("api/games/" + game + "/reviews")
         .then(res => {
             if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
                 throw new Error(res["response"]["data"])
@@ -109,7 +109,7 @@ export default function ReviewSection({game}) {
     }
 
     return (
-        <Box className="bg-slate-300 w-full p-4">
+        <Box className="bg-slate-100 w-full p-6 rounded">
             <Typography variant="h4">Lascia una recensione</Typography>
             {!loadingPage && <FormControl className="w-full">
                 <Box className="flex gap-4 mb-6" >

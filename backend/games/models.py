@@ -66,7 +66,7 @@ class Review(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="reviews_game")
 
     def __str__(self):
-        return (self.game.title + " - " + self.rating + " - " + self.body)
+        return (self.game.title + " - " + str(self.rating) + " - " + self.body)
     
     class Meta:
         db_table = "reviews"
