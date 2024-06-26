@@ -16,6 +16,7 @@ const ErrorMap = {
     'ERR_ATTACHMENTS_REQUIRED': 'Gli allegati del gioco sono richiesti',
     'ERR_NO_RATING': 'Non hai valutato il gioco.',
     'ERR_TOO_MANY_TAGS': 'Puoi scegliere al massimo 4 tags.',
+    'ERR_NO_GAMES_AVAILABLES': 'Non sono presenti giochi con tali filtri.',
 }
 const blockedUrls = []
 

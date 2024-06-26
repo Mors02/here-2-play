@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Game, Discount, GameAttachment, Category, Review, Tag, GameTags, Bundle, BundleGames
+from django.utils.dateparse import parse_date
+import datetime
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -40,7 +42,7 @@ class GameTagSerializer(serializers.ModelSerializer):
 
 class GameSerializer(serializers.ModelSerializer):
     attachments = GameAttachmentSerializer(source="game_attachments_game", many=True, read_only=True)
-    discounts = DiscountSerializer(source="discounts_game", many=True, read_only=True)
+    discounts = serializers.SerializerMethodField()
     category = CategorySerializer(read_only=True)
     publisher = serializers.SerializerMethodField()
     tags = serializers.SerializerMethodField()
@@ -53,6 +55,16 @@ class GameSerializer(serializers.ModelSerializer):
     def get_publisher(self, obj):
         from authentication.serializers import UserInfoSerializer
         return UserInfoSerializer(obj.publisher).data
+    
+    def get_discounts(self, obj):
+        discounts = DiscountSerializer(obj.discounts_game, many=True).data
+
+        for discount in discounts:
+            today = datetime.date.today()
+            if today < parse_date(discount['start_date']) and today > parse_date(discount['end_date']):
+                discounts.remove(discount)
+
+        return discounts
     
     def get_tags(self, obj):
         top_tags = obj.game_tags_game.order_by('-count')[:4]
