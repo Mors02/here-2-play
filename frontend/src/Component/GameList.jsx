@@ -11,20 +11,18 @@ import { ErrorMap } from "../config/enums"
 import { useForm } from 'react-hook-form';
 import moment from 'moment';
 
-function GameList({ games, handleClick, maxCount=1000, searchSection=false }) {
+function GameList({ games, handleClick, maxCount=1000, searchSection=false, tagId='', previewPrices=false }) {
     const [loading, setLoading] = useState(true)
     const [filteredGames, setFilteredGames] = useState([])
-    const [rangePrices, setRangePrices] = useState(0)
-    const [defaultMin, setDefaultMin] = useState(0)
-    const [defaultMax, setDefaultMax] = useState(100)
+    const [rangePrices, setRangePrices] = useState([0, 1000])
     const [allCategories, setAllCategories] = useState([])
     const [allTags, setAllTags] = useState([])
     const [selectedCategory, setSelectedCategory] = useState('')
-    const [selectedTag, setSelectedTag] = useState('')
+    const [selectedTag, setSelectedTag] = useState(tagId)
     const [open, setOpen] = useState(false)
 
     const maxHomepageGames = maxCount
-    const minDistance = 5
+    const minDistance = 20
 
     const {
         register,
@@ -47,28 +45,15 @@ function GameList({ games, handleClick, maxCount=1000, searchSection=false }) {
         setLoading(true)
 
         let data = (games.length > maxHomepageGames && searchSection) ? games.slice(0, maxHomepageGames) : games
-        
-        if (searchSection && data.length > 0) {
-            let today = moment()
+
+        if (searchSection) {
             data.map(game => {
-                game?.discounts.some(discount => {
-                    if (today.isAfter(discount.start_date) && today.isBefore(discount.end_date))
-                        game.price = game.price - (game.price * discount.percentage / 100)
-                })
+                let discount = game?.discounts[0]
+                if (discount)
+                    game.price = game.price - (game.price * discount.percentage / 100)
             })
             
-            let minPrice = parseInt(Math.min(...data.map(({ price }) => price)))
-            let maxPrice = parseInt(Math.max(...data.map(({ price }) => price)))
-            
-            if (!defaultMin)
-                setDefaultMin(minPrice)
-            
-            if (!defaultMax)
-                setDefaultMax(maxPrice)
-            
-            setRangePrices([minPrice, maxPrice])
-
-            if (data.length <= 0)
+            if (data.length <= 0) 
                 toast.error(ErrorMap['ERR_NO_GAMES_AVAILABLES'])
         }
         setFilteredGames(data)
@@ -80,6 +65,9 @@ function GameList({ games, handleClick, maxCount=1000, searchSection=false }) {
         if (searchSection)
             retrieveData()
         updateData(games)
+        
+        if (tagId)
+            executeSearch()
     }, [])
 
     function executeSearch() {
@@ -131,7 +119,7 @@ function GameList({ games, handleClick, maxCount=1000, searchSection=false }) {
 
     function Games() {
         return filteredGames.map(game =>
-            <Game key={game.id} game={game} handleClick={handleClick} />
+            <Game key={game.id} game={game} handleClick={handleClick} previewPrices={previewPrices} />
         )
     }
 
@@ -146,8 +134,7 @@ function GameList({ games, handleClick, maxCount=1000, searchSection=false }) {
                         <Box className="flex gap-4">
                             <Typography className='w-[125px] !my-auto'>Range Prezzi</Typography>
                             <Slider
-                                min={defaultMin}
-                                max={defaultMax}
+                                max={1000}
                                 value={rangePrices}
                                 onChange={handleChange}
                                 valueLabelDisplay="on"
@@ -191,18 +178,24 @@ function GameList({ games, handleClick, maxCount=1000, searchSection=false }) {
     )
 }
 
-function Game({game, handleClick}) {
+function Game({ game, handleClick, previewPrices }) {
     const [entered, setEntered] = useState(false)
-    const hoverClass = "bg-slate-700 absolute bottom-0 w-full py-2 text-center bg-opacity-80 rounded-t-lg transition ease-linear shadow-[0_-10px_20px_-15px_rgba(0,0,0)]"
-    const normalClass = "bg-slate-700 absolute bottom-0 w-full py-2 text-center bg-opacity-20 rounded-t-lg transition ease-linear"
+    const hoverClass = "bg-opacity-80 shadow-[0_-10px_20px_-15px_rgba(0,0,0)]"
+    const normalClass = "bg-opacity-20"
     
     return (
-        <Box className="relative rounded overflow-hidden hover:scale-105 transition ease-linear shadow-2xl" key={game.id} onClick={() => handleClick(game)} onMouseEnter={() => setEntered(true)} onMouseLeave={() => setEntered(false)}>
+        <Box className="relative rounded overflow-hidden hover:scale-105 transition ease-linear shadow-2xl cursor-pointer" key={game.id} onClick={() => handleClick(game)} onMouseEnter={() => setEntered(true)} onMouseLeave={() => setEntered(false)}>
             <img className='aspect-[600/900] w-full object-cover' src={process.env.REACT_APP_BASE_URL + (game.image ?? game.details.image)} />
-            <Box className={entered ? hoverClass : normalClass}>
-                <Typography variant="h7" className='text-white cursor-default'>{game.title ?? game.details.title}</Typography>
+            <Box className={"bg-slate-700 absolute bottom-0 w-full py-2 text-center rounded-t-lg transition ease-linear " + (entered ? hoverClass : normalClass)}>
+                <Typography className='text-white md:!text-lg'>{game.title ?? game.details.title}</Typography>
             </Box>
+            {
+                previewPrices && <Box className={"absolute top-0 right-0 bg-opacity-80 px-2 py-1 rounded-bl-md " + (game?.discounts?.length > 0 ? 'bg-[#228B22]' : 'bg-slate-700')}>
+                    <Typography className='text-white md:!text-lg'>{(+game.price).toFixed(2)} €</Typography>
+                </Box>
+            }
         </Box>
-    )}
+    )
+}
 
 export default GameList;

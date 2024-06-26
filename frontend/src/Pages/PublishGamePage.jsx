@@ -12,6 +12,7 @@ import { ErrorMap } from '../config/enums'
 import EditDrawer from '../Component/EditDrawer';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
+import { IoArrowBackCircle } from "react-icons/io5";
 import MenuItem from '@mui/material/MenuItem';
 
 function PublishGamePage() {
@@ -107,7 +108,9 @@ function PublishGamePage() {
 
     if (!loading)
     return (
-        <form className='p-10' onSubmit={e => onSubmit(e)}>
+        <form className='px-[10%] lg:px-[12%] relative py-10' onSubmit={e => onSubmit(e)}>
+            <IoArrowBackCircle color="#63748B" size={50} className="absolute top-4 left-4 cursor-pointer" onClick={() => navigate(-1)} />
+
             <Stack direction="column" spacing={2}>
                 <TextField {...register('title')} label="Titolo" variant="outlined" required />
                 <TextField {...register('description')} label="Descrizione" variant="outlined" multiline rows={3} required />
