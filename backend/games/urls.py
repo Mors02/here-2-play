@@ -21,5 +21,8 @@ urlpatterns = [
     path('games/<int:pk>/reviews/<int:rev_pk>', views.ReviewViewSet.as_view({'patch': 'partial_update'})),
 
     path('tags/', views.TagViewSet.as_view({'get': 'list', 'post': 'create'})),
-    path('tags/<int:pk>/', views.TagViewSet.as_view({'delete', 'destroy'}))
+    path('tags/<int:pk>/', views.TagViewSet.as_view({'delete', 'destroy'})),
+
+    path('bundles/', views.BundleViewSet.as_view({'get': 'list', 'post': 'create'})),
+    path('bundles/<int:pk>/', views.BundleViewSet.as_view({'delete': 'destroy', 'get': 'retrieve'})),
 ]

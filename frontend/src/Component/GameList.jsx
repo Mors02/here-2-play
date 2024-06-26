@@ -5,17 +5,24 @@ import Box from '@mui/material/Box';
 import { Typography } from '@mui/material';
 import { MdSentimentVerySatisfied } from 'react-icons/md';
 
-function GameList({ games, handleClick, maxCount=1000 }) {
+function GameList({ selection=[], games, handleClick, maxCount=1000 }) {
+
     function Games() {
+        const [selected, setSelected] = useState(selection)
+        useEffect(() => {
+            setSelected(selection)
+        }, [selection]);
+
         const maxHomepageGames = maxCount
         let filteredGames = []
-        
-        
-        filteredGames = games.length > maxHomepageGames ? games.slice(0, maxHomepageGames) : games
+        if (games) {
+            filteredGames = games.length > maxHomepageGames ? games.slice(0, maxHomepageGames) : games
+        }
+            
         
         return filteredGames.map(game => {
                 return (
-                    <Game game={game} handleClick={handleClick} />
+                    <Game game={game} handleClick={handleClick} selected={selected.length > 0? selected.some(id => id == game.id) : false}/>
                 )
             }
         )
@@ -28,16 +35,15 @@ function GameList({ games, handleClick, maxCount=1000 }) {
     )
 }
 
-function Game({game, handleClick}) {
+function Game({game, handleClick, selected}) {
     const [entered, setEntered] = useState(false)
     const hoverClass = "bg-slate-700 absolute bottom-0 w-full py-2 text-center bg-opacity-80 rounded-t-lg transition ease-linear"
     const normalClass = "bg-slate-700 absolute bottom-0 w-full py-2 text-center bg-opacity-20 rounded-t-lg transition ease-linear"
-    
     return (
-        <Box className="relative" key={game.id} onClick={() => handleClick(game)} onMouseEnter={() => setEntered(true)} onMouseLeave={() => setEntered(false)}>
-            <img className='aspect-[600/900] object-cover' src={process.env.REACT_APP_BASE_URL + (game.image ?? game.details.image)} />
+        <Box className={"relative " + (selected? "outline outline-4 outline-slate-600 opacity-80" : "")}  key={game.id} onClick={() => handleClick(game)} onMouseEnter={() => setEntered(true)} onMouseLeave={() => setEntered(false)}>
+            <img className='aspect-[600/900] w-full object-cover' src={process.env.REACT_APP_BASE_URL + (game.image ?? game.details.image)} />
             <Box className={entered ? hoverClass : normalClass}>
-                <Typography variant="h4" className='text-white cursor-default'>{game.title}</Typography>
+                <Typography variant="h4" className='text-white cursor-default'>{game.title ?? game.details.title}</Typography>
             </Box>
         </Box>
     )}

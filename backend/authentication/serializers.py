@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import make_password
-from .models import UserProfile
+from .models import UserProfile, Role
 from django.contrib.auth.models import User
-from orders.serializers import GamesBoughtSerializer
+from orders.serializers import GamesBoughtSerializer, GameSerializer
+from games.serializers import BundleSerializer
 
 UserModel = get_user_model()
 
@@ -109,28 +110,36 @@ class UserEditSerializer(serializers.Serializer):
         #print(user)
 
         return None
-        
+
+class UserInfoWithGamesSerializer(serializers.ModelSerializer):
+    games = GamesBoughtSerializer(source="games_bought_user", many=True, read_only=True)
+    published_games = GameSerializer(source="games_publisher", many=True, read_only=True)
+    profile_picture = serializers.SerializerMethodField()
+    bundles = BundleSerializer(source="bundles_user", many=True, read_only=True)
+
+    class Meta:
+        model = UserModel
+        fields = ["username", "id", "games", "published_games", "profile_picture", "bundles"]
+
+    def get_profile_picture(self, obj):
+        return obj.user_profile_user.profile_picture.url
+
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = '__all__'   
 
 class UserSerializer(serializers.ModelSerializer):
+    user = UserInfoWithGamesSerializer()
+    role = RoleSerializer()
+
     class Meta:
         model = UserProfile
         #fields = ("email", "username", "first_name", "last_name", "role")
-        fields = ["user", "role", "profile_picture"]
-        depth = 1  
+        fields = ["user", "role", "profile_picture"] 
 
 class UserInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserModel
         fields = ["username", "date_joined", "id"]
-
-class UserInfoWithGamesSerializer(serializers.ModelSerializer):
-    games = GamesBoughtSerializer(source="games_bought_user", many=True, read_only=True)
-    profile_picture = serializers.SerializerMethodField()
-
-    class Meta:
-        model = UserModel
-        fields = ["username", "id", "games", "profile_picture"]
-
-    def get_profile_picture(self, obj):
-        return obj.user_profile_user.profile_picture.url

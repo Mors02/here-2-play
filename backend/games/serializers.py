@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Game, Discount, GameAttachment, Category, Review, Tag, GameTags
+from .models import Game, Discount, GameAttachment, Category, Review, Tag, GameTags, Bundle, BundleGames
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -68,3 +68,41 @@ class ReviewSerializer(serializers.ModelSerializer):
         review.save()
         return review
     
+class BundleGamesSerializer(serializers.ModelSerializer):
+    game = GameSerializer(read_only=True)
+    class Meta:
+        model = BundleGames
+        fields = '__all__'
+    
+    def create(self, data):
+        bundleGame = BundleGames(**data)
+        bundleGame.save()
+        return bundleGame
+
+class BundleSerializer(serializers.ModelSerializer):
+    games = BundleGamesSerializer(source="bundle_games_bundle", many=True, read_only=True)
+    total_price = serializers.SerializerMethodField()
+    discounted_price = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Bundle
+        fields = ['games', 'id', 'name', 'description', 'discount', 'total_price', 'discounted_price']
+
+    def create(self, data):
+        bundle = Bundle(**data)
+        bundle.save()
+        return bundle
+    
+    def get_total_price(self, obj):
+        sum = 0
+        games = obj.bundle_games_bundle.all()        
+        for bundleGame in games:
+            print(bundleGame.game)
+            if len(bundleGame.game.discounts_game.all()) > 0:
+                print(bundleGame.game.price * bundleGame.game.discounts[0].percentage / 100)
+            #sum += (game.game.details.price * game.game.details.discounts[0].percentage / 100)
+        return sum 
+    
+    def get_discounted_price(self, obj):
+        return 0
+

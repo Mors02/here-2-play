@@ -3,7 +3,7 @@ from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.authentication import SessionAuthentication
 from .models import Game, GameAttachment, Discount, Review, Tag, Category
-from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer
+from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer, BundleSerializer, BundleGamesSerializer
 from rest_framework.response import Response
 from rest_framework import permissions, status, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
@@ -105,6 +105,46 @@ class ReviewViewSet(viewsets.ModelViewSet):
             return Response(revData, status=status.HTTP_200_OK)
         except Review.DoesNotExist:
             return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)  
+        pass
+
+class BundleViewSet(viewsets.ModelViewSet):
+    def get_permissions(self):
+        if (self.action in ['list', 'retrieve']):
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+    
+    def list(self, request):
+        pass
+
+    def retrieve(self, request, pk=None):
+        pass
+
+    def create(self, request):
+        data = request.data
+        if (int(data["discount"]) < 0 or int(data["discount"]) > 100):
+            return Response("ERR_INVALID_PERCENTAGE", status=status.HTTP_400_BAD_REQUEST)
+        filtered_data = {**{key: value for key, value in data.items() if key != "games"}, "user": request.user}
+        serializer = BundleSerializer(data=filtered_data)
+        if (serializer.is_valid(raise_exception=True)):
+            bundle = serializer.create(filtered_data)
+            
+            for game in data["games"]:
+                try: 
+                    gameObj = Game.objects.get(id=game)
+                    print(bundle)
+                    gameSerializer = BundleGamesSerializer(data={"game": gameObj, "bundle": bundle.pk})
+                    if (gameSerializer.is_valid(raise_exception=True)):
+                        gameSerializer.create({"game": gameObj, "bundle": bundle})
+                    print(serializer.data)
+                except Game.DoesNotExist:
+                    return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_201_CREATED)
+        
+        return Response("ERR_STUPID", status=status.HTTP_200_OK)
+
+    def destroy(self, request, pk=None):
         pass
 
 class GameViewSet(viewsets.ModelViewSet):

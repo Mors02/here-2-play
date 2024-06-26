@@ -92,4 +92,27 @@ class GameTags(models.Model):
     
     def __str__(self):
         return (self.tag +" -> "+ self.game.title)
+    
+class Bundle(models.Model):
+    name = models.TextField(max_length=50)
+    description = models.TextField(max_length=300)
+    discount = models.PositiveSmallIntegerField(validators=[MaxValueValidator(100)])
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bundles_user")
+
+    class Meta:
+        db_table = "bundles"
+
+    def __str__(self):
+        return (self.name + " - " + self.description)
+
+class BundleGames(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="bundle_games_game")
+    bundle = models.ForeignKey(Bundle, on_delete=models.CASCADE, related_name="bundle_games_bundle")
+
+    class Meta:
+        db_table = "bundle_games"
+
+    def __str__(self):
+        return (self.bundle.name + " - " + self.game.title)
+
 

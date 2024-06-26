@@ -10,6 +10,7 @@ import UserEditPage from "../Pages/Auth/UserEditPage";
 import UserPage from "../Pages/UserPage";
 import { validUrls } from "../config/enums";
 import OrderPage from "../Pages/OrderPage";
+import BundleCreate from "../Pages/Bundles/BundleCreate";
 
 export default function AppRoutes() {
     return (
@@ -19,6 +20,7 @@ export default function AppRoutes() {
             <Route path="/publish" element={<PublishGamePage />}></Route>
             <Route path="/games/:gameId" element={<GameDetailsPage />}></Route>
             <Route path="/games/:gameId/edit" element={<GameEditPage />}></Route>
+            <Route path="/bundle/create" element={<BundleCreate />}></Route>
             <Route path="/register" element={<RegisterPage />}></Route>
             <Route path="/user/:id" element={<UserPage />}></Route>
             <Route path="/user/" element={<UserEditPage />}></Route>
