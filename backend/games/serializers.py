@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Game, Discount, GameAttachment, Category, Review, Tag, GameTags, Bundle, BundleGames
+from .models import Game, Discount, GameAttachment, Category, Review, Tag, GameTags, Bundle, BundleGames, VisitedGame
 from django.utils.dateparse import parse_date
 from django.db.models import Avg
 import datetime
@@ -146,3 +146,13 @@ class BundleSerializer(serializers.ModelSerializer):
         total_price = total_price - (total_price * obj.discount / 100)
         return total_price
 
+class VisitedGameSerializer(serializers.ModelSerializer):
+    game = serializers.SerializerMethodField()
+
+    class Meta:
+        model = VisitedGame
+        fields = ['game', 'user', 'visited_at']
+    
+    def get_game(self, obj):
+        game = Game.objects.get(id=obj.game_id)
+        return GameSerializer(game).data

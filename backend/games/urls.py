@@ -25,4 +25,6 @@ urlpatterns = [
 
     path('bundles/', views.BundleViewSet.as_view({'get': 'list', 'post': 'create'})),
     path('bundles/<int:pk>/', views.BundleViewSet.as_view({'delete': 'destroy', 'get': 'retrieve'})),
+
+    path('visit/game/', views.VisitedGameViewSet.as_view({'post': 'create'})),
 ]

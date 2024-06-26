@@ -1,17 +1,17 @@
 from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.authentication import SessionAuthentication
 
 from orders.models import GamesBought
-from .models import Game, GameAttachment, Discount, Review, Tag, Category, Bundle, BundleGames
-from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer, BundleSerializer, BundleGamesSerializer
+from .models import Game, GameAttachment, Discount, Review, Tag, Category, Bundle, BundleGames, VisitedGame
+from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer, BundleSerializer, BundleGamesSerializer, VisitedGameSerializer
 from rest_framework.response import Response
 from rest_framework import permissions, status, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from django.shortcuts import get_object_or_404
 from django.utils.dateparse import parse_date
 from authentication.models import User
+from django.utils import timezone
 
 class DiscountViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -308,3 +308,36 @@ class TagViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         pass
+
+class VisitedGameViewSet(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+
+    def create(self, request):
+        print(request.data)
+        if request.user.is_authenticated:
+            exist = VisitedGame.objects.filter(game_id=request.data['game']).filter(user_id=request.user.pk).count()
+
+            print(exist)
+            if exist > 0:
+                return self.update(request=request, pk=request.data['game'])
+
+            visit = VisitedGame(
+                game_id=request.data['game'],
+                user_id=request.user.pk
+            )
+        else:
+            visit = VisitedGame(
+                game_id=request.data['game'],
+                user_id=None
+            )
+        visit.save()
+
+        return Response(status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk):
+        visit = VisitedGame.objects.get(game_id=pk, user_id=request.user.pk)
+
+        visit.visited_at = timezone.now()
+        visit.save()
+
+        return Response(status=status.HTTP_200_OK)

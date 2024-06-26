@@ -108,7 +108,6 @@ class UserViewSet(viewsets.ModelViewSet):
         try:
             user = User.objects.get(id=pk)
             serializer = UserInfoWithGamesSerializer(user)
-            print(serializer.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
