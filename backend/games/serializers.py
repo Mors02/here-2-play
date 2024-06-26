@@ -95,21 +95,25 @@ class BundleSerializer(serializers.ModelSerializer):
     games = BundleGamesSerializer(source="bundle_games_bundle", many=True, read_only=True)
     total_price = serializers.SerializerMethodField()
     discounted_price = serializers.SerializerMethodField()
+    publisher = serializers.SerializerMethodField()
 
     class Meta:
         model = Bundle
-        fields = ['games', 'id', 'name', 'description', 'discount', 'total_price', 'discounted_price']
+        fields = ['games', 'id', 'name', 'description', 'discount', 'total_price', 'discounted_price', 'publisher']
 
     def create(self, data):
         bundle = Bundle(**data)
         bundle.save()
         return bundle
     
+    def get_publisher(self, obj):
+        from authentication.serializers import UserInfoSerializer
+        return UserInfoSerializer(obj.user).data
+    
     def get_total_price(self, obj):
         sum = 0
         games = obj.bundle_games_bundle.all()        
         for bundleGame in games:
-            print(bundleGame.game)
             game = GameSerializer(bundleGame.game).data
             if len(game["discounts"]) > 0:
                 disc = float(game["price"]) * int(game["discounts"][0]["percentage"]) / 100

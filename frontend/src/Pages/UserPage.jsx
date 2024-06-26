@@ -106,7 +106,7 @@ export default function UserPage() {
 
                         <TabPanel value={1}>
                             <Box className="px-10 py-8">
-                                <GameList games={retrievedUser.games} handleClick={handleClick} />
+                                <GameList games={retrievedUser.games} handleClick={handleClick} selection={[]} />
                             </Box>
                         </TabPanel>
                         <TabPanel value={2}>

@@ -4,7 +4,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.authentication import SessionAuthentication
 
 from orders.models import GamesBought
-from .models import Game, GameAttachment, Discount, Review, Tag, Category
+from .models import Game, GameAttachment, Discount, Review, Tag, Category, Bundle, BundleGames
 from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer, BundleSerializer, BundleGamesSerializer
 from rest_framework.response import Response
 from rest_framework import permissions, status, viewsets
@@ -124,7 +124,12 @@ class BundleViewSet(viewsets.ModelViewSet):
         pass
 
     def retrieve(self, request, pk=None):
-        pass
+        try:
+            bundle = Bundle.objects.get(id=pk)
+            bundleData = BundleSerializer(bundle).data
+            return Response(bundleData, status=status.HTTP_200_OK)
+        except Bundle.DoesNotExist:
+            return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
 
     def create(self, request):
         data = request.data

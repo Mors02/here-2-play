@@ -6,10 +6,10 @@ import { Link, useNavigate } from "react-router-dom";
 import BundleList from "../../Component/BundleList";
 
 export default function BundleOfUSer({user}) {
-    console.log(user)
+    const navigate = useNavigate()
 
-    function handleClick(game) {
-        console.log("click")
+    function handleClick(bundle) {
+        return navigate('/bundle/'+bundle.id)
     }
 
     return (

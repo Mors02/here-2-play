@@ -27,11 +27,11 @@ function Bundle({bundle, handleClick}) {
     return (
         <Box className={entered ? hoverClass : normalClass}  key={bundle.id} onClick={() => handleClick(bundle)} onMouseEnter={() => setEntered(true)} onMouseLeave={() => setEntered(false)}>        
             <Box className="absolute top-0 right-0 w-fit p-2 bg-slate-500 rounded-tr-xl rounded-bl-xl">
-                <Typography className="line-through">{(+bundle.total_price).toFixed(2)} €</Typography>
-                <Typography className="">{(+bundle.discounted_price).toFixed(2)} €</Typography>
+                <Typography variant="h7" className="line-through text-white">{(+bundle.total_price).toFixed(2)} €</Typography>
+                <Typography variant="h6"className="text-white font-bold">{(+bundle.discounted_price).toFixed(2)} €</Typography>
             </Box>
             <Box className="!mx-auto">
-                <Typography variant="h4" className='text-white'>{bundle.name}</Typography>
+                <Typography variant="h4" className=''>{bundle.name}</Typography>
             </Box>
         </Box>
     )
