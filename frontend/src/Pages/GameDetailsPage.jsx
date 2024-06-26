@@ -27,7 +27,7 @@ const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 function GameDetailsPage() {
     const theme = useTheme();
     const [modalIsOpen, setIsOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [pageLoading, setPageLoading] = useState(true);
     const [attachments, setAttachments] = useState()
     const [activeStep, setActiveStep] = useState(0)
     const [maxLength, setMaxLength] = useState()
@@ -35,7 +35,7 @@ function GameDetailsPage() {
     const [game, setGame] = useState([])
     const { gameId } = useParams()
     const navigate = useNavigate()
-    const {user} = useCurrentUser()
+    const { user, loading } = useCurrentUser()
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -50,7 +50,7 @@ function GameDetailsPage() {
     };
 
     function updateData() {
-        setLoading(true)
+        setPageLoading(true)
 
         return axiosConfig.get('/api/games/' + gameId)
             .then((res) => {
@@ -68,7 +68,7 @@ function GameDetailsPage() {
                     }
                 })
 
-                setLoading(false)
+                setPageLoading(false)
             })
     }
 
@@ -154,7 +154,7 @@ function GameDetailsPage() {
         return game.price
     }
 
-    if (!loading)
+    if (!loading && !pageLoading)
     return (
         <Stack spacing={4} className="px-[10%] lg:px-[15%]">
             <Divider className="text-3xl !mt-8"><b>{game.title}</b></Divider>
@@ -173,11 +173,11 @@ function GameDetailsPage() {
                             <b>Prezzo: </b>
                             <Price />
                         </Typography>
-                        <Typography><b>Categoria: </b>{game.category.name}</Typography>
+                        <Typography><b>Categoria: </b>{game?.category?.name}</Typography>
                         <Typography><b>Data di Pubblicazione: </b>{moment(game.upload_date).format('DD/MM/YYYY')}</Typography>
                         <Typography>
                             <b>Sviluppatore: </b>
-                            <a className="text-blue-500" href={"/user/" + game.publisher.id}>{game.publisher.username}</a>
+                            <a className="text-blue-500" href={"/user/" + game.publisher?.id}>{game.publisher?.username}</a>
                         </Typography>
                         <Typography>
                             <b>Valutazione Media: </b>
@@ -196,7 +196,12 @@ function GameDetailsPage() {
                     </Box>
                 </Box>
             </Box>
-            {!loading && game.publisher.id != user.id && <ReviewSection game={game.id}/>}
+
+            {   
+                game.publisher?.id != user.id && (
+                    <ReviewSection game={game.id}/>
+                ) 
+            }
         </Stack>
     )
 }
