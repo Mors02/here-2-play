@@ -168,10 +168,17 @@ class GameViewSet(viewsets.ModelViewSet):
             data = data.filter(title__icontains=request['title'])
         if 'category' in request:
             data = data.filter(category_id=request['category'])
-        if 'end' in request:
-            data = data.filter(price__lte=request['end'])
 
         serialized_data = GameSerializer(data, many=True).data
+        copy = serialized_data[:]
+
+        if 'start' in request and 'end' in request:
+            for obj in copy:
+                final_price = float(obj['price'])
+                if (len(obj['discounts']) > 0):
+                    final_price = float(obj['price']) - (float(obj['price']) * int(obj['discounts'][0]['percentage']) / 100)
+                if final_price < float(request['start']) or final_price > float(request['end']):
+                    serialized_data.remove(obj)
 
         if 'tag' in request:
             serialized_data = [obj for obj in serialized_data if int(request['tag']) in [tag['id'] for tag in obj['tags']]]
