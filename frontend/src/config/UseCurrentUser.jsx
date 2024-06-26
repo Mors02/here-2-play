@@ -4,6 +4,7 @@ import { axiosConfig, getToken } from './axiosConfig';
 export default function useCurrentUser() {
   const [user, setUser] = useState();
   const [role, setRole] = useState();
+  const [pfp, setPfp] = useState();
   const [loading, setLoading] = useState(true);
     useEffect(() => {        
         axiosConfig.get("/api/authuser/")
@@ -11,14 +12,16 @@ export default function useCurrentUser() {
             //console.log(res.data);    
             setUser(res.data.user);
             setRole(res.data.role);
+            setPfp(res.data.profile_picture);
             setLoading(false);
         })
         .catch(error => {
             setLoading(false);
             setUser();        
-            setRole();    
+            setRole();
+            setPfp();  
         })
     }, []);
     
-    return {user: user, role: role, loggedIn: user != null, loading: loading}
+    return {user: user, role: role, loggedIn: user != null, loading: loading, pfp: pfp}
 }

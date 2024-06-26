@@ -13,7 +13,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
 
 function UserEditPage() {
-    const {user, role, loading, loggedIn} = useCurrentUser();
+    const {user, role, loading, loggedIn, pfp} = useCurrentUser();
     const [err, setError] = useState();
     const navigate = useNavigate();
 
@@ -47,7 +47,11 @@ function UserEditPage() {
       };
     
     function onSubmit(e, values) {
-        axiosConfig.put('/api/user/' + user.id +"/", values)
+        axiosConfig.put('/api/user/' + user.id +"/", values,  {
+            headers: {
+            'Content-Type': 'multipart/form-data'
+            }
+        })
         .then(res => {
             setError()
             if (res.data && res.data.force_relogin)
@@ -71,7 +75,7 @@ function UserEditPage() {
                 <Typography variant="h3">
                     Ciao, {user.username}! Sei un {role.name}
                 </Typography>
-                <UserForm title={"Modifica dati"} onSubmit={onSubmit} isEdit={true} user={user}/>
+                <UserForm title={"Modifica dati"} onSubmit={onSubmit} isEdit={true} user={user} pfp={pfp}/>
                 <ErrorLabel text={err} />
                 {role.slug != "developer"? <Button variant={"contained"} onClick={changeRole}>Diventa developer!</Button> : <></>}
             </CenterBox>
