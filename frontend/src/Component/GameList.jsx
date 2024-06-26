@@ -22,6 +22,11 @@ function GameList({selection=[], games, handleClick, maxCount=1000, searchSectio
     const [selectedCategory, setSelectedCategory] = useState('')
     const [selectedTag, setSelectedTag] = useState('')
     const [open, setOpen] = useState(false)
+    const [selected, setSelected] = useState(selection)
+    
+    useEffect(() => {
+        setSelected(selection)
+    }, [selection]);
 
     const maxHomepageGames = maxCount
     const minDistance = 5
@@ -129,19 +134,8 @@ function GameList({selection=[], games, handleClick, maxCount=1000, searchSectio
             }
         };
 
+    
     function Games() {
-        return filteredGames.map(game =>
-            <Game key={game.id} game={game} handleClick={handleClick} />
-        )
-    }
-
-    if (!loading) 
-
-    function Games() {
-        const [selected, setSelected] = useState(selection)
-        useEffect(() => {
-            setSelected(selection)
-        }, [selection]);
 
         const maxHomepageGames = maxCount
         let filteredGames = []
@@ -158,6 +152,7 @@ function GameList({selection=[], games, handleClick, maxCount=1000, searchSectio
         )
     }
 
+    if (!loading) 
     return (
         <Stack spacing={4}>
             <SearchSection />

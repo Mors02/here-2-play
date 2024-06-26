@@ -110,11 +110,17 @@ class BundleSerializer(serializers.ModelSerializer):
         games = obj.bundle_games_bundle.all()        
         for bundleGame in games:
             print(bundleGame.game)
-            if len(bundleGame.game.discounts_game.all()) > 0:
-                print(bundleGame.game.price * bundleGame.game.discounts[0].percentage / 100)
+            game = GameSerializer(bundleGame.game).data
+            if len(game["discounts"]) > 0:
+                disc = float(game["price"]) * int(game["discounts"][0]["percentage"]) / 100
+                sum += (float(game["price"]) - disc)
+            else:
+                sum += float(game["price"])
             #sum += (game.game.details.price * game.game.details.discounts[0].percentage / 100)
         return sum 
     
     def get_discounted_price(self, obj):
-        return 0
+        total_price = self.get_total_price(obj)
+        total_price = total_price - (total_price * obj.discount / 100)
+        return total_price
 

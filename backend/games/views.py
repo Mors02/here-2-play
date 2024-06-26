@@ -2,6 +2,8 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.authentication import SessionAuthentication
+
+from orders.models import GamesBought
 from .models import Game, GameAttachment, Discount, Review, Tag, Category
 from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer, BundleSerializer, BundleGamesSerializer
 from rest_framework.response import Response
@@ -72,7 +74,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
         try:
             user = User.objects.get(id=request.user.pk)
             game = Game.objects.get(id=pk)
-
+            
+            gamesBought = GamesBought.objects.get(user=user, game=game)
             #create the tags or update the old ones
             tags=data["tags"]
             print(tags)
@@ -90,6 +93,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Game.DoesNotExist:
             return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_400_BAD_REQUEST)
+        except GamesBought.DoesNotExist:
+            return Response("ERR_GAME_NOT_OWNED", status=status.HTTP_400_BAD_REQUEST)
         return Response("ERR_SERVER_ERROR", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     def partial_update(self, request, pk=None, rev_pk=None):
