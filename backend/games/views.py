@@ -2,8 +2,10 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.authentication import SessionAuthentication
-from .models import Game, GameAttachment, Discount, Review, Tag, Category
-from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer
+
+from orders.models import GamesBought
+from .models import Game, GameAttachment, Discount, Review, Tag, Category, Bundle, BundleGames
+from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer, BundleSerializer, BundleGamesSerializer
 from rest_framework.response import Response
 from rest_framework import permissions, status, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
@@ -72,7 +74,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
         try:
             user = User.objects.get(id=request.user.pk)
             game = Game.objects.get(id=pk)
-
+            
+            gamesBought = GamesBought.objects.get(user=user, game=game)
             #create the tags or update the old ones
             tags=data["tags"]
             print(tags)
@@ -90,6 +93,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Game.DoesNotExist:
             return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_400_BAD_REQUEST)
+        except GamesBought.DoesNotExist:
+            return Response("ERR_GAME_NOT_OWNED", status=status.HTTP_400_BAD_REQUEST)
         return Response("ERR_SERVER_ERROR", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     def partial_update(self, request, pk=None, rev_pk=None):
@@ -105,6 +110,51 @@ class ReviewViewSet(viewsets.ModelViewSet):
             return Response(revData, status=status.HTTP_200_OK)
         except Review.DoesNotExist:
             return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)  
+        pass
+
+class BundleViewSet(viewsets.ModelViewSet):
+    def get_permissions(self):
+        if (self.action in ['list', 'retrieve']):
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+    
+    def list(self, request):
+        pass
+
+    def retrieve(self, request, pk=None):
+        try:
+            bundle = Bundle.objects.get(id=pk)
+            bundleData = BundleSerializer(bundle).data
+            return Response(bundleData, status=status.HTTP_200_OK)
+        except Bundle.DoesNotExist:
+            return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
+
+    def create(self, request):
+        data = request.data
+        if (int(data["discount"]) < 0 or int(data["discount"]) > 100):
+            return Response("ERR_INVALID_PERCENTAGE", status=status.HTTP_400_BAD_REQUEST)
+        filtered_data = {**{key: value for key, value in data.items() if key != "games"}, "user": request.user}
+        serializer = BundleSerializer(data=filtered_data)
+        if (serializer.is_valid(raise_exception=True)):
+            bundle = serializer.create(filtered_data)
+            
+            for game in data["games"]:
+                try: 
+                    gameObj = Game.objects.get(id=game)
+                    print(bundle)
+                    gameSerializer = BundleGamesSerializer(data={"game": gameObj, "bundle": bundle.pk})
+                    if (gameSerializer.is_valid(raise_exception=True)):
+                        gameSerializer.create({"game": gameObj, "bundle": bundle})
+                    print(serializer.data)
+                except Game.DoesNotExist:
+                    return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_201_CREATED)
+        
+        return Response("ERR_STUPID", status=status.HTTP_200_OK)
+
+    def destroy(self, request, pk=None):
         pass
 
 class GameViewSet(viewsets.ModelViewSet):

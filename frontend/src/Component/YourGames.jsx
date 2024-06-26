@@ -32,7 +32,7 @@ function UserGamesPage({ retrievedUser }) {
     if (!userLoading && !pageLoading)
     return (
         <Box className='px-10 py-8'>
-            <GameList games={games} handleClick={handleClick} />
+            <GameList games={games} handleClick={handleClick} selection={[]} />
 
             <Button className='!mt-6' variant='contained'>
                 <FaPlus className='mr-2' /><Link to="/publish">Nuovo Gioco</Link>

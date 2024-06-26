@@ -21,6 +21,7 @@ export default function OrderPage() {
     const initialState =  {totalCost: 0}
     const initializer = initialState => initialState
     const [games, setGames] = useState([])
+    const [bundles, setBundles] = useState([])
     const [order, setOrder] = useState({})
     const [loading, isLoading] = useState(true)
     const [state, dispatch] = useReducer(reducer, initialState, initializer);
@@ -50,9 +51,14 @@ export default function OrderPage() {
             setOrder(res.data)
             applyDiscounts(res.data.games)
             setGames(res.data.games)
+            setBundles(res.data.bundles)
             res.data.games.map(game => {
                 let price = game.details.price;
                 dispatch({price: +price, type: "add"})
+            })
+            res.data.bundles.map(bundle => {
+                let price = bundle.details.discounted_price;
+                dispatch({price: +price, type: "add"})                
             })
             isLoading(false)
         })
@@ -77,6 +83,23 @@ export default function OrderPage() {
             refreshGames()
         })
     }
+
+    function deleteBundle(id) {
+        axiosConfig.delete('api/orders/bundle/' + id + "/")
+        .then(res => {
+            if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                throw new Error(res["response"]["data"])
+        })
+        .catch(err => {
+            toast.error(ErrorMap[err.message])
+            console.log(err)
+        })
+        .finally(() => {
+            dispatch({type: "reset", totalCost: initialState})
+            refreshGames()
+        })
+    }
+
     const normalStyle = "border-b-2 min-w-60 min-h-16 border-black py-8"
     return (
         <Box>
@@ -89,12 +112,19 @@ export default function OrderPage() {
                         <Button onClick={() => deleteGame(game.id)} color={"error"} variant={"contained"}>Rimuovi</Button>
                     </Box>
                 ))}
+                {bundles.map((bundle, index) => (
+                    <Box className={index==0 && games.length == 0? normalStyle + " border-t-2" : normalStyle}>
+                        <Typography>{bundle.details.name}</Typography>
+                        <Typography className="float-right">€ {(+bundle.details.discounted_price).toFixed(2)}</Typography>
+                        <Button onClick={() => deleteBundle(bundle.id)} color={"error"} variant={"contained"}>Rimuovi</Button>
+                    </Box>
+                ))}
             </Stack>
             <Stack>
                 {/* il costo totale va dimezzato perché in strict mode */}
-                {games.length == 0 && <Typography variant="h3">Il tuo carrello è vuoto. Riempilo!</Typography>}
+                {games.length == 0 && bundles.length == 0 && <Typography variant="h3">Il tuo carrello è vuoto. Riempilo!</Typography>}
                 <Typography variant="h5" className="float-right">Subtotale: € {!loading? (state.totalCost).toFixed(2) : 0}</Typography>
-                <Button variant="contained" onClick={() => openModal()} disabled={games.length == 0}>Completa ordine</Button>
+                <Button variant="contained" onClick={() => openModal()} disabled={games.length == 0 && bundles.length == 0}>Completa ordine</Button>
             </Stack>
             <PaymentModal modalIsOpen={showModal} openModal={openModal} closeModal={closeModal} order={order}/>
         </Box>
@@ -105,6 +135,7 @@ export function OrderDropdown() {
     const [games, setGames] = useState([])
     const [loading, isLoading] = useState(true)
     const [state, dispatch] = useReducer((state, action) => {return {totalCost: state.totalCost + action.price}}, {totalCost: 0});
+    const [bundles, setBundles] = useState([])
 
     useEffect(() => {
         axiosConfig.get('api/orders/')
@@ -114,37 +145,40 @@ export function OrderDropdown() {
                 }
 
                 applyDiscounts(res.data.games)
-                    
                 setGames(res.data.games)
+                setBundles(res.data.bundles)                
                 res.data.games.map(game => {
                     let price = game.details.price;
-                    dispatch({price: +price})
-                    console.log(state.totalCost)
+                    dispatch({price: +price, type: "add"})
+                })
+                res.data.bundles.map(bundle => {
+                    let price = bundle.details.discounted_price;
+                    dispatch({price: +price, type: "add"})                
                 })
                 isLoading(false)
             })
             .catch(err => {
                 console.log(err)
-            })
+            }).finally(() => {console.log(bundles)})
     }, [])
-    // const games = [
-    //     {"name": "asdasd"},
-    //     {"name": "asdasd"},
-    //     {"name": "asdasd"},
-    //     {"name": "asdasd"}
-        
-    // ];
+
     const normalStyle = "border-b-2 min-w-60 min-h-16 border-black "
 
     return(
         <Box className="bg-slate-400 shadow-lg w-64 grid justify-center place-items-center p-2 h-screen overflow-x-hidden">
             <Typography variant="h6">Carrello</Typography>
             <Stack className="flex justify-start max-h-full overflow-auto ">
-                {games.length == 0 && <Typography variant="h3">Vuoto...</Typography>}              
+                {games.length == 0 && bundles.length == 0 && <Typography variant="h3">Vuoto...</Typography>}              
                 {games.map((game, index) => (
                     <Box className={index==0? normalStyle + " border-t-2" : normalStyle}>
                         <Typography>{game.details.title}</Typography>
                         <Typography className="float-right">€ {game.details.price}</Typography>
+                    </Box>
+                ))}
+                {bundles.map((bundle, index) => (
+                    <Box className={index==0 && games.length==0? normalStyle + " border-t-2" : normalStyle}>
+                        <Typography>{bundle.details.name}</Typography>
+                        <Typography className="float-right">€ {(+bundle.details.discounted_price).toFixed(2)}</Typography>
                     </Box>
                 ))}
             </Stack>

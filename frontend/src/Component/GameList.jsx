@@ -11,7 +11,7 @@ import { ErrorMap } from "../config/enums"
 import { useForm } from 'react-hook-form';
 import moment from 'moment';
 
-function GameList({ games, handleClick, maxCount=1000, searchSection=false, tagId='', previewPrices=false }) {
+function GameList({selection=[], games, handleClick, maxCount=1000, searchSection=false, tagId='', previewPrices=false }) {
     const [loading, setLoading] = useState(true)
     const [filteredGames, setFilteredGames] = useState([])
     const [rangePrices, setRangePrices] = useState([0, 1000])
@@ -20,6 +20,11 @@ function GameList({ games, handleClick, maxCount=1000, searchSection=false, tagI
     const [selectedCategory, setSelectedCategory] = useState('')
     const [selectedTag, setSelectedTag] = useState(tagId)
     const [open, setOpen] = useState(false)
+    const [selected, setSelected] = useState(selection)
+        
+    useEffect(() => {
+        setSelected(selection)
+    }, [selection]);
 
     const maxHomepageGames = maxCount
     const minDistance = 20
@@ -28,6 +33,8 @@ function GameList({ games, handleClick, maxCount=1000, searchSection=false, tagI
         register,
         getValues
     } = useForm()
+
+    console.log("games", games)
 
     function retrieveData() {
         axiosConfig.get('/api/tags/')
@@ -46,16 +53,16 @@ function GameList({ games, handleClick, maxCount=1000, searchSection=false, tagI
 
         let data = (games.length > maxHomepageGames && searchSection) ? games.slice(0, maxHomepageGames) : games
 
-        if (searchSection) {
-            data.map(game => {
-                let discount = game?.discounts[0]
-                if (discount)
-                    game.price = game.price - (game.price * discount.percentage / 100)
-            })
+        // if (searchSection) {
+        //     data.map(game => {
+        //         let discount = game?.discounts[0]
+        //         if (discount)
+        //             game.price = game.price - (game.price * discount.percentage / 100)
+        //     })
             
-            if (data.length <= 0) 
-                toast.error(ErrorMap['ERR_NO_GAMES_AVAILABLES'])
-        }
+        //     if (data.length <= 0) 
+        //         toast.error(ErrorMap['ERR_NO_GAMES_AVAILABLES'])
+        // }
         setFilteredGames(data)
         
         setLoading(false)
@@ -117,13 +124,25 @@ function GameList({ games, handleClick, maxCount=1000, searchSection=false, tagI
             }
         };
 
+    
     function Games() {
-        return filteredGames.map(game =>
-            <Game key={game.id} game={game} handleClick={handleClick} previewPrices={previewPrices} />
+
+        const maxHomepageGames = maxCount
+        let filteredGames = []
+        if (games) {
+            filteredGames = games.length > maxHomepageGames ? games.slice(0, maxHomepageGames) : games
+        }
+            
+        
+        return filteredGames.map(game => {
+                return (
+                    <Game game={game} handleClick={handleClick} selected={selected.length > 0? selected.some(id => id == game.id) : false} previewPrices={previewPrices}/>
+                )
+            }
         )
     }
 
-    if (!loading)
+    if (!loading) 
     return (
         <Stack spacing={4}>
             <SearchSection />
@@ -178,20 +197,32 @@ function GameList({ games, handleClick, maxCount=1000, searchSection=false, tagI
     )
 }
 
-function Game({ game, handleClick, previewPrices }) {
+function Game({ game, handleClick, selected, previewPrices }) {
     const [entered, setEntered] = useState(false)
     const hoverClass = "bg-opacity-80 shadow-[0_-10px_20px_-15px_rgba(0,0,0)]"
     const normalClass = "bg-opacity-20"
     
+    function price(game) {
+        if (game?.discounts?.length > 0)
+            return (+game.price - (+game.price * game.discounts[0].percentage / 100)).toFixed(2)
+        else
+            return (+game.price).toFixed(2)
+    }
+
     return (
-        <Box className="relative rounded overflow-hidden hover:scale-105 transition ease-linear shadow-2xl cursor-pointer" key={game.id} onClick={() => handleClick(game)} onMouseEnter={() => setEntered(true)} onMouseLeave={() => setEntered(false)}>
+        <Box className={"relative rounded overflow-hidden hover:scale-105 transition ease-linear shadow-2xl cursor-pointer " + (selected? "outline outline-4 outline-slate-600 opacity-80" : "")}  
+            key={game.id} 
+            onClick={() => handleClick(game)} 
+            onMouseEnter={() => setEntered(true)} 
+            onMouseLeave={() => setEntered(false)}
+        >
             <img className='aspect-[600/900] w-full object-cover' src={process.env.REACT_APP_BASE_URL + (game.image ?? game.details.image)} />
             <Box className={"bg-slate-700 absolute bottom-0 w-full py-2 text-center rounded-t-lg transition ease-linear " + (entered ? hoverClass : normalClass)}>
                 <Typography className='text-white md:!text-lg'>{game.title ?? game.details.title}</Typography>
             </Box>
             {
                 previewPrices && <Box className={"absolute top-0 right-0 bg-opacity-80 px-2 py-1 rounded-bl-md " + (game?.discounts?.length > 0 ? 'bg-[#228B22]' : 'bg-slate-700')}>
-                    <Typography className='text-white md:!text-lg'>{(+game.price).toFixed(2)} €</Typography>
+                    <Typography className='text-white md:!text-lg'>{price(game)} €</Typography>
                 </Box>
             }
         </Box>

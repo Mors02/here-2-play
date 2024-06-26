@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { axiosConfig } from "../config/axiosConfig";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useLocation } from "react-router";
 import { Container, LinearProgress, Typography, Button, Box, Stack } from "@mui/material";
 import useCurrentUser from "../config/UseCurrentUser";
 import moment from 'moment';
@@ -11,12 +11,15 @@ import { MdReport } from "react-icons/md";
 import ReportUserModal from "../Modals/ReportUserModal";
 import YourGames from "../Component/YourGames"
 import GameList from "../Component/GameList";
+import BundleOfUSer from "./Bundles/BundleOfUser";
 
 export default function UserPage() {
     const [retrievedUser, setUser] = useState()
     const {user, loading} = useCurrentUser()
     const navigate = useNavigate()
     const { id } = useParams()
+    const [tab, setTab] = useState(2)
+    const location = useLocation()
     const [loadingPage, setLoading] = useState(true);
     const [modalIsOpen, setIsOpen] = useState(false);
 
@@ -94,19 +97,23 @@ export default function UserPage() {
                     userReported={retrievedUser}
                 />
                 <Box className="h-screen" sx={{borderLeft:"1px solid #aaa", borderRight:"1px solid #aaa"}}>
-                    <Tabs>
+                    <Tabs value={tab}>
                         <TabList>
-                            <Tab>Libreria</Tab>
-                            <Tab>Giochi Pubblicati</Tab>
+                            <Tab value={1}>Libreria</Tab>
+                            <Tab value={2}>Giochi Pubblicati</Tab>
+                            <Tab value={3}>Bundle</Tab>
                         </TabList>
 
-                        <TabPanel>
+                        <TabPanel value={1}>
                             <Box className="px-10 py-8">
-                                <GameList games={retrievedUser.games} handleClick={handleClick} />
+                                <GameList games={retrievedUser.games} handleClick={handleClick} selection={[]} />
                             </Box>
                         </TabPanel>
-                        <TabPanel>
+                        <TabPanel value={2}>
                             <YourGames user={retrievedUser} />
+                        </TabPanel>
+                        <TabPanel value={3}>
+                            <BundleOfUSer user={retrievedUser}/>
                         </TabPanel>
                     </Tabs>
                 </Box>

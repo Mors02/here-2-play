@@ -29,7 +29,7 @@ function Homepage() {
         <Box className='p-10'>
             { 
                 games.length > 0 
-                ? <GameList games={games} maxCount={30} handleClick={handleClick} tagId={location?.state?.tagId} previewPrices={true} searchSection={true} /> 
+                ? <GameList games={games} maxCount={30} handleClick={handleClick} tagId={location?.state?.tagId} previewPrices={true} searchSection={true} selection={[]} /> 
                 : <Typography>Non sono presenti giochi nello store...</Typography> 
             }
         </Box>

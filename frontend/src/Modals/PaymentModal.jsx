@@ -27,7 +27,7 @@ export default function PaymentModal({afterOpenModal, closeModal, modalIsOpen, o
             console.log(res)
             if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")
                 throw new Error(res["response"]["data"])
-            toast.success("Segnalazione completata.", {onClose: () => {closeModal(); window.location.replace("user/"+user.id)}})
+            toast.success("Acquisto completato.", {onClose: () => {closeModal(); window.location.replace("user/"+user.id)}})
         })
         .catch(err => {
             console.log(err)
