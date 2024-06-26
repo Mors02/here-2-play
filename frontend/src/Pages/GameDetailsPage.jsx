@@ -154,7 +154,7 @@ function GameDetailsPage() {
 
     if (!loading && !pageLoading)
     return (
-        <Stack spacing={4} className="px-[10%] lg:px-[12%] relative">
+        <Stack spacing={4} className="px-[10%] lg:px-[12%] relative !mb-10">
             <IoArrowBackCircle color="#63748B" size={50} className="absolute top-4 left-4 cursor-pointer" onClick={() => navigate(-1)} />
             <Divider className="text-3xl !mt-8"><b>{game.title}</b></Divider>
 
@@ -167,21 +167,22 @@ function GameDetailsPage() {
                 <Box className="p-6 w-full relative">
                     <Stack className="w-full" spacing={1}>
                         <Divider><b>{game.title}</b></Divider>
-                        <Typography><b>Descrizione: </b>{game.description}</Typography>
-                        <Typography className="flex gap-2">
+                        <Box><b>Descrizione: </b>{game.description}</Box>
+                        <Box className="flex gap-2">
                             <b>Prezzo: </b>
                             <Price />
-                        </Typography>
-                        <Typography><b>Categoria: </b>{game.category? game.category.name : "(Categoria Eliminata)"}</Typography>
-                        <Typography><b>Data di Pubblicazione: </b>{moment(game.upload_date).format('DD/MM/YYYY')}</Typography>
-                        <Typography>
+                        </Box>
+                        <Box><b>Categoria: </b>{game.category? game.category.name : "(Categoria Eliminata)"}</Box>
+                        <Box><b>Data di Pubblicazione: </b>{moment(game.upload_date).format('DD/MM/YYYY')}</Box>
+                        <Box>
                             <b>Sviluppatore: </b>
                             <a className="text-blue-500" href={"/user/" + game.publisher?.id}>{game.publisher?.username}</a>
-                        </Typography>
-                        <Typography>
+                        </Box>
+                        <Box className="flex gap-2">
                             <b>Valutazione Media: </b>
-                            {/* <Rating className="" defaultValue={2.5} precision={0.5} readOnly /> */}
-                        </Typography>
+                            <Rating className="" defaultValue={game?.average_rating} precision={0.5} readOnly />
+                            <Typography>({game?.reviews?.length})</Typography>
+                        </Box>
                         <Box className="flex gap-2">
                             <b>Tags: </b>
                             {
@@ -194,7 +195,7 @@ function GameDetailsPage() {
                 </Box>
             </Box>
 
-            <Box className="grid grid-cols-2 gap-4 !mb-10">
+            <Box className="grid grid-cols-2 gap-4">
                 <Button variant="contained" onClick={() => addGame()} color="info">Aggiungi al carrello</Button>
                 <Button variant="contained" color="error" onClick={() => openModal()}><MdReport className="mr-2" />Segnala</Button>
                 <ReportGameModal 

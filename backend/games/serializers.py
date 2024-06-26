@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Game, Discount, GameAttachment, Category, Review, Tag, GameTags
 from django.utils.dateparse import parse_date
+from django.db.models import Avg
 import datetime
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -45,11 +46,13 @@ class GameSerializer(serializers.ModelSerializer):
     discounts = serializers.SerializerMethodField()
     category = CategorySerializer(read_only=True)
     publisher = serializers.SerializerMethodField()
+    reviews = serializers.SerializerMethodField()
+    average_rating = serializers.SerializerMethodField()
     tags = serializers.SerializerMethodField()
 
     class Meta:
         model = Game
-        fields = ["id", "title", "description", "upload_date", "publisher", "price", 'image', 'uploaded_file', 'attachments', 'discounts', 'category', 'tags']
+        fields = ["id", "title", "description", "upload_date", "publisher", "price", 'image', 'uploaded_file', 'attachments', 'discounts', 'category', 'tags', 'reviews', 'average_rating']
         extra_kargs = {"publisher": {"read_only": True}}
 
     def get_publisher(self, obj):
@@ -69,6 +72,21 @@ class GameSerializer(serializers.ModelSerializer):
     def get_tags(self, obj):
         top_tags = obj.game_tags_game.order_by('-count')[:4]
         return GameTagSerializer(top_tags, many=True).data
+    
+    def get_reviews(self, obj):
+        reviews = obj.reviews_game.all()
+        return ReviewSerializer(reviews, many=True).data
+    
+    def get_average_rating(self, obj):
+        reviews = obj.reviews_game.all()
+
+        if len(reviews) > 0:
+            sum = 0
+            for obj in reviews:
+                sum += obj.rating
+            average = sum / len(reviews)
+            return average
+        return 0
 
 class ReviewSerializer(serializers.ModelSerializer):    
     class Meta:
