@@ -9,13 +9,16 @@ import useCurrentUser from '../config/UseCurrentUser';
 
 function UserGamesPage({ retrievedUser }) {
     const [games, setGames] = useState([])
+    const [pageLoading, setPageLoading] = useState()
     const { user, userLoading } = useCurrentUser()
     const navigate = useNavigate()
 
     useEffect(() => {
+        setPageLoading(true)
         axiosConfig.get('/api/your-games/')
             .then(res => {
                 setGames(res.data)
+                setPageLoading(false)
             }
         )
     }, [])
@@ -26,7 +29,7 @@ function UserGamesPage({ retrievedUser }) {
         return navigate('/games/' + game.id)
     }
     
-    if (!userLoading)
+    if (!userLoading && !pageLoading)
     return (
         <Box className='px-10 py-8'>
             <GameList games={games} handleClick={handleClick} />

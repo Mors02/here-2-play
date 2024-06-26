@@ -116,9 +116,22 @@ class GameViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
     
     def list(self, request):
+        request = request.GET.dict()
         data = Game.objects.all()
-        serializer = GameSerializer(data, many=True)
-        return Response(serializer.data)
+
+        if 'title' in request:
+            data = data.filter(title__icontains=request['title'])
+        if 'category' in request:
+            data = data.filter(category_id=request['category'])
+        if 'end' in request:
+            data = data.filter(price__lte=request['end'])
+
+        serialized_data = GameSerializer(data, many=True).data
+
+        if 'tag' in request:
+            serialized_data = [obj for obj in serialized_data if int(request['tag']) in [tag['id'] for tag in obj['tags']]]
+
+        return Response(serialized_data)
     
     def retrieve(self, request, pk=None):
         game = get_object_or_404(Game, pk=pk)

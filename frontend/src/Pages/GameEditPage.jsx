@@ -315,10 +315,6 @@ function GameEditPage() {
         )
     }
 
-    function handleCategory() {
-
-    }
-
     if (!pageLoading && game) {
         return (
             <form className='p-10' onSubmit={e => onSubmit(e)}>

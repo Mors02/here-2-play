@@ -85,8 +85,8 @@ export default function OrderPage() {
                 {games.map((game, index) => (
                     <Box className={index==0? normalStyle + " border-t-2" : normalStyle}>
                         <Typography>{game.details.title}</Typography>
-                        <Typography className="float-right">€ {(game.details.price).toFixed(2)}</Typography>
-                        <Button onClick={() => deleteGame(game.id)}color={"error"} variant={"contained"}>Rimuovi</Button>
+                        <Typography className="float-right">€ {(+game.details.price).toFixed(2)}</Typography>
+                        <Button onClick={() => deleteGame(game.id)} color={"error"} variant={"contained"}>Rimuovi</Button>
                     </Box>
                 ))}
             </Stack>

@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 
 function Layout(props) {
     const [open, toggleDrawer] = useState(false);
-    const {loggedIn, loading} = useCurrentUser();
+    const { loggedIn, loading } = useCurrentUser();
     const [showFriends, setShowFriends] = useState(false);
     const [dropdownVisibile, setDropdownVisibile] = useState(false);
     const location = window.location.href;
@@ -26,7 +26,7 @@ function Layout(props) {
             {!loading? <>
                 <Box className="min-h-12 bg-slate-500 ">
                     <Box className="p-5">
-                        <Link to="/">LOGO HERE</Link>
+                        <Link to="/">Here2Play</Link>
                         <Stack direction={"row"} className="float-right w-60 flex justify-end">
                             <ShoppingCartIcon fontSize="large" className="cursor-pointer" onClick={() => setDropdownVisibile(true)}/>
                             <ReorderIcon fontSize="large" className="cursor-pointer ml-20" onClick={() => toggleDrawer(true)}/>
