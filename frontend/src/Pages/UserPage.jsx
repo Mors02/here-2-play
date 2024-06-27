@@ -62,7 +62,7 @@ export default function UserPage() {
             setTab(1)
 
         
-        axiosConfig.get('/api/user/'+id+"/")
+        axiosConfig.get('/api/user/' + id + "/")
         .then(res => {
             console.log(res.data)
             setLoading(false);
@@ -75,8 +75,8 @@ export default function UserPage() {
         });
     }, [])
     
-    function handleClick(game) {
-        return navigate('/games/' + game.id)
+    function handleClick({ game }) {
+        return navigate('/games/' + game)
     }
 
     if (loadingPage || loading)
@@ -117,7 +117,7 @@ export default function UserPage() {
                         </TabList>
 
                         <TabPanel value={0}>
-                            <Box className="px-10 py-8">
+                            <Box className="px-4 py-3">
                                 <GameList games={retrievedUser.games} handleClick={handleClick} selection={[]} />
                             </Box>
                         </TabPanel>

@@ -283,9 +283,6 @@ class GameViewSet(viewsets.ModelViewSet):
         purchases = purchases.count()
         
         return Response({'reviews': reviews, 'registered_visits': registered_visits, 'anonymous_visits': anonymous_visits, 'purchases': purchases}, status=status.HTTP_200_OK)
-    
-    def all_time_statistics(self, request, pk=None):
-        ...
 
     def user_owns(self, request, pk=None):
         try:
