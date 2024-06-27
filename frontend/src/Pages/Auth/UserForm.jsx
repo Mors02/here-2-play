@@ -83,7 +83,7 @@ function UserForm({title, onSubmit, isEdit, user, pfp}) {
                             </Box>           
                         </Stack>}
                 </Box>
-                <Box className="pb-10 relative ml-20 cursor-pointer" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+                {isEdit && <Box className="pb-10 relative ml-20 cursor-pointer" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
                     <ReactFileReader
                         fileTypes={[".png", ".jpg"]}
                         base64={true}
@@ -92,7 +92,7 @@ function UserForm({title, onSubmit, isEdit, user, pfp}) {
                         <img className="object-cover w-64 h-64 rounded-full inline " src={imageData} />
                         {<FiCamera className={show? "absolute bottom-1/2 left-1/2 w-24 h-24 transform -translate-x-1/2 translate-y-[33%] opacity-50 transition ease-linear" : "absolute bottom-1/2 left-1/2 w-24 h-24 transform -translate-x-1/2 opacity-0 transition ease-linear"}/>}
                     </ReactFileReader>
-                </Box>
+                </Box>}
             </Stack>
             <Box>
                 {isEdit? <Button sx={{margin: "15px", display: "inline"}} onClick={() => setChangePassword(!changePassword)} variant="contained" color="warning">Cambia password</Button> : <></>}
