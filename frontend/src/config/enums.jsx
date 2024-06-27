@@ -17,6 +17,7 @@ const ErrorMap = {
     'ERR_NO_RATING': 'Non hai valutato il gioco.',
     'ERR_TOO_MANY_TAGS': 'Puoi scegliere al massimo 4 tags.',
     'ERR_NO_GAMES_AVAILABLES': 'Non sono presenti giochi con tali filtri.',
+    'ERR_GAME_NOT_OWNED': 'Gioco non posseduto.'
 }
 const blockedUrls = []
 
