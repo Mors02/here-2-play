@@ -12,6 +12,8 @@ from django.shortcuts import get_object_or_404
 from django.utils.dateparse import parse_date
 from authentication.models import User
 from django.utils import timezone
+from datetime import timedelta
+from django.utils import timezone
 
 class DiscountViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -256,6 +258,23 @@ class GameViewSet(viewsets.ModelViewSet):
             game.delete()
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+    def last_30_days_statistics(self, request, pk=None):
+        game = Game.objects.get(pk=pk)
+
+        if request.user.pk != game.publisher.pk:
+            return Response('ERR_UNAUTHORIZED', status=status.HTTP_401_UNAUTHORIZED)
+        
+        query = Review.objects.filter(game_id=pk).filter(created_at__gte=timezone.now()-timedelta(days=30))
+        reviews = ReviewSerializer(query, many=True).data
+
+        registered_visits = VisitedGame.objects.filter(game_id=pk).filter(visited_at__gte=timezone.now()-timedelta(days=30)).exclude(user_id__isnull=True).count()
+        anonymous_visits = VisitedGame.objects.filter(game_id=pk).filter(visited_at__gte=timezone.now()-timedelta(days=30)).filter(user_id__isnull=True).count()
+        
+        return Response({'reviews': reviews, 'registered_visits': registered_visits, 'anonymouys_visits': anonymous_visits}, status=status.HTTP_200_OK)
+    
+    def all_time_statistics(self, request, pk=None):
+        ...
 
 class YourGameList(generics.ListAPIView):
     serializer_class = GameSerializer
@@ -284,7 +303,7 @@ class GameAttachmentViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK)
     
 class CategoryViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def list(self, request):
         data = Category.objects.all()
@@ -296,7 +315,7 @@ class TagViewSet(viewsets.ModelViewSet):
         if (self.action in ['destroy', 'create']):
             permission_classes = [IsAdminUser]
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
     
     def list(self, request):

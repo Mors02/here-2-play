@@ -11,7 +11,7 @@ import GameList from "../../Component/GameList";
 
 
 export default function BundleDetails() {
-    const {id}= useParams()
+    const { id }= useParams()
     const navigate = useNavigate()
     const [bundle, setBundle] = useState({})
     const [loadingPage, setLoading] = useState(true)

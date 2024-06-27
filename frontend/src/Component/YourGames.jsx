@@ -25,7 +25,7 @@ function UserGamesPage({ retrievedUser }) {
     
     function handleClick(game) {
         if (game.publisher.id == user.id)
-            return navigate('/games/' + game.id + '/edit')
+            return navigate('/games/' + game.id + '/statistics')
         return navigate('/games/' + game.id)
     }
     

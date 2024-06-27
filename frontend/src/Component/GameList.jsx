@@ -34,8 +34,6 @@ function GameList({selection=[], games, handleClick, maxCount=1000, searchSectio
         getValues
     } = useForm()
 
-    console.log("games", games)
-
     function retrieveData() {
         axiosConfig.get('/api/tags/')
             .then(res => {
@@ -119,28 +117,10 @@ function GameList({selection=[], games, handleClick, maxCount=1000, searchSectio
                 const clamped = Math.max(newValue[1], minDistance);
                 setRangePrices([clamped - minDistance, clamped]);
             }
-            } else {
-                setRangePrices(newValue);
-            }
-        };
-
-    
-    function Games() {
-
-        const maxHomepageGames = maxCount
-        let filteredGames = []
-        if (games) {
-            filteredGames = games.length > maxHomepageGames ? games.slice(0, maxHomepageGames) : games
+        } else {
+            setRangePrices(newValue);
         }
-            
-        
-        return filteredGames.map(game => {
-                return (
-                    <Game game={game} handleClick={handleClick} selected={selected.length > 0? selected.some(id => id == game.id) : false} previewPrices={previewPrices}/>
-                )
-            }
-        )
-    }
+    };
 
     if (!loading) 
     return (
@@ -191,7 +171,11 @@ function GameList({selection=[], games, handleClick, maxCount=1000, searchSectio
             }
 
             <Box className='grid sm:grid-cols-3 md:grid-cols-5 gap-8'>
-                <Games />
+                {
+                    filteredGames?.map(game =>
+                        <Game game={game} handleClick={handleClick} selected={selected.length > 0? selected.some(id => id == game.id) : false} previewPrices={previewPrices}/>
+                    )
+                }
             </Box>
         </Stack>
     )
@@ -210,7 +194,7 @@ function Game({ game, handleClick, selected, previewPrices }) {
     }
 
     return (
-        <Box className={"relative rounded overflow-hidden hover:scale-105 transition ease-linear shadow-2xl cursor-pointer " + (selected? "outline outline-4 outline-slate-600 opacity-80" : "")}  
+        <Box className={"relative rounded overflow-hidden hover:scale-105 transition ease-linear shadow-2xl cursor-pointer " + (selected ? "outline outline-4 outline-slate-600 opacity-80" : "")}  
             key={game.id} 
             onClick={() => handleClick(game)} 
             onMouseEnter={() => setEntered(true)} 

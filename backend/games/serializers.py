@@ -91,7 +91,7 @@ class GameSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):    
     class Meta:
         model = Review
-        fields = ["id", "user", "game", "rating", "body"]
+        fields = ["id", "user", "game", "rating", "body", "created_at"]
 
     def create(self, data):
         review = Review(**data)

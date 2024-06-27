@@ -65,6 +65,7 @@ class Review(models.Model):
     body = models.TextField(max_length=500, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews_user")
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="reviews_game")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return (self.game.title + " - " + str(self.rating) + " - " + self.body)
