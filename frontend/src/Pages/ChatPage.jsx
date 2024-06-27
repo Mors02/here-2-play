@@ -12,20 +12,19 @@ export default function ChatPage() {
     const [WS_URL, setWs] = useState('')
     const msgClass="bg-slate-400 my-3"
 
-
-    const {sendMessage, sendJsonMessage, lastJsonMesssage, readyState} = useWebSocket(
+    const { sendMessage, sendJsonMessage, lastJsonMesssage, readyState } = useWebSocket(
         WS_URL,
         {
             share: false,
             shouldReconnect: () => true,
-            queryParams: {
-                authorization: `${localStorage.getItem('access_token')}`
-            }
+            // queryParams: {
+            //     authorization: `${localStorage.getItem('access_token')}`
+            // }
         },
     )
 
     useEffect(() => {
-        axiosConfig.get("api/chat/"+id)
+        axiosConfig.get("api/chat/" + id)
         .then((res) => {
             setChat(res.data)
             console.log(res.data)

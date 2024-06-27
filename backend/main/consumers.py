@@ -5,7 +5,7 @@ from channels.db import database_sync_to_async
 
 class WSConsumerChat(AsyncWebsocketConsumer):
     async def connect(self):
-
+        print(self)
         user = self.scope["user"]
         print(user)
         if (not user.is_authenticated):
@@ -18,7 +18,7 @@ class WSConsumerChat(AsyncWebsocketConsumer):
             await self.close()
             return
 
-        self.room_group_name = 'chat_' +self.room_name
+        self.room_group_name = 'chat_' + self.room_name
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -41,7 +41,7 @@ class WSConsumerChat(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         print(self.scope["user"])
         #print(text_data)
-        ...
+        
         # text_data_json = json.loads(text_data)
         # print(text_data)
         # username = text_data_json['user']

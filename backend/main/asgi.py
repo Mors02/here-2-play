@@ -18,6 +18,7 @@ from .middleware import JWTAuthMiddleware
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'main.settings')
 
 #application = get_asgi_application()
+
 application = ProtocolTypeRouter(
     {
         "http" : get_asgi_application(),

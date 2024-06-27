@@ -43,7 +43,6 @@ class UserReportsView(viewsets.ModelViewSet):
 
 
 class GameReportsView(viewsets.ModelViewSet):
-
     def get_permissions(self):
         if (self.action in ['create']):
             permission_classes = [IsAuthenticated]
@@ -80,6 +79,7 @@ class ChatViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
     
     def retrieve(self, request, pk=None):
+        print(request)
         userA = request.user.id
         userB = pk
         try:

@@ -12,7 +12,6 @@ function App() {
       <ToastContainer autoClose={400} position="bottom-center" hideProgressBar/>
       <header>
         <div>
-          
           <Layout />
           <AppRoutes /> 
           <ChatRoute />   
