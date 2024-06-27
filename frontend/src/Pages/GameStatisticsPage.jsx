@@ -7,11 +7,13 @@ import { useState } from "react";
 import { MdEdit } from "react-icons/md";
 import GameCard from "../Component/GameCard";
 import axios from "axios";
+import useCurrentUser from "../config/UseCurrentUser";
 
 function GameStatisticsPage() {
     const [game, setGame] = useState()
     const [loading, setLoading] = useState(true)
     const { gameId } = useParams()
+    const {user} = useCurrentUser()
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -41,7 +43,7 @@ function GameStatisticsPage() {
     if (!loading)
     return (
         <Box className="px-[10%] lg:px-[12%] relative py-10 h-[1000px]">
-            <IoArrowBackCircle color="#63748B" size={50} className="absolute top-4 left-4 cursor-pointer" onClick={() => navigate(-1)} />
+            <IoArrowBackCircle color="#63748B" size={50} className="absolute top-4 left-4 cursor-pointer" onClick={() => navigate("/user/"+user.id+"#games")} />
 
             <Box className="absolute top-5 right-5 cursor-pointer bg-[#63748B] rounded-full w-[40px] aspect-square align-middle flex">
                 <MdEdit onClick={() => handleEdit()} color="white" size={25} className="!m-auto" />

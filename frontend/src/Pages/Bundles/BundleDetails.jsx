@@ -3,11 +3,12 @@ import { axiosConfig } from "../../config/axiosConfig";
 import { Button, Divider, Stack, Typography } from "@mui/material";
 import { toast } from "react-toastify";
 import { ErrorMap } from "../../config/enums";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import Box from '@mui/material/Box';
 import 'react-toastify/dist/ReactToastify.min.css';
 import { IoArrowBackCircle } from "react-icons/io5";
 import GameList from "../../Component/GameList";
+import useCurrentUser from "../../config/UseCurrentUser";
 
 
 export default function BundleDetails() {
@@ -15,6 +16,8 @@ export default function BundleDetails() {
     const navigate = useNavigate()
     const [bundle, setBundle] = useState({})
     const [loadingPage, setLoading] = useState(true)
+    const {user} = useCurrentUser()
+    const {state} = useLocation()
 
     useEffect(() => {
         axiosConfig.get('api/bundles/'+id+"/")
@@ -59,7 +62,7 @@ export default function BundleDetails() {
 
     return (
         <Stack spacing={4} className="px-[10%] lg:px-[12%] relative">
-            <IoArrowBackCircle color="#63748B" size={50} className="absolute top-4 left-4 cursor-pointer" onClick={() => navigate(-1)} />
+            <IoArrowBackCircle color="#63748B" size={50} className="absolute top-4 left-4 cursor-pointer" onClick={() => state?.backToBundles? navigate('/user/'+user.id+'#bundles') : navigate(-1)} />
             <Divider className="text-3xl !mt-8"><b>{bundle.name}</b></Divider>
                 {!loadingPage && <GameList games={bundle.games.map(game => game.game)} previewPrices={true} selection={[]} handleClick={handleClick} />}
             <Box className="bg-gray-100 rounded-md flex">

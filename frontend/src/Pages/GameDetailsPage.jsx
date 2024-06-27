@@ -5,7 +5,7 @@ import { MdReport } from "react-icons/md";
 import ReportGameModal from "../Modals/ReportGameModal";
 import { toast } from "react-toastify";
 import { ErrorMap } from "../config/enums";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { useTheme } from '@mui/material/styles';
 import MobileStepper from '@mui/material/MobileStepper';
 import { TiDelete } from "react-icons/ti";
@@ -53,7 +53,7 @@ function GameDetailsPage() {
 
     function updateData() {
         setPageLoading(true)
-
+        
         return axiosConfig.get('/api/games/' + gameId)
             .then((res) => {
                 console.log(res.data)

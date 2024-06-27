@@ -9,7 +9,7 @@ export default function BundleOfUSer({user}) {
     const navigate = useNavigate()
 
     function handleClick(bundle) {
-        return navigate('/bundle/'+bundle.id)
+        return navigate('/bundle/'+bundle.id, {state: {backToBundles: true}})
     }
 
     return (
