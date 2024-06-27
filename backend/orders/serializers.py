@@ -40,7 +40,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        #'games', 
         fields = ['user_id', 'id', 'games', 'bundles', 'order_date', 'payment_method', 'status']
 
     def create(self, data):
@@ -53,7 +52,7 @@ class GamesBoughtSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = GamesBought
-        fields = ["user", "details", "id", "game"]
+        fields = ["user", "details", "id", "game", "created_at"]
 
     def create(self, data):
         gameInLib = GamesBought(

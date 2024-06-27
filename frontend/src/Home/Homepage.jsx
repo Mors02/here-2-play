@@ -10,7 +10,7 @@ function Homepage() {
     const [loading, setLoading] = useState()
     const [games, setGames] = useState([])
     const navigate = useNavigate()
-    const location = useLocation()
+    const { state } = useLocation()
     
     useEffect(() => {
         setLoading(true)
@@ -33,7 +33,7 @@ function Homepage() {
         <Box className='p-10'>
             { 
                 games.length > 0 
-                ? <GameList games={games} maxCount={30} handleClick={handleClick} tagId={location?.state?.tagId} previewPrices={true} searchSection={true} selection={[]} /> 
+                ? <GameList games={games} maxCount={30} handleClick={handleClick} tagId={state?.tagId} previewPrices={true} searchSection={true} selection={[]} /> 
                 : <Typography>Non sono presenti giochi nello store...</Typography> 
             }
         </Box>

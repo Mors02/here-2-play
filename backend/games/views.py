@@ -188,7 +188,7 @@ class GameViewSet(viewsets.ModelViewSet):
                     serialized_data.remove(obj)
 
         if 'tag' in request:
-            serialized_data = [obj for obj in serialized_data if int(request['tag']) in [tag['id'] for tag in obj['tags']]]
+            serialized_data = [obj for obj in serialized_data if int(request['tag']) in [tag['tag']['id'] for tag in obj['tags']]]
 
         return Response(serialized_data)
     
@@ -259,19 +259,30 @@ class GameViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     
-    def last_30_days_statistics(self, request, pk=None):
+    def statistics(self, request, pk=None, type='all-time'):
         game = Game.objects.get(pk=pk)
+        limited = type == 'last-30-days'
 
         if request.user.pk != game.publisher.pk:
             return Response('ERR_UNAUTHORIZED', status=status.HTTP_401_UNAUTHORIZED)
         
-        query = Review.objects.filter(game_id=pk).filter(created_at__gte=timezone.now()-timedelta(days=30))
-        reviews = ReviewSerializer(query, many=True).data
+        reviews = Review.objects.filter(game_id=pk)
+        registered_visits = VisitedGame.objects.filter(game_id=pk)
+        anonymous_visits = VisitedGame.objects.filter(game_id=pk)
+        purchases = GamesBought.objects.filter(game_id=pk)
 
-        registered_visits = VisitedGame.objects.filter(game_id=pk).filter(visited_at__gte=timezone.now()-timedelta(days=30)).exclude(user_id__isnull=True).count()
-        anonymous_visits = VisitedGame.objects.filter(game_id=pk).filter(visited_at__gte=timezone.now()-timedelta(days=30)).filter(user_id__isnull=True).count()
+        if limited:
+            reviews = reviews.filter(created_at__gte=timezone.now()-timedelta(days=30))
+            registered_visits = registered_visits.filter(visited_at__gte=timezone.now()-timedelta(days=30))    
+            anonymous_visits = anonymous_visits.filter(visited_at__gte=timezone.now()-timedelta(days=30))
+            purchases = purchases.filter(created_at__gte=timezone.now()-timedelta(days=30))
+
+        reviews = ReviewSerializer(reviews.order_by('-created_at'), many=True).data
+        registered_visits = registered_visits.exclude(user_id__isnull=True).count()
+        anonymous_visits = anonymous_visits.filter(user_id__isnull=True).count()
+        purchases = purchases.count()
         
-        return Response({'reviews': reviews, 'registered_visits': registered_visits, 'anonymouys_visits': anonymous_visits}, status=status.HTTP_200_OK)
+        return Response({'reviews': reviews, 'registered_visits': registered_visits, 'anonymous_visits': anonymous_visits, 'purchases': purchases}, status=status.HTTP_200_OK)
     
     def all_time_statistics(self, request, pk=None):
         ...

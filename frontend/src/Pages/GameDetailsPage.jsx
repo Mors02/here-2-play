@@ -149,10 +149,6 @@ function GameDetailsPage() {
         return game.price
     }
 
-    function handleTagClick(id) {
-        navigate('/', { state: { tagId: id } })
-    }
-
     if (!loading && !pageLoading)
     return (
         <Stack spacing={4} className="px-[10%] lg:px-[12%] relative !mb-10">

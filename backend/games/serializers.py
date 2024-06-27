@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import Game, Discount, GameAttachment, Category, Review, Tag, GameTags, Bundle, BundleGames, VisitedGame
 from django.utils.dateparse import parse_date
-from django.db.models import Avg
 import datetime
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -88,7 +87,9 @@ class GameSerializer(serializers.ModelSerializer):
             return average
         return 0
 
-class ReviewSerializer(serializers.ModelSerializer):    
+class ReviewSerializer(serializers.ModelSerializer):   
+    user = serializers.SerializerMethodField()
+
     class Meta:
         model = Review
         fields = ["id", "user", "game", "rating", "body", "created_at"]
@@ -97,6 +98,13 @@ class ReviewSerializer(serializers.ModelSerializer):
         review = Review(**data)
         review.save()
         return review
+    
+    def get_user(self, obj):
+        from authentication.serializers import UserInfoSerializer
+        from django.contrib.auth.models import User
+        
+        user = User.objects.get(pk=obj.user_id)
+        return UserInfoSerializer(user).data
     
 class BundleGamesSerializer(serializers.ModelSerializer):
     game = GameSerializer(read_only=True)
