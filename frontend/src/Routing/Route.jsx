@@ -14,6 +14,7 @@ import BundleCreate from "../Pages/Bundles/BundleCreate";
 import BundleDetails from "../Pages/Bundles/BundleDetails";
 import GameStatisticsPage from "../Pages/GameStatisticsPage";
 import ChatPage from "../Pages/ChatPage";
+import PlayGamePage from "../Pages/PlayGamePage"
 
 export default function AppRoutes() {
     return (
@@ -22,6 +23,7 @@ export default function AppRoutes() {
             <Route path="/" element={<Homepage />}></Route>
             <Route path="/login" element={<LoginPage />}></Route>
             <Route path="/publish" element={<PublishGamePage />}></Route>
+            <Route path="/play/:gameId" element={<PlayGamePage />}></Route>
             <Route path="/games/:gameId" element={<GameDetailsPage />}></Route>
             <Route path="/games/:gameId/edit" element={<GameEditPage />}></Route>
             <Route path="/games/:gameId/statistics" element={<GameStatisticsPage />}></Route>
