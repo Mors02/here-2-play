@@ -31,7 +31,7 @@ function UserGamesPage({ retrievedUser }) {
     
     if (!userLoading && !pageLoading)
     return (
-        <Box className='px-10 py-8'>
+        <Box className='px-4 py-3'>
             <GameList games={games} handleClick={handleClick} selection={[]} />
 
             <Button className='!mt-6' variant='contained'>
