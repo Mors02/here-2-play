@@ -123,11 +123,16 @@ class BundleGamesSerializer(serializers.ModelSerializer):
         bundleGame.save()
         return bundleGame
 
+class CreateBundleSerializer(serializers.ModelSerializer):
+     class Meta:
+        model = Bundle
+        fields = ['id', 'name', 'description', 'discount']
+
 class BundleSerializer(serializers.ModelSerializer):
     games = BundleGamesSerializer(source="bundle_games_bundle", many=True, read_only=True)
     total_price = serializers.SerializerMethodField()
-    discounted_price = serializers.SerializerMethodField()
-    publisher = serializers.SerializerMethodField()
+    discounted_price = serializers.SerializerMethodField(read_only=True)
+    publisher = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Bundle
@@ -144,6 +149,7 @@ class BundleSerializer(serializers.ModelSerializer):
     
     def get_total_price(self, obj):
         sum = 0
+        print(obj)
         games = obj.bundle_games_bundle.all()        
         for bundleGame in games:
             game = GameSerializer(bundleGame.game).data

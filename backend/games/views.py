@@ -4,7 +4,7 @@ from rest_framework.authentication import SessionAuthentication
 
 from orders.models import GamesBought
 from .models import Game, GameAttachment, Discount, Review, Tag, Category, Bundle, BundleGames, VisitedGame
-from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer, BundleSerializer, BundleGamesSerializer, VisitedGameSerializer
+from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer, BundleSerializer, BundleGamesSerializer, VisitedGameSerializer, CreateBundleSerializer
 from rest_framework.response import Response
 from rest_framework import permissions, status, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
@@ -138,7 +138,7 @@ class BundleViewSet(viewsets.ModelViewSet):
         if (int(data["discount"]) < 0 or int(data["discount"]) > 100):
             return Response("ERR_INVALID_PERCENTAGE", status=status.HTTP_400_BAD_REQUEST)
         filtered_data = {**{key: value for key, value in data.items() if key != "games"}, "user": request.user}
-        serializer = BundleSerializer(data=filtered_data)
+        serializer = CreateBundleSerializer(data=filtered_data)
         if (serializer.is_valid(raise_exception=True)):
             bundle = serializer.create(filtered_data)
             

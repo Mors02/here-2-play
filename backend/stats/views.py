@@ -16,7 +16,7 @@ class DeveloperStatsView(APIView):
         userInfo = DeveloperSerializer(user).data
         year = request.data["year"]
         
-        allCopies = {game["id"]: list(GamesBought.objects.filter(game_id=game["id"], date__year=year)) for game in userInfo["games"]}
+        allCopies = {game["id"]: list(GamesBought.objects.filter(game_id=game["id"], created_at__year=year)) for game in userInfo["games"]}
         allVisits = {game["id"]: list(VisitedGame.objects.filter(game_id=game["id"], visited_at__year=year)) for game in userInfo["games"]}
         print(allVisits)
         stats = {'purchases': 0, 'earnings': 0, 'visits': 0}
@@ -28,7 +28,7 @@ class DeveloperStatsView(APIView):
             total['earnings'] += sum([game.price for game in purchases])
             for purchase in purchases:
                 #make it an index
-                month = int(purchase.date.strftime('%m'))-1
+                month = int(purchase.created_at.strftime('%m'))-1
                 statsByMonth[month]["purchases"] += 1
                 statsByMonth[month]["earnings"] += purchase.price
 
