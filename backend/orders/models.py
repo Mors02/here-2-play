@@ -1,6 +1,7 @@
 from django.db import models
 from games.models import Game, Bundle
 from authentication.models import User
+from django.core.validators import MinValueValidator
 
 class Order(models.Model):        
     PENDING = "pen"
@@ -50,6 +51,8 @@ class GamesBought(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="games_bought_game")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="games_bought_user")
     hidden = models.BooleanField(default=False)
+    price = models.FloatField(validators=[MinValueValidator(0)])
+    date = models.DateTimeField()
 
     class Meta:
         db_table = "user_games"

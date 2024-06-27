@@ -5,7 +5,7 @@ from .models import UserProfile, Role
 from games.models import VisitedGame
 from django.contrib.auth.models import User
 from orders.serializers import GamesBoughtSerializer, GameSerializer
-from games.serializers import BundleSerializer, VisitedGameSerializer
+from games.serializers import BundleSerializer, VisitedGameSerializer, PartialGameSerializer
 
 UserModel = get_user_model()
 
@@ -118,13 +118,17 @@ class UserInfoWithGamesSerializer(serializers.ModelSerializer):
     profile_picture = serializers.SerializerMethodField()
     bundles = BundleSerializer(source="bundles_user", many=True, read_only=True)
     recently_visited_games = serializers.SerializerMethodField()
+    role = serializers.SerializerMethodField()
 
     class Meta:
         model = UserModel
-        fields = ["username", "id", "games", "published_games", "profile_picture", "bundles", "recently_visited_games"]
+        fields = ["username", "id", "games", "role", "date_joined", "published_games", "profile_picture", "bundles", "recently_visited_games"]
 
     def get_profile_picture(self, obj):
         return obj.user_profile_user.profile_picture.url
+    
+    def get_role(self, obj):
+        return obj.user_profile_user.role.slug
     
     def get_recently_visited_games(self, obj):
         visits = VisitedGame.objects.filter(user_id=obj.id).order_by('-visited_at')[:8]
@@ -148,3 +152,10 @@ class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ["username", "date_joined", "id"]
+
+class DeveloperSerializer(serializers.ModelSerializer):
+    games = PartialGameSerializer(source="games_publisher", many=True, read_only=True)
+
+    class Meta:
+        model = UserModel
+        fields = ["username", 'id', 'games']

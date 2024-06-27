@@ -29,10 +29,14 @@ class OrderView(viewsets.ModelViewSet):
                 gameObj = Game.objects.get(id=game["game"])
             except Game.DoesNotExist:
                 return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
-            clean_data = {"game": game["game"], "user": request.user.pk}
+            if len(game["details"]["discounts"]) > 0:
+                price = game["details"]["price"] - (game["details"]["price"] * game["details"]["discounts"][0]["percentage"] /100)
+            else:
+                price = game["details"]["price"]
+            clean_data = {"game": game["game"], "user": request.user.pk, "price": price, "date": timezone.now()}
             serializer = GamesBoughtSerializer(data=clean_data)
             if (serializer.is_valid(raise_exception=True)):
-                gameInLibrary = serializer.create(data={"game": gameObj, "user": request.user})
+                gameInLibrary = serializer.create(data={"game": gameObj, "user": request.user, "price": price, "date": timezone.now()})
             else:
                 return Response("ERR_STUPID", status=status.HTTP_400_BAD_REQUEST)
         
@@ -43,10 +47,19 @@ class OrderView(viewsets.ModelViewSet):
                 except Game.DoesNotExist:
                     return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
                 
-                clean_data = {"game": game["game"]["id"], "user": request.user.pk}
+                #eventual game discount
+                if len(game["details"]["discounts"]) > 0:
+                    price = game["details"]["price"] - (game["details"]["price"] * game["details"]["discounts"][0]["percentage"] /100)
+                else:
+                    price = game["details"]["price"]
+
+                #bundle discount
+                price = price - (price * bundle["details"]["discount"] / 100)
+                
+                clean_data = {"game": game["game"]["id"], "user": request.user.pk, "price": price, "date": timezone.now()}
                 serializer = GamesBoughtSerializer(data=clean_data)
                 if (serializer.is_valid(raise_exception=True)):
-                    gameInLibrary = serializer.create(data={"game": gameObj, "user": request.user})
+                    gameInLibrary = serializer.create(data={"game": gameObj, "user": request.user, "price": price, "date": timezone.now()})
                 else:
                     return Response("ERR_STUPID", status=status.HTTP_400_BAD_REQUEST)
                 

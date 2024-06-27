@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'authentication',
     'friendlist',
     'games',
-    'orders'
+    'orders',
+    'stats'
 ]
 
 MIDDLEWARE = [

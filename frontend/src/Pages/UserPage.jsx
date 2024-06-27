@@ -7,15 +7,16 @@ import useCurrentUser from "../config/UseCurrentUser";
 import moment from 'moment';
 import 'react-tabs/style/react-tabs.css';
 import { FaPen } from "react-icons/fa";
-import { MdReport } from "react-icons/md";
+import { MdReport, MdRotateLeft } from "react-icons/md";
 import ReportUserModal from "../Modals/ReportUserModal";
 import YourGames from "../Component/YourGames"
 import GameList from "../Component/GameList";
 import BundleOfUSer from "./Bundles/BundleOfUser";
+import DeveloperStatsPage from "./DeveloperStatsPage";
 
 export default function UserPage() {
     const [retrievedUser, setUser] = useState()
-    const {user, loading} = useCurrentUser()
+    const {user, role, loading} = useCurrentUser()
     const navigate = useNavigate()
     const { id } = useParams()
     const [tab, setTab] = useState(0)
@@ -32,6 +33,7 @@ export default function UserPage() {
     }
 
     function dateDiff(start) {
+        console.log(start)
         const startDate = moment(start);
         const timeEnd = moment();
         const diff = timeEnd.diff(startDate);
@@ -109,8 +111,9 @@ export default function UserPage() {
                     <TabContext value={tab}>
                         <TabList onChange={(event, newValue) => setTab(newValue)}>
                             <Tab label={"Libreria"}></Tab>
-                            <Tab label={"Giochi Pubblicati"}></Tab>
-                            <Tab label={"Bundle"}></Tab>
+                            {retrievedUser.role == "developer" && <Tab label={"Giochi Pubblicati"}></Tab>}
+                            {retrievedUser.role == "developer" && <Tab label={"Bundle"}></Tab>}
+                            {retrievedUser.id == user.id && role.slug == "developer" && <Tab label={"Statistiche"}></Tab>}
                         </TabList>
 
                         <TabPanel value={0}>
@@ -124,6 +127,9 @@ export default function UserPage() {
                         <TabPanel value={2}>
                             <BundleOfUSer user={retrievedUser}/>
                         </TabPanel>
+                        {retrievedUser.id == user.id && role.slug == "developer" && <TabPanel value={3}>
+                            <DeveloperStatsPage />
+                        </TabPanel>}
                     </TabContext>
                 </Box>
                 <Box className="bg-slate-300 w-full p-6">

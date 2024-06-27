@@ -41,6 +41,12 @@ class GameTagSerializer(serializers.ModelSerializer):
             gameTag.save()
             return gameTag
 
+class PartialGameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Game
+        fields = '__all__'
+        extra_kargs = {"publisher": {"read_only": True}}
+
 class GameSerializer(serializers.ModelSerializer):
     attachments = GameAttachmentSerializer(source="game_attachments_game", many=True, read_only=True)
     discounts = serializers.SerializerMethodField()

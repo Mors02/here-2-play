@@ -56,9 +56,6 @@ class GamesBoughtSerializer(serializers.ModelSerializer):
         fields = ["user", "details", "id", "game"]
 
     def create(self, data):
-        gameInLib = GamesBought(
-            user = data["user"],
-            game = data["game"]
-        )
+        gameInLib = GamesBought(**data)
         gameInLib.save()
         return gameInLib
