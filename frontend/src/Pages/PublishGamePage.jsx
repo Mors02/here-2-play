@@ -75,7 +75,7 @@ function PublishGamePage() {
 
                 if (res.status == 201)
                     return toast.success('Gioco pubblicato con successo!')
-                return toast.error(ErrorMap['ERR_DIFFERENT_PASSWORDS'])
+                return toast.error(ErrorMap['ERR_SERVER_ERROR'])
             })
             .catch(err => console.log(err))
     }
