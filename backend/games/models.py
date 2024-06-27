@@ -2,6 +2,7 @@ from django.db import models
 from authentication.models import User
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
+from datetime import datetime
 
 User = get_user_model()
 
@@ -64,6 +65,7 @@ class Review(models.Model):
     body = models.TextField(max_length=500, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews_user")
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="reviews_game")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return (self.game.title + " - " + str(self.rating) + " - " + self.body)
@@ -114,5 +116,14 @@ class BundleGames(models.Model):
 
     def __str__(self):
         return (self.bundle.name + " - " + self.game.title)
+    
+class VisitedGame(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='visited_games_game')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='visited_games_user', blank=True, null=True)
+    visited_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        db_table = "visited_games"
 
+    def __str__(self):
+        return str(self.user.pk) + " has visited " + self.game.title + " on " + self.visited_at.strftime("%H:%M:%S")

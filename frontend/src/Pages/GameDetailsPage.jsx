@@ -22,6 +22,7 @@ import moment from 'moment';
 import useCurrentUser from "../config/UseCurrentUser.jsx";
 import ReviewSection from "../Component/ReviewSection.jsx";
 import { IoArrowBackCircle } from "react-icons/io5";
+import GameCard from "../Component/GameCard"
 
 const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
@@ -161,39 +162,8 @@ function GameDetailsPage() {
             <Box className="bg-gray-100 border-4 border-[#f3f4f6] rounded-md">
                 <Attachments />
             </Box>
-            
-            <Box className="bg-gray-100 rounded-md flex">
-                <img className="aspect-[600/900] w-2/5 object-cover rounded-l" src={process.env.REACT_APP_BASE_URL + game.image} />
-                <Box className="p-6 w-full relative">
-                    <Stack className="w-full" spacing={1}>
-                        <Divider><b>{game.title}</b></Divider>
-                        <Box><b>Descrizione: </b>{game.description}</Box>
-                        <Box className="flex gap-2">
-                            <b>Prezzo: </b>
-                            <Price />
-                        </Box>
-                        <Box><b>Categoria: </b>{game.category? game.category.name : "(Categoria Eliminata)"}</Box>
-                        <Box><b>Data di Pubblicazione: </b>{moment(game.upload_date).format('DD/MM/YYYY')}</Box>
-                        <Box>
-                            <b>Sviluppatore: </b>
-                            <a className="text-blue-500" href={"/user/" + game.publisher?.id}>{game.publisher?.username}</a>
-                        </Box>
-                        <Box className="flex gap-2">
-                            <b>Valutazione Media: </b>
-                            <Rating className="" defaultValue={game?.average_rating} precision={0.5} readOnly />
-                            <Typography>({game?.reviews?.length})</Typography>
-                        </Box>
-                        <Box className="flex gap-2">
-                            <b>Tags: </b>
-                            {
-                                game?.tags.map(tag => 
-                                    <Typography onClick={() => handleTagClick(tag.tag.id)} className="bg-orange-400 hover:bg-opacity-60 transition ease-linear text-white px-2 rounded cursor-pointer">{tag.tag.name}</Typography>
-                                )
-                            }
-                        </Box>
-                    </Stack>
-                </Box>
-            </Box>
+
+            <GameCard game={game} />
 
             <Box className="grid grid-cols-2 gap-4">
                 <Button variant="contained" onClick={() => addGame()} color="info">Aggiungi al carrello</Button>
@@ -206,7 +176,7 @@ function GameDetailsPage() {
             </Box>
 
             {   
-                game.publisher?.id != user.id && (
+                game.publisher?.id != user?.id && (
                     <ReviewSection game={game.id}/>
                 ) 
             }

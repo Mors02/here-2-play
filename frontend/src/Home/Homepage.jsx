@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import { Typography } from '@mui/material';
 import { axiosConfig } from '../config/axiosConfig';
 import { useLocation, useNavigate } from 'react-router';
+import axios from 'axios';
 
 function Homepage() {
     const [loading, setLoading] = useState()
@@ -21,7 +22,10 @@ function Homepage() {
     }, [])
 
     function handleClick(game) {
-        return navigate('/games/' + game.id)
+        axiosConfig.post('/api/visit/game/', { game: game.id })
+            .then(res => {
+                return navigate('/games/' + game.id)
+            })
     } 
 
     if (!loading)
