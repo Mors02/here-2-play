@@ -49,6 +49,7 @@ class BundleInOrder(models.Model):
 class GamesBought(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="games_bought_game")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="games_bought_user")
+    created_at = models.DateTimeField(auto_now_add=True)
     hidden = models.BooleanField(default=False)
 
     class Meta:
