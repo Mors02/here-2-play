@@ -16,9 +16,14 @@ function Homepage() {
         setLoading(true)
         axiosConfig.get('/api/games/')
             .then(res => {
+                if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                    throw new Error(res["response"]["data"])
                 setGames(res.data)
+                setLoading(false)
             })
-        setLoading(false)
+            .catch(err => {
+                toast.error(ErrorMap[err.message])
+            })
     }, [])
 
     function handleClick(game) {

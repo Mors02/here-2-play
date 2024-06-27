@@ -6,6 +6,8 @@ import { FaPlus } from "react-icons/fa";
 import Box from '@mui/material/Box';
 import GameList from './GameList';
 import useCurrentUser from '../config/UseCurrentUser';
+import { toast } from 'react-toastify';
+import { ErrorMap } from '../config/enums';
 
 function UserGamesPage({ retrievedUser }) {
     const [games, setGames] = useState([])
@@ -17,10 +19,15 @@ function UserGamesPage({ retrievedUser }) {
         setPageLoading(true)
         axiosConfig.get('/api/your-games/')
             .then(res => {
+                if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                    throw new Error(res["response"]["data"])
                 setGames(res.data)
                 setPageLoading(false)
             }
         )
+        .catch(err => {
+            toast.error(ErrorMap[err.message])
+        })
     }, [])
     
     function handleClick(game) {

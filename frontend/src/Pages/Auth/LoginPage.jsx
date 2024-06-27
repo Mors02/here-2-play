@@ -18,7 +18,7 @@ function LoginPage() {
     const {loggedIn, user} = useCurrentUser();
     const { login } = useAuth();
     
-    //if already logged in
+    // If already logged in
     if (loggedIn) {
         console.log(loggedIn)
         navigate("/", {replace: true})
