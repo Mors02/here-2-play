@@ -276,6 +276,26 @@ class GameViewSet(viewsets.ModelViewSet):
     def all_time_statistics(self, request, pk=None):
         ...
 
+    def user_owns(self, request, pk=None):
+        try:
+            user_id = request.user.pk
+            game = Game.objects.get(id=pk)
+            user_owns = GamesBought.objects.get(user_id=user_id, game_id=game.pk)
+            return Response(True, status=status.HTTP_200_OK)
+        except Game.DoesNotExist:
+            return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
+        except GamesBought.DoesNotExist:
+            return Response(False, status=status.HTTP_200_OK)
+
+    def game_bundles(self, request, pk=None):
+        try:
+            game = Game.objects.get(id=pk)
+            bundles = [bundle.bundle for bundle in BundleGames.objects.filter(game_id=pk).select_related('bundle')]
+            bundles = BundleSerializer(bundles, many=True).data
+            return Response(bundles, status=200)
+        except Game.DoesNotExist:
+            return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
+
 class YourGameList(generics.ListAPIView):
     serializer_class = GameSerializer
     permission_classes = [IsAuthenticated]
