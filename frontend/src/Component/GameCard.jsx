@@ -1,9 +1,11 @@
 import { Box, Divider, Stack, Typography, Rating } from "@mui/material";
 import moment from 'moment'
 import { useState } from "react";
+import { Navigate, useNavigate } from "react-router";
 
 function GameCard({ game }) {
     const [discount, setDiscount] = useState(game?.discounts[0])
+    const navigate = useNavigate()
 
     function Price() {
         if (discount) {
@@ -16,6 +18,10 @@ function GameCard({ game }) {
             )
         }
         return game.price
+    }
+
+    function handleTagClick(id) {
+        navigate('/', { state: { tagId: id } })
     }
 
     return (
@@ -44,7 +50,7 @@ function GameCard({ game }) {
                         <b>Tags: </b>
                         {
                             game?.tags.map(tag => 
-                                <Typography className="bg-orange-400 transition ease-linear text-white px-2 rounded cursor-pointer">{tag.tag.name}</Typography>
+                                <Typography onClick={() => handleTagClick(tag.tag.id)} className="bg-orange-400 hover:bg-opacity-60 transition ease-linear text-white px-2 rounded cursor-pointer">{tag.tag.name}</Typography>
                             )
                         }
                     </Box>

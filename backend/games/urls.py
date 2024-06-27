@@ -5,8 +5,7 @@ from . import views
 urlpatterns = [
     path('games/', views.GameViewSet.as_view({'get': 'list'})),
     path('games/<int:pk>/', views.GameViewSet.as_view({'delete': 'destroy', 'put': 'update', 'get': 'retrieve'})),
-    path('games/<int:pk>/statistics/', views.GameViewSet.as_view({'get': 'last_30_days_statistics'})),
-    path('games/<int:pk>/all-time-statistics/', views.GameViewSet.as_view({'get': 'all_time_statistics'})),
+    path('games/<int:pk>/statistics/<slug:type>/', views.GameViewSet.as_view({'get': 'statistics'})),
     path('games/create/', views.GameViewSet.as_view({'post': 'create'})),
     path('games/<int:pk>/owned', views.GameViewSet.as_view({'get': 'user_owns'})),
     path('games/<int:pk>/bundles', views.GameViewSet.as_view({'get': 'game_bundles'})),

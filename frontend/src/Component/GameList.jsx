@@ -51,16 +51,6 @@ function GameList({selection=[], games, handleClick, maxCount=1000, searchSectio
 
         let data = (games.length > maxHomepageGames && searchSection) ? games.slice(0, maxHomepageGames) : games
 
-        // if (searchSection) {
-        //     data.map(game => {
-        //         let discount = game?.discounts[0]
-        //         if (discount)
-        //             game.price = game.price - (game.price * discount.percentage / 100)
-        //     })
-            
-        //     if (data.length <= 0) 
-        //         toast.error(ErrorMap['ERR_NO_GAMES_AVAILABLES'])
-        // }
         setFilteredGames(data)
         
         setLoading(false)
@@ -173,7 +163,7 @@ function GameList({selection=[], games, handleClick, maxCount=1000, searchSectio
             <Box className='grid sm:grid-cols-3 md:grid-cols-5 gap-8'>
                 {
                     filteredGames?.map(game =>
-                        <Game game={game} handleClick={handleClick} selected={selected.length > 0? selected.some(id => id == game.id) : false} previewPrices={previewPrices}/>
+                        <Game game={game} handleClick={handleClick} selected={selected.length > 0 ? selected.some(id => id == game.id) : false} previewPrices={previewPrices}/>
                     )
                 }
             </Box>
