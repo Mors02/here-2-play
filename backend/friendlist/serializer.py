@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UserReport, GameReport, FriendRequest, Friendship
+from .models import UserReport, GameReport, FriendRequest, Friendship, Chat, Message
 from django.db.models import Q
 from authentication.models import User, UserProfile
 
@@ -31,8 +31,27 @@ class GameReportSerializer(serializers.ModelSerializer):
             )
         report.save()
         return report
+    
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = '__all__'
+
+class ChatSerializer(serializers.ModelSerializer):
+    messages = MessageSerializer(source='message_chat', many=True, read_only=True)
+
+    class Meta:
+        model = Chat
+        fields = ['friend_request', 'messages', 'name']
+
+    def create(self, data):
+        chat = Chat(**data)
+        chat.save()
+        return chat
 
 class FriendRequestSerializer(serializers.ModelSerializer):
+    chat = ChatSerializer(source="chat_friend_request", read_only=True)
+
     class Meta:
         model = FriendRequest
         fields = '__all__'
@@ -122,4 +141,3 @@ class FriendshipListSerializer(serializers.Serializer):
 
         self.context["requests"] = requestJson
         return user
-    

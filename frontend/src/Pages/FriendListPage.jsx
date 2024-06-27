@@ -9,6 +9,7 @@ import { ErrorMap } from "../config/enums";
 import { FaCheck } from "react-icons/fa6";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
+import { useNavigate } from "react-router";
 //import { TabPanel, Tabs, TabList, Tab } from "react-tabs";
 
 export function PanelTab(props) {
@@ -30,6 +31,7 @@ export default function FriendListPage({onClick}) {
     const [friends, setFriends] = useState([])
     const [username, setUsername] = useState("")
     const [friendRequests, setFriendRequests] = useState([])
+    const navigate = useNavigate()
 
     useEffect(() => {
         refreshFriendRequests()
@@ -135,6 +137,11 @@ export default function FriendListPage({onClick}) {
         });        
     }
 
+    function openChat(id) {
+        
+        return navigate('/chat/'+id)
+    }
+
     return (
         <>
         <Box className=" bg-slate-600 rounded-t-lg">
@@ -152,7 +159,7 @@ export default function FriendListPage({onClick}) {
                             {console.log(friend)}
                             <img className="object-cover rounded-full w-8 h-8 m-1" src={process.env.REACT_APP_BASE_URL + friend.profile_picture}/>
                             <Typography variant="h6" className="pl-4 py-1" ><a href={"/user/"+friend.id}>{friend.username}</a></Typography>
-                            <CiChat1 className="ml-32 h-8 w-8 cursor-pointer" />
+                            <CiChat1 onClick={() => openChat(friend.id)}className="ml-32 h-8 w-8 cursor-pointer" />
                             <TbFriendsOff onClick={() => deleteFriend(friend.username, friend.id)} className="ml-2 h-8 w-8 cursor-pointer" color="red"/>
                         </Stack>
                     ))}

@@ -13,9 +13,11 @@ import OrderPage from "../Pages/OrderPage";
 import BundleCreate from "../Pages/Bundles/BundleCreate";
 import BundleDetails from "../Pages/Bundles/BundleDetails";
 import GameStatisticsPage from "../Pages/GameStatisticsPage";
+import ChatPage from "../Pages/ChatPage";
 
 export default function AppRoutes() {
     return (
+        
         <Routes>
             <Route path="/" element={<Homepage />}></Route>
             <Route path="/login" element={<LoginPage />}></Route>
@@ -29,6 +31,14 @@ export default function AppRoutes() {
             <Route path="/user/:id" element={<UserPage />}></Route>
             <Route path="/user/" element={<UserEditPage />}></Route>
             <Route path="/cart" element={<OrderPage />}></Route>
+        </Routes>
+    )
+}
+
+export function ChatRoute() {
+    return (
+        <Routes>
+            <Route path="/chat/:id" element={<ChatPage />}></Route>
         </Routes>
     )
 }
