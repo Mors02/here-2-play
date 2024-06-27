@@ -155,12 +155,8 @@ function GameDetailsPage() {
         return game.price
     }
 
-    function handleTagClick(id) {
-        navigate('/', { state: { tagId: id } })
-    }
-
     function userOwns() {
-        axiosConfig.get('api/games/'+gameId+'/owned')
+        axiosConfig.get('api/games/' + gameId + '/owned/')
         .then(res => {
             if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")
                 throw new Error(res["response"]["data"])
@@ -173,11 +169,11 @@ function GameDetailsPage() {
     }
 
     function handleBundleClick(bundle) {
-        return navigate('/bundle/'+bundle.id);
+        return navigate('/bundle/' + bundle.id);
     }
 
     function bundlesOfGame() {
-        axiosConfig.get('api/games/'+gameId+'/bundles')
+        axiosConfig.get('api/games/' + gameId + '/bundles/')
         .then(res => {
             if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")
                 throw new Error(res["response"]["data"])
@@ -186,6 +182,28 @@ function GameDetailsPage() {
         .catch(err => {
             console.log(err)
             toast.error(ErrorMap[err.message])
+        })
+    }
+
+    function downloadGame() {
+        const segments = game.uploaded_file.split('/')
+        axiosConfig.get(process.env.REACT_APP_BASE_URL + "/" + game.uploaded_file, {
+            responseType: 'blob',
+        })
+        .then(response => {
+            // Create a URL for the blob object
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            
+            // Create a link element to trigger the download
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', segments[segments.length - 1]); // Set the desired file name
+            document.body.appendChild(link);
+            link.click();
+
+            // Clean up and remove the link
+            link.parentNode.removeChild(link);
+            window.URL.revokeObjectURL(url); // Free up memory
         })
     }
 
@@ -202,9 +220,12 @@ function GameDetailsPage() {
             <GameCard game={game} />
 
             <Box className="grid grid-cols-2 gap-4">
-                {!owned? <Button variant="contained" onClick={() => addGame()} color="info">Aggiungi al carrello</Button> :
-                        <Button variant="contained" color="success"><CheckIcon/> In libreria</Button>}
-                <Button variant="contained" color="error" onClick={() => openModal()}><MdReport className="mr-2" />Segnala</Button>
+                {
+                    !owned 
+                    ? <Button variant="contained" onClick={() => addGame()} color="info">Aggiungi al carrello</Button> 
+                    : <Button variant="contained" color="success" onClick={() => downloadGame()} startIcon={<CheckIcon />}>Download</Button>
+                }
+                <Button variant="contained" color="error" onClick={() => openModal()} startIcon={<MdReport />}>Segnala</Button>
                 <ReportGameModal 
                     closeModal={closeModal} 
                     modalIsOpen={modalIsOpen} 
