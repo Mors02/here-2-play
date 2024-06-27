@@ -53,6 +53,7 @@ class GamesBought(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     hidden = models.BooleanField(default=False)
     price = models.FloatField(validators=[MinValueValidator(0)])
+    play_time = models.PositiveIntegerField(validators=[MinValueValidator(0)], default=0)
 
     class Meta:
         db_table = "user_games"

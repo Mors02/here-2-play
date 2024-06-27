@@ -3,7 +3,7 @@ import moment from 'moment'
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
-function GameCard({ game }) {
+function GameCard({ game, owned }) {
     const [discount, setDiscount] = useState(game?.discounts[0])
     const navigate = useNavigate()
 
@@ -22,6 +22,16 @@ function GameCard({ game }) {
 
     function handleTagClick(id) {
         navigate('/', { state: { tagId: id } })
+    }
+
+    function PlayTime() {
+        if (owned)
+        return (
+            <Box className="flex gap-2">
+                <b>Ore di Gioco: </b>
+                <Typography>{Math.floor(owned.play_time / 60)}:{owned.play_time % 60} Ore</Typography>
+            </Box>
+        )
     }
 
     return (
@@ -54,6 +64,7 @@ function GameCard({ game }) {
                             )
                         }
                     </Box>
+                    <PlayTime />
                 </Stack>
             </Box>
         </Box>

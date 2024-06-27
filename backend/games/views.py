@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
 
+from orders.serializers import GamesBoughtSerializer
 from orders.models import GamesBought
 from .models import Game, GameAttachment, Discount, Review, Tag, Category, Bundle, BundleGames, VisitedGame
 from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer, BundleSerializer, BundleGamesSerializer, VisitedGameSerializer, CreateBundleSerializer
@@ -291,7 +292,7 @@ class GameViewSet(viewsets.ModelViewSet):
             user_id = request.user.pk
             game = Game.objects.get(id=pk)
             user_owns = GamesBought.objects.get(user_id=user_id, game_id=game.pk)
-            return Response(True, status=status.HTTP_200_OK)
+            return Response(GamesBoughtSerializer(user_owns).data, status=status.HTTP_200_OK)
         except Game.DoesNotExist:
             return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
         except GamesBought.DoesNotExist:
