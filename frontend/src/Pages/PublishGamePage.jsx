@@ -14,12 +14,14 @@ import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import { IoArrowBackCircle } from "react-icons/io5";
 import MenuItem from '@mui/material/MenuItem';
+import useCurrentUser from '../config/UseCurrentUser';
 
 function PublishGamePage() {
     const [image, setImage] = useState()
     const [attachments, setAttachments] = useState()
     const [categories, setCategories] = useState()
     const [file, setFile] = useState()
+    const {user} = useCurrentUser()
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
 
@@ -109,7 +111,7 @@ function PublishGamePage() {
     if (!loading)
     return (
         <form className='px-[10%] lg:px-[12%] relative py-10' onSubmit={e => onSubmit(e)}>
-            <IoArrowBackCircle color="#63748B" size={50} className="absolute top-4 left-4 cursor-pointer" onClick={() => navigate(-1)} />
+            <IoArrowBackCircle color="#63748B" size={50} className="absolute top-4 left-4 cursor-pointer" onClick={() => navigate('/user/'+user.id+'#games')} />
 
             <Stack direction="column" spacing={2}>
                 <TextField {...register('title')} label="Titolo" variant="outlined" required />

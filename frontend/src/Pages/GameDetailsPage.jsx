@@ -5,7 +5,7 @@ import { MdReport } from "react-icons/md";
 import ReportGameModal from "../Modals/ReportGameModal";
 import { toast } from "react-toastify";
 import { ErrorMap } from "../config/enums";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { useTheme } from '@mui/material/styles';
 import MobileStepper from '@mui/material/MobileStepper';
 import { TiDelete } from "react-icons/ti";
@@ -22,7 +22,9 @@ import moment from 'moment';
 import useCurrentUser from "../config/UseCurrentUser.jsx";
 import ReviewSection from "../Component/ReviewSection.jsx";
 import { IoArrowBackCircle } from "react-icons/io5";
-import GameCard from "../Component/GameCard"
+import GameCard from "../Component/GameCard";
+import CheckIcon from '@mui/icons-material/Check';
+import BundleList from "../Component/BundleList.jsx";
 
 const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
@@ -35,6 +37,8 @@ function GameDetailsPage() {
     const [maxLength, setMaxLength] = useState()
     const [discount, setDiscount] = useState()
     const [game, setGame] = useState([])
+    const [owned, setOwned] = useState(false)
+    const [bundles, setBundles] = useState([])
     const { gameId } = useParams()
     const navigate = useNavigate()
     const { user, loading } = useCurrentUser()
@@ -53,7 +57,7 @@ function GameDetailsPage() {
 
     function updateData() {
         setPageLoading(true)
-
+        
         return axiosConfig.get('/api/games/' + gameId)
             .then((res) => {
                 console.log(res.data)
@@ -68,6 +72,8 @@ function GameDetailsPage() {
     }
 
     useEffect(() => {
+        userOwns()
+        bundlesOfGame()
         updateData()
     }, [])
 
@@ -149,6 +155,40 @@ function GameDetailsPage() {
         return game.price
     }
 
+    function handleTagClick(id) {
+        navigate('/', { state: { tagId: id } })
+    }
+
+    function userOwns() {
+        axiosConfig.get('api/games/'+gameId+'/owned')
+        .then(res => {
+            if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")
+                throw new Error(res["response"]["data"])
+            setOwned(res.data)
+        })
+        .catch(err => {
+            console.log(err)
+            toast.error(ErrorMap[err.message])
+        })
+    }
+
+    function handleBundleClick(bundle) {
+        return navigate('/bundle/'+bundle.id);
+    }
+
+    function bundlesOfGame() {
+        axiosConfig.get('api/games/'+gameId+'/bundles')
+        .then(res => {
+            if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")
+                throw new Error(res["response"]["data"])
+            setBundles(res.data)
+        })
+        .catch(err => {
+            console.log(err)
+            toast.error(ErrorMap[err.message])
+        })
+    }
+
     if (!loading && !pageLoading)
     return (
         <Stack spacing={4} className="px-[10%] lg:px-[12%] relative !mb-10">
@@ -162,7 +202,8 @@ function GameDetailsPage() {
             <GameCard game={game} />
 
             <Box className="grid grid-cols-2 gap-4">
-                <Button variant="contained" onClick={() => addGame()} color="info">Aggiungi al carrello</Button>
+                {!owned? <Button variant="contained" onClick={() => addGame()} color="info">Aggiungi al carrello</Button> :
+                        <Button variant="contained" color="success"><CheckIcon/> In libreria</Button>}
                 <Button variant="contained" color="error" onClick={() => openModal()}><MdReport className="mr-2" />Segnala</Button>
                 <ReportGameModal 
                     closeModal={closeModal} 
@@ -170,9 +211,14 @@ function GameDetailsPage() {
                     gameReported={game}
                 />
             </Box>
-
+            {bundles.length > 0 &&
+                <Box>
+                    <Typography variant="h5">Il gioco compare in:</Typography>
+                    <BundleList bundles={bundles} handleClick={handleBundleClick} />
+                </Box>
+            }
             {   
-                game.publisher?.id != user?.id && (
+                (game.publisher?.id != user?.id) && owned && (
                     <ReviewSection game={game.id}/>
                 ) 
             }

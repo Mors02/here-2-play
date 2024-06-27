@@ -67,7 +67,7 @@ export default function BundleCreate() {
                     <TextField className="grow" label="Descrizione" type="text" {...register('description')} />
                 </Box>
                 <Box className="float-left !mt-6">
-                    <Button variant="outlined" color="error" onClick={() => navigate('/user/'+user.id)}>Indietro</Button>
+                    <Button variant="outlined" color="error" onClick={() => navigate('/user/'+user.id+'#bundles')}>Indietro</Button>
                 </Box>
                 <Box className="float-right !mt-6">
                     <Button variant="contained" type="submit">Crea Bundle</Button>
