@@ -19,35 +19,42 @@ function GameStatisticsPage() {
     const [registeredVisits, setRegisteredVisits] = useState()
     const [anonymousVisits, setAnonymousVisits] = useState()
     const [purchases, setPurchases] = useState()
+    const [amountGain, setAmountGain] = useState()
     const [lastMonth, setLastMonth] = useState(true)
     const { gameId } = useParams()
-    const {user} = useCurrentUser()
+    const { user, loggedIn } = useCurrentUser()
     const navigate = useNavigate()
 
     useEffect(() => {
         setLoading(true)
 
         axiosConfig.get('/api/games/' + gameId)
+        .then(res => {
+            if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                throw new Error(res['response']['data'])
+            
+            setGame(res.data)
+            
+            axiosConfig.get('/api/games/' + gameId + '/statistics/' + (setLastMonth ? 'last-30-days/' : 'all-time'))
             .then(res => {
-                setGame(res.data)
-
-                axiosConfig.get('/api/games/' + gameId + '/statistics/' + (setLastMonth ? 'last-30-days/' : 'all-time'))
-                    .then(res => {
-                        if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
-                            throw new Error(res['response']['data'])
-                        console.log(res.data)
-
-                        setRegisteredVisits(res.data.registered_visits ?? 0)
-                        setAnonymousVisits(res.data.anonymous_visits ?? 0)
-                        setPurchases(res.data.purchases ?? 0)
-                        setReviews(res.data.reviews)
-
-                        setLoading(false)
-                    })
-                    .catch(err => {
-                        return toast.error(ErrorMap[err.message])
-                    })
+                if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                    throw new Error(res['response']['data'])
+                
+                setRegisteredVisits(res.data.registered_visits ?? 0)
+                setAnonymousVisits(res.data.anonymous_visits ?? 0)
+                setPurchases(res.data.purchases ?? 0)
+                setAmountGain(res.data.amount_gain.price__sum ?? 0)
+                setReviews(res.data.reviews)
+                
+                    setLoading(false)
+                })
+                .catch(err => {
+                    return toast.error(ErrorMap[err.message])
             })
+        })
+        .catch(err => {
+            return toast.error(ErrorMap[err.message])
+        })
     }, [lastMonth])
 
     function handleEdit() {
@@ -88,11 +95,10 @@ function GameStatisticsPage() {
         return (
             <Stack spacing={2}>
                 <Divider><b>Acquisti ({lastMonth ? "Ultimo Mese" : "Sempre"})</b></Divider>
-                <Box className="bg-gray-100 rounded-md p-6">
-                {
-                    // acquisti
-                }
-                </Box>
+                <Stack spacing={2} className="bg-gray-100 rounded-md p-6">
+                    <Typography><b>Acquisiti: </b>{purchases}</Typography>
+                    <Typography><b>Ricavi: </b>{amountGain}</Typography>
+                </Stack>
             </Stack>
         )
     }

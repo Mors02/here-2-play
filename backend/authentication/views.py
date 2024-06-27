@@ -89,9 +89,12 @@ class UserView(APIView):
     authentication_classes = (JWTAuthentication,)
 
     def get(self, request):
-        profile = UserProfile.objects.get(user_id=request.user.pk)
-        serializer = UserSerializer(profile)        
-        return Response(serializer.data, status = status.HTTP_200_OK)
+        try:
+            profile = UserProfile.objects.get(user_id=request.user.pk)
+            serializer = UserSerializer(profile)        
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except UserProfile.DoesNotExist:
+            return Response('ERR_USER_NOT_FOUND', status=status.HTTP_404_NOT_FOUND)
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()

@@ -14,6 +14,7 @@ from authentication.models import User
 from django.utils import timezone
 from datetime import timedelta
 from django.utils import timezone
+from django.db.models import Sum
 
 class DiscountViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -280,9 +281,10 @@ class GameViewSet(viewsets.ModelViewSet):
         reviews = ReviewSerializer(reviews.order_by('-created_at'), many=True).data
         registered_visits = registered_visits.exclude(user_id__isnull=True).count()
         anonymous_visits = anonymous_visits.filter(user_id__isnull=True).count()
+        amount_gain = purchases.aggregate(Sum('price'))
         purchases = purchases.count()
         
-        return Response({'reviews': reviews, 'registered_visits': registered_visits, 'anonymous_visits': anonymous_visits, 'purchases': purchases}, status=status.HTTP_200_OK)
+        return Response({'reviews': reviews, 'registered_visits': registered_visits, 'anonymous_visits': anonymous_visits, 'purchases': purchases, 'amount_gain': amount_gain}, status=status.HTTP_200_OK)
 
     def user_owns(self, request, pk=None):
         try:

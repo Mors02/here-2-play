@@ -194,8 +194,8 @@ function GameDetailsPage() {
             responseType: 'blob',
         })
         .then(response => {
-            if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
-                throw new Error(res["response"]["data"])
+            if (response.code == "ERR_BAD_REQUEST" || response.code == "ERR_BAD_RESPONSE")
+                throw new Error(response["response"]["data"])
 
             // Create a URL for the blob object
             const url = window.URL.createObjectURL(new Blob([response.data]));
