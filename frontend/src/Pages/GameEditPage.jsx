@@ -18,6 +18,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import moment from 'moment';
 import { IoArrowBackCircle } from "react-icons/io5";
+import { ErrorMap } from "../config/enums";
 
 function GameEditPage() {
     const [pageLoading, setPageLoading] = useState()
@@ -53,12 +54,12 @@ function GameEditPage() {
             .then(res => {
                 if (res?.response?.status == 404) {
                     navigate('/')
-                    return toast.error('Gioco non trovato!') 
+                    return toast.error(ErrorMap('ERR_GAME_NOT_FOUND')) 
                 }
 
                 if (res.data.publisher.id != user.id) {
                     navigate('/')
-                    return toast.error('Non hai i permessi per modificare il gioco!') 
+                    return toast.error(ErrorMap('ERR_UNAUTHORIZED')) 
                 }
                 
                 setAttachments(res.data.attachments)
@@ -72,9 +73,8 @@ function GameEditPage() {
         axiosConfig.get('/api/categories/')
             .then(res => {
                 setAllCategories(res.data)
+                setPageLoading(false)
             })
-
-        setPageLoading(false)
     }
 
     useEffect(() => {
@@ -146,7 +146,7 @@ function GameEditPage() {
                             updateData()
                             return toast.success('L\'allegato è stato cancellato con successo!')
                         }
-                        return toast.error('Non è stato possibile cancellare l\'allegato!')
+                        return toast.error(ErrorMap['ERR_SERVER_ERROR'])
                     })
               }
             },
@@ -170,7 +170,7 @@ function GameEditPage() {
                             navigate('/')
                             return toast.success('Il gioco è stato cancellato con successo!')
                         }
-                        return toast.error('Non è stato possibile cancellare il gioco')
+                        return toast.error(ErrorMap['ERR_SERVER_ERROR'])
                     })
               }
             },
@@ -222,7 +222,7 @@ function GameEditPage() {
 
                 if (res.status == 200)
                     return toast.success('Gioco modificato con successo!')
-                return toast.error('Errore durante la modifica!')
+                return toast.error(ErrorMap['ERR_SERVER_ERROR'])
             })
     }
 
@@ -246,9 +246,9 @@ function GameEditPage() {
 
                         toast.success('Sconto creato con successo!')
                     } else if (res?.response?.status == 400)
-                        toast.error('I periodi di sconto non possono incrociarsi con quelli già attivi!')
+                        toast.error(ErrorMap['ERR_OVERLAP_DISCOUNTS'])
                     else
-                        toast.error('Creazione sconto fallita!')
+                        toast.error(ErrorMap['ERR_SERVER_ERROR'])
                 })
         }
     }
@@ -266,7 +266,7 @@ function GameEditPage() {
                                 updateData()
                                 return toast.success('Sconto cancellato con successo!')
                             }
-                            return toast.error('Non è stato possibile cancellare lo sconto')
+                            return toast.error(ErrorMap('ERR_SERVER_ERROR'))
                         })
                     }
                 },

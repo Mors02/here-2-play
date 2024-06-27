@@ -60,7 +60,8 @@ function GameDetailsPage() {
         
         return axiosConfig.get('/api/games/' + gameId)
             .then((res) => {
-                console.log(res.data)
+                if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")
+                    throw new Error(res["response"]["data"])
                 
                 setGame(res.data)
                 setAttachments(res.data.attachments)
@@ -68,6 +69,9 @@ function GameDetailsPage() {
                 setDiscount(res.data.discounts[0])
 
                 setPageLoading(false)
+            })
+            .catch(err => {
+                toast.error(ErrorMap[err.message])
             })
     }
 
@@ -163,7 +167,6 @@ function GameDetailsPage() {
             setOwned(res.data)
         })
         .catch(err => {
-            console.log(err)
             toast.error(ErrorMap[err.message])
         })
     }
@@ -191,6 +194,9 @@ function GameDetailsPage() {
             responseType: 'blob',
         })
         .then(response => {
+            if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                throw new Error(res["response"]["data"])
+
             // Create a URL for the blob object
             const url = window.URL.createObjectURL(new Blob([response.data]));
             
@@ -204,6 +210,9 @@ function GameDetailsPage() {
             // Clean up and remove the link
             link.parentNode.removeChild(link);
             window.URL.revokeObjectURL(url); // Free up memory
+        })
+        .catch(err => {
+            toast.error(ErrorMap(err.message))
         })
     }
 

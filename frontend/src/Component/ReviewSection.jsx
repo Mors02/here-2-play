@@ -72,7 +72,7 @@ export default function ReviewSection({game}) {
     }
 
     function createReview() {
-        axiosConfig.post("api/games/"+game+"/reviews/", {body, rating, tags: selectedTags})
+        axiosConfig.post("api/games/" + game + "/reviews/", {body, rating, tags: selectedTags})
         .then(res => {
             if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
                 throw new Error(res["response"]["data"])

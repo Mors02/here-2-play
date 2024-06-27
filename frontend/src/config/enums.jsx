@@ -7,6 +7,7 @@ const ErrorMap = {
     'ERR_SERVER_ERROR': 'Errore con il server.',
     'ERR_RESOURCE_NOT_FOUND': 'Non trovato.',
     'ERR_USER_NOT_FOUND': 'User non trovato.',
+    'ERR_GAME_NOT_FOUND': 'Gioco non trovato.',
     'ERR_ALREADY_REQUESTED': 'Hai già inviato una richiesta di amicizia.',
     'ERR_SELF_FRIEND': 'Non puoi essere amico di te stesso.',
     'ERR_STUPID': 'Lo user è stupido.',
@@ -17,7 +18,9 @@ const ErrorMap = {
     'ERR_NO_RATING': 'Non hai valutato il gioco.',
     'ERR_TOO_MANY_TAGS': 'Puoi scegliere al massimo 4 tags.',
     'ERR_NO_GAMES_AVAILABLES': 'Non sono presenti giochi con tali filtri.',
-    'ERR_GAME_NOT_OWNED': 'Gioco non posseduto.'
+    'ERR_GAME_NOT_OWNED': 'Gioco non posseduto.',
+    'ERR_UNAUTHORIZED': 'Non hai i permessi per compiere quest\'azione.',
+    'ERR_OVERLAP_DISCOUNTS': 'I periodi di sconto non possono incrociarsi con quelli già attivi!',
 }
 const blockedUrls = []
 
