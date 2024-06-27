@@ -5,6 +5,8 @@ import { Typography } from '@mui/material';
 import { axiosConfig } from '../config/axiosConfig';
 import { useLocation, useNavigate } from 'react-router';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import { ErrorMap } from '../config/enums';
 
 function Homepage() {
     const [loading, setLoading] = useState()
@@ -16,9 +18,14 @@ function Homepage() {
         setLoading(true)
         axiosConfig.get('/api/games/')
             .then(res => {
+                if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                    throw new Error(res["response"]["data"])
                 setGames(res.data)
+                setLoading(false)
             })
-        setLoading(false)
+            .catch(err => {
+                toast.error(ErrorMap[err.message])
+            })
     }, [])
 
     function handleClick(game) {

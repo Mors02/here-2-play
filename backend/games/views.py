@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
 
+from orders.serializers import GamesBoughtSerializer
 from orders.models import GamesBought
 from .models import Game, GameAttachment, Discount, Review, Tag, Category, Bundle, BundleGames, VisitedGame
 from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer, BundleSerializer, BundleGamesSerializer, VisitedGameSerializer, CreateBundleSerializer
@@ -14,6 +15,7 @@ from authentication.models import User
 from django.utils import timezone
 from datetime import timedelta
 from django.utils import timezone
+from django.db.models import Sum
 
 class DiscountViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -280,16 +282,17 @@ class GameViewSet(viewsets.ModelViewSet):
         reviews = ReviewSerializer(reviews.order_by('-created_at'), many=True).data
         registered_visits = registered_visits.exclude(user_id__isnull=True).count()
         anonymous_visits = anonymous_visits.filter(user_id__isnull=True).count()
+        amount_gain = purchases.aggregate(Sum('price'))
         purchases = purchases.count()
         
-        return Response({'reviews': reviews, 'registered_visits': registered_visits, 'anonymous_visits': anonymous_visits, 'purchases': purchases}, status=status.HTTP_200_OK)
+        return Response({'reviews': reviews, 'registered_visits': registered_visits, 'anonymous_visits': anonymous_visits, 'purchases': purchases, 'amount_gain': amount_gain}, status=status.HTTP_200_OK)
 
     def user_owns(self, request, pk=None):
         try:
             user_id = request.user.pk
             game = Game.objects.get(id=pk)
             user_owns = GamesBought.objects.get(user_id=user_id, game_id=game.pk)
-            return Response(True, status=status.HTTP_200_OK)
+            return Response(GamesBoughtSerializer(user_owns).data, status=status.HTTP_200_OK)
         except Game.DoesNotExist:
             return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
         except GamesBought.DoesNotExist:

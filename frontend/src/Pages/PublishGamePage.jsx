@@ -35,7 +35,6 @@ function PublishGamePage() {
 
         axiosConfig.get('/api/categories/')
             .then(res => {
-                console.log(res.data)
                 setCategories(res.data)
                 setLoading(false)
             })
@@ -76,7 +75,7 @@ function PublishGamePage() {
 
                 if (res.status == 201)
                     return toast.success('Gioco pubblicato con successo!')
-                return toast.error('Errore durante la pubblicazione!')
+                return toast.error(ErrorMap['ERR_SERVER_ERROR'])
             })
             .catch(err => console.log(err))
     }

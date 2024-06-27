@@ -22,7 +22,7 @@ export default function PaymentModal({afterOpenModal, closeModal, modalIsOpen, o
 
     function pay(method) {
         console.log(method, order.id);
-        axiosConfig.post('api/orders/'+order.id+"/", {method})
+        axiosConfig.post('api/orders/' + order.id + "/", {method})
         .then(res => {
             console.log(res)
             if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")

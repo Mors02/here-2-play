@@ -52,7 +52,7 @@ class GamesBoughtSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = GamesBought
-        fields = ["user", "details", "id", "game", "created_at"]
+        fields = ["user", "details", "id", "game", "created_at", "play_time"]
 
     def create(self, data):
         gameInLib = GamesBought(**data)

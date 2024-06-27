@@ -25,6 +25,7 @@ import { IoArrowBackCircle } from "react-icons/io5";
 import GameCard from "../Component/GameCard";
 import CheckIcon from '@mui/icons-material/Check';
 import BundleList from "../Component/BundleList.jsx";
+import { IoIosPlay } from "react-icons/io";
 
 const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
@@ -39,9 +40,9 @@ function GameDetailsPage() {
     const [game, setGame] = useState([])
     const [owned, setOwned] = useState(false)
     const [bundles, setBundles] = useState([])
+    const { user, loading } = useCurrentUser()
     const { gameId } = useParams()
     const navigate = useNavigate()
-    const { user, loading } = useCurrentUser()
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -60,7 +61,8 @@ function GameDetailsPage() {
         
         return axiosConfig.get('/api/games/' + gameId)
             .then((res) => {
-                console.log(res.data)
+                if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")
+                    throw new Error(res["response"]["data"])
                 
                 setGame(res.data)
                 setAttachments(res.data.attachments)
@@ -68,6 +70,9 @@ function GameDetailsPage() {
                 setDiscount(res.data.discounts[0])
 
                 setPageLoading(false)
+            })
+            .catch(err => {
+                toast.error(ErrorMap[err.message])
             })
     }
 
@@ -142,19 +147,6 @@ function GameDetailsPage() {
             })
     }
 
-    function Price() {
-        if (discount) {
-            return (
-                <Box className="flex gap-3">
-                    <Typography className="line-through">{game.price}</Typography>
-                    <Typography>{(game.price - (game.price * discount.percentage / 100)).toFixed(2)}€</Typography>
-                    <Typography className="rounded text-[#7CFC00] bg-[#228B22] px-1">-{discount.percentage}%</Typography>
-                </Box>
-            )
-        }
-        return game.price
-    }
-
     function userOwns() {
         axiosConfig.get('api/games/' + gameId + '/owned/')
         .then(res => {
@@ -163,7 +155,6 @@ function GameDetailsPage() {
             setOwned(res.data)
         })
         .catch(err => {
-            console.log(err)
             toast.error(ErrorMap[err.message])
         })
     }
@@ -191,6 +182,9 @@ function GameDetailsPage() {
             responseType: 'blob',
         })
         .then(response => {
+            if (response.code == "ERR_BAD_REQUEST" || response.code == "ERR_BAD_RESPONSE")
+                throw new Error(response["response"]["data"])
+
             // Create a URL for the blob object
             const url = window.URL.createObjectURL(new Blob([response.data]));
             
@@ -205,6 +199,23 @@ function GameDetailsPage() {
             link.parentNode.removeChild(link);
             window.URL.revokeObjectURL(url); // Free up memory
         })
+        .catch(err => {
+            toast.error(ErrorMap(err.message))
+        })
+    }
+
+    function playGame() {
+        window.open(
+            "/play/" + gameId,
+            'targetWindow',
+            `toolbar=no,
+            location=no,
+            menubar=no,
+            scrollbars=yes,
+            resizable=yes,
+            width=350,
+            height=350`
+        )
     }
 
     if (!loading && !pageLoading)
@@ -217,14 +228,12 @@ function GameDetailsPage() {
                 <Attachments />
             </Box>
 
-            <GameCard game={game} />
+            <GameCard game={game} owned={owned} />
 
-            <Box className="grid grid-cols-2 gap-4">
-                {
-                    !owned 
-                    ? <Button variant="contained" onClick={() => addGame()} color="info">Aggiungi al carrello</Button> 
-                    : <Button variant="contained" color="success" onClick={() => downloadGame()} startIcon={<CheckIcon />}>Download</Button>
-                }
+            <Box className={"grid gap-4 " + (owned ? "grid-cols-3" : "grid-cols-2")}>
+                { !owned && <Button variant="contained" onClick={() => addGame()} color="info">Aggiungi al carrello</Button> }
+                { owned && <Button variant="contained" color="success" onClick={() => downloadGame()} startIcon={<CheckIcon />}>Download</Button> }
+                { owned && <Button variant="contained" color="success" onClick={() => playGame()} startIcon={<IoIosPlay />}>Play</Button> }
                 <Button variant="contained" color="error" onClick={() => openModal()} startIcon={<MdReport />}>Segnala</Button>
                 <ReportGameModal 
                     closeModal={closeModal} 
@@ -232,7 +241,8 @@ function GameDetailsPage() {
                     gameReported={game}
                 />
             </Box>
-            {bundles.length > 0 &&
+            {
+                bundles.length > 0 &&
                 <Box>
                     <Typography variant="h5">Il gioco compare in:</Typography>
                     <BundleList bundles={bundles} handleClick={handleBundleClick} />

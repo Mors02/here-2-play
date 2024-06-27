@@ -156,6 +156,21 @@ class BundleInOrderView(viewsets.ModelViewSet):
             return Response(status=status.HTTP_200_OK)
         except:
             return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
+        
+class GamesBoughtViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, pk):
+        if not 'playTime' in request.data:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+        game = GamesBought.objects.get(user_id=request.user.pk, game_id=pk)
+        print(game.play_time)
+        game.play_time += int(request.data['playTime'])
+        print(game.play_time)
+        game.save()
+        
+        return Response(status=status.HTTP_200_OK)
 
 def lastOrderOfUser(user):
     try:
