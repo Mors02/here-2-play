@@ -86,7 +86,7 @@ class Message(models.Model):
         db_table = "messages"
 
     def __str__(self):
-        return self.user + ": " + self.text
+        return self.user.username + ": " + self.text
     
     user = models.ForeignKey(User, related_name="message_user", on_delete=models.CASCADE)
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name="message_chat")

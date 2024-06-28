@@ -138,6 +138,7 @@ class FriendRequestView(viewsets.ModelViewSet):
             elif (data["status"] == "acc"):
                 friendRequest.status = FriendRequest.ACCEPTED
                 friendData = {"userA": friendRequest.user_requested, "userB": friendRequest.user_requester}
+                
                 #create the friendship
                 serializer = FriendshipSerializer(data=friendData)
                 friendRequest.save()

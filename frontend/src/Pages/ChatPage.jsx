@@ -10,6 +10,7 @@ export default function ChatPage() {
     const [text, setText] = useState("")
     const [chat, setChat] = useState({})
     const [WS_URL, setWs] = useState('')
+    const [messages, setMessages] = useState([])
     const msgClass="bg-slate-400 my-3"
 
     const { sendMessage, sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
@@ -32,23 +33,19 @@ export default function ChatPage() {
             setChat(res.data)
             console.log(res.data)
             setWs(`${process.env.REACT_APP_WS_URL}/chat/${res.data.name}`)
+            setMessages(res.data.messages)
         })
         .catch(err => {
             console.log(err)
         })
-        console.log("connection changed")
-        // if (readyState === ReadyState.OPEN) {
-        //     sendJsonMessage({
-        //       event: "subscribe",
-        //       data: {
-        //         channel: "pierino",
-        //       },
-        //     })
-        //   }
+        
     }, [readyState])
 
     useEffect(() => {
         console.log(`new message: ${JSON.stringify(lastJsonMessage)}`)
+        if (lastJsonMessage) {
+            setMessages([lastJsonMessage, ...messages])
+        }
     }, [lastJsonMessage])
 
     function sendTextMessage() {
@@ -64,40 +61,12 @@ export default function ChatPage() {
     return(
         <Box>
             <Typography>Chat con {id}</Typography>
-            <Box className="overflow-y-scroll h-80">
-
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
-                <Box className={msgClass}><Typography>Teste</Typography></Box>
+            <Box className="overflow-y-scroll h-80 flex flex-col-reverse">
+                {messages.map(message => (
+                    <Box className={msgClass}>
+                        <Typography><b>{message.user.username}</b> - {message.text}</Typography>
+                    </Box>
+                ))}
             </Box>
             <Box>
                 <TextField value={text} onChange={(e) => setText(e.target.value)}/><Button onClick={() => sendTextMessage()} variant="contained">Send</Button>            
