@@ -21,7 +21,7 @@ export default function DeveloperStatsPage() {
     },[]);
 
     function getDataSet(year) {
-        axiosConfig.post('api/stats/dev', {year: year.year()})
+        axiosConfig.post('api/stats/dev/', {year: year.year()})
         .then(res => {
             console.log(res.data)
             setDataset(res.data.monthly)

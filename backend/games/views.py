@@ -5,7 +5,7 @@ from rest_framework.authentication import SessionAuthentication
 from orders.serializers import GamesBoughtSerializer
 from orders.models import GamesBought
 from .models import Game, GameAttachment, Discount, Review, Tag, Category, Bundle, BundleGames, VisitedGame
-from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer, BundleSerializer, BundleGamesSerializer, VisitedGameSerializer, CreateBundleSerializer
+from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer, BundleSerializer, BundleGamesSerializer, VisitedGameSerializer, CreateBundleSerializer, CreateReviewSerializer
 from rest_framework.response import Response
 from rest_framework import permissions, status, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
@@ -91,7 +91,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
                     tagSerializer.createOrUpdate({"tag": tagObj, "game": game, "count": 1})
 
             #save the review        
-            serializer = ReviewSerializer(data={**data, 'user': user.pk, 'game': game.pk})
+            serializer = CreateReviewSerializer(data={**data, 'user': user.pk, 'game': game.pk})
             if (serializer.is_valid(raise_exception=True)):
                 serializer.create(data={'body': data['body'], 'rating': data['rating'], 'user': user, 'game': game})
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
