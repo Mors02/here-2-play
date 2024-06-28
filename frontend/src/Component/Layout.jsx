@@ -1,46 +1,53 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
-import { Container, Button, Box, Drawer, CircularProgress, Stack } from "@mui/material";
+import { Container, Button, Box, Drawer, CircularProgress, Stack, Avatar } from "@mui/material";
 import ReorderIcon from '@mui/icons-material/Reorder';
 import useCurrentUser from "../config/UseCurrentUser";
 import { FaUserFriends } from "react-icons/fa";
 import { shouldShowFriendlistInUrl } from "../Routing/Route";
 import FriendListPage from "../Pages/FriendListPage";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { FaShoppingCart } from "react-icons/fa";
 import { OrderDropdown } from "../Pages/OrderPage";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Layout(props) {
     const [open, toggleDrawer] = useState(false);
-    const { loggedIn, loading } = useCurrentUser();
+    const { loggedIn, user, loading } = useCurrentUser();
     const [showFriends, setShowFriends] = useState(false);
     const [dropdownVisibile, setDropdownVisibile] = useState(false);
+    const navigate = useNavigate()
     const location = window.location.href;
 
     function toggleFriends(){
         setShowFriends(!showFriends)
     }
 
+    function navigateProfile() {
+        navigate('/user/' + user.id)
+    }
+
+    if (!loading)
     return (
         <Box>
-            {!loading? <>
-                <Box className="min-h-12 bg-slate-500 ">
-                    <Box className="p-5">
-                        <Link to="/">Here2Play</Link>
-                        <Stack direction={"row"} className="float-right w-60 flex justify-end">
-                            <ShoppingCartIcon fontSize="large" className="cursor-pointer" onClick={() => setDropdownVisibile(true)}/>
-                            <ReorderIcon fontSize="large" className="cursor-pointer ml-20" onClick={() => toggleDrawer(true)}/>
-                        </Stack>
-                    </Box>
+            <Box className="flex items-center bg-slate-500 px-6 py-3">
+                <Link to="/"><b className="text-white tracking-wide">Here2Play</b></Link>
+
+                <Box className="flex items-center grow gap-6 justify-end">
+                    <FaUserFriends color="white" size={30} className="cursor-pointer" onClick={() => toggleDrawer(true)}/>
+                    {/* <ShoppingCartIcon fontSize="large" className="cursor-pointer" onClick={() => setDropdownVisibile(true)}/> */}
+                    <FaShoppingCart color="white" size={30} className="cursor-pointer" onClick={() => setDropdownVisibile(true)} />
+                    <Avatar className="cursor-pointer" onClick={() => navigateProfile()} sx={{ width: 40, height: 40 }} src={process.env.REACT_APP_BASE_URL + user.profile_picture} />
                 </Box>
-                <Drawer open={open} onClose={() => toggleDrawer(false) } anchor="right">
-                    <Sidebar onSelect={() => toggleDrawer(false)}/>
-                </Drawer>
-                <Drawer open={dropdownVisibile} anchor="right" onClose={() => setDropdownVisibile(false)}>
-                    <OrderDropdown />
-                </Drawer>
-                { props.children }  </> : <CircularProgress />
-            }
+            </Box>
+
+            <Drawer open={open} onClose={() => toggleDrawer(false) } anchor="right">
+                <Sidebar onSelect={() => toggleDrawer(false)} />
+            </Drawer>
+            <Drawer open={dropdownVisibile} anchor="right" onClose={() => setDropdownVisibile(false)}>
+                <OrderDropdown />
+            </Drawer>
+            { props.children }
 
             {loggedIn && shouldShowFriendlistInUrl(location)?
                 showFriends? 
