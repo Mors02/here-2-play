@@ -6,20 +6,23 @@ import useWebSocket, {ReadyState} from 'react-use-websocket';
 import { axiosConfig } from "../config/axiosConfig";
 
 export default function ChatPage() {
-    const {id} = useParams()
+    const { id } = useParams()
     const [text, setText] = useState("")
     const [chat, setChat] = useState({})
     const [WS_URL, setWs] = useState('')
     const msgClass="bg-slate-400 my-3"
 
-    const { sendMessage, sendJsonMessage, lastJsonMesssage, readyState } = useWebSocket(
+    const { sendMessage, sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
         WS_URL,
         {
+            onOpen: () => console.log('WebSocket connection opened'),
+            onClose: () => console.log('WebSocket connection closed'),
+            onError: (e) => console.log('WebSocket error', e),
             share: false,
             shouldReconnect: () => true,
-            // queryParams: {
-            //     authorization: `${localStorage.getItem('access_token')}`
-            // }
+            queryParams: {
+                token: `${localStorage.getItem('access_token')}`
+            }
         },
     )
 
@@ -28,7 +31,7 @@ export default function ChatPage() {
         .then((res) => {
             setChat(res.data)
             console.log(res.data)
-            setWs(`${process.env.REACT_APP_WS_URL}/chat/` + res.data.name)
+            setWs(`${process.env.REACT_APP_WS_URL}/chat/${res.data.name}`)
         })
         .catch(err => {
             console.log(err)
@@ -45,10 +48,10 @@ export default function ChatPage() {
     }, [readyState])
 
     useEffect(() => {
-        console.log(`new message: ${lastJsonMesssage}`)
-    }, [lastJsonMesssage])
+        console.log(`new message: ${JSON.stringify(lastJsonMessage)}`)
+    }, [lastJsonMessage])
 
-    function sendTxtMessage() {
+    function sendTextMessage() {
         console.log(text)
         sendJsonMessage({
             event: 'send',
@@ -97,7 +100,7 @@ export default function ChatPage() {
                 <Box className={msgClass}><Typography>Teste</Typography></Box>
             </Box>
             <Box>
-                <TextField value={text} onChange={(e) => setText(e.target.value)}/><Button onClick={() => sendTxtMessage()} variant="contained">Send</Button>            
+                <TextField value={text} onChange={(e) => setText(e.target.value)}/><Button onClick={() => sendTextMessage()} variant="contained">Send</Button>            
             </Box>
         </Box>
     )

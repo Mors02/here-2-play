@@ -5,14 +5,13 @@ from channels.db import database_sync_to_async
 
 class WSConsumerChat(AsyncWebsocketConsumer):
     async def connect(self):
-        print(self)
         user = self.scope["user"]
-        print(user)
         if (not user.is_authenticated):
             await self.close()
             return
         
         self.room_name = self.scope['url_route']['kwargs']['room']
+        print(self.room_name)
         
         if (not await self.chat_exists(self.room_name)):
             await self.close()
@@ -23,7 +22,7 @@ class WSConsumerChat(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-        #print(self.scope)
+        print(self.scope)
         print("CONNESSO AL SERVER")
         await self.accept()
 
@@ -39,28 +38,21 @@ class WSConsumerChat(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None, bytes_data=None):
         data = json.loads(text_data)
-        print(self.scope["user"])
-        #print(text_data)
-        
-        # text_data_json = json.loads(text_data)
-        # print(text_data)
-        # username = text_data_json['user']
-        # message =  text_data_json['msg']
 
-        # await self.channel_layer.group_send(
-        #     self.room_group_name,
-        #     {
-        #         'type': 'chatroom_message',
-        #         'msg': message,
-        #         'user': username
-        #     }
-        # )
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'chatroom_message',
+                'msg': data['data']['msg'],
+                'user': self.scope["user"].username
+            }
+        )
 
     async def chatroom_message(self, event):
         message = event['msg']
         username = event['user']
 
-        await self.send(txt_data=json.dumps({
+        await self.send(text_data=json.dumps({
             'msg': message,
             'user': username
         }))

@@ -79,7 +79,7 @@ class ChatViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
     
     def retrieve(self, request, pk=None):
-        print(request)
+        # print(request)
         userA = request.user.id
         userB = pk
         try:
