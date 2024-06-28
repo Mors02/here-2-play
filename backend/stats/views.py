@@ -51,7 +51,7 @@ class MostSoldGamesView(APIView):
         ).annotate(
             num_visits=Count('visited_games_game', filter=Q(visited_games_game__visited_at__gte=timezone.now()-timedelta(days=30)))
         ).annotate(
-            total_interactions=ExpressionWrapper(F('num_visits')+F('num_purchases'), output_field=IntegerField())
+            total_interactions=ExpressionWrapper(F('num_visits')+F('num_purchases')*8, output_field=IntegerField())
         ).order_by('-total_interactions')[:5]
         games = GameSerializer(games, many=True).data
         return Response(games, status=200)
@@ -63,6 +63,5 @@ class BestRatedGamesView(APIView):
         ).annotate(
             avg_rating=Avg('reviews_game__rating')
         ).order_by('-avg_rating')[:5]
-        print(games)
         games = GameSerializer(games, many=True).data
         return Response(games, status=200)

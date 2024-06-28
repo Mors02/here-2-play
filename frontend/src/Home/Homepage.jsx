@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import GameList from '../Component/GameList';
 import Box from '@mui/material/Box';
-import { Typography } from '@mui/material';
+import { Typography, Divider } from '@mui/material';
 import { axiosConfig } from '../config/axiosConfig';
 import { useLocation, useNavigate } from 'react-router';
 import axios from 'axios';
@@ -17,19 +17,18 @@ function Homepage() {
     const { state } = useLocation()
     
     useEffect(() => {
-        // const gamesSections = async () => {
-        //     const promises = [
-        //         mostSoldGames(),
-        //         allGames(),
-        //         bestRatedGames(),
-        //     ]
+        const gamesSections = async () => {
+            const promises = [
+                mostSoldGames(),
+                allGames(),
+                bestRatedGames(),
+            ]
 
-        //     const data = await Promise.allSettled(promises).finally(() => {console.log(mostSold, bestRated, games); setLoading(false)});
-        //     //console.log(data)
-        // }
-
-        // gamesSections();
-        allGames()
+            const data = await Promise.allSettled(promises).finally(() => {console.log(mostSold, bestRated, games); setLoading(false)});
+            //console.log(data)
+        }
+        gamesSections();
+        //allGames()
     }, [])
 
     async function allGames() {
@@ -39,17 +38,8 @@ function Homepage() {
                     throw new Error(res["response"]["data"])
                 setGames(res.data)
             })
-            .then(async (res) => {
-                await mostSoldGames()
-            })
-            .then(async (res)=> {
-                await bestRatedGames()
-            })
             .catch(err => {
                 toast.error(ErrorMap[err.message])
-            })
-            .finally(() => {
-                setLoading(false)
             })
     }
 
@@ -91,16 +81,16 @@ function Homepage() {
             { 
                 games.length > 0 ? 
                 <Box>
-                    <Box className="mb-6">
-                        <Typography variant='h4'>Giochi con i voti migliori: </Typography>
+                    {bestRated.length > 0 && <Box className="mb-6">
+                        <Divider className="text-3xl !my-6"><b>Ultime uscite migliori</b></Divider>
                         <GameList games={bestRated} maxCount={5} handleClick={handleClick} previewPrices={true} selection={[]} />
-                    </Box>
-                    <Box className="mb-6">
-                        <Typography variant='h4'>Giochi più venduti: </Typography>
+                    </Box>}
+                    {mostSold.length > 0 && <Box className="mb-6">
+                        <Divider className="text-3xl !my-6"><b>Giochi di tendenza</b></Divider>
                         <GameList games={mostSold} maxCount={5} handleClick={handleClick} previewPrices={true} selection={[]} />
-                    </Box>
+                    </Box>}
                     <Box>
-                        <Typography variant='h4'>Tutti i giochi: </Typography>
+                        <Divider className="text-3xl !my-6"><b>Tutti i giochi</b></Divider>
                         <GameList games={games} maxCount={30} handleClick={handleClick} tagId={state?.tagId} previewPrices={true} searchSection={false} selection={[]} /> 
                     </Box>
                 </Box>
