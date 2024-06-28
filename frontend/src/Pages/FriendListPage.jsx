@@ -137,9 +137,8 @@ export default function FriendListPage({onClick}) {
         });        
     }
 
-    function openChat(id) {
-        
-        return navigate('/chat/'+id)
+    function openChat(friend) {
+        return navigate('/chat/' + friend.id, { state: { friend: friend } })
     }
 
     return (
@@ -159,7 +158,7 @@ export default function FriendListPage({onClick}) {
                             {console.log(friend)}
                             <img className="object-cover rounded-full w-8 h-8 m-1" src={process.env.REACT_APP_BASE_URL + friend.profile_picture}/>
                             <Typography variant="h6" className="pl-4 py-1" ><a href={"/user/"+friend.id}>{friend.username}</a></Typography>
-                            <CiChat1 onClick={() => openChat(friend.id)}className="ml-32 h-8 w-8 cursor-pointer" />
+                            <CiChat1 onClick={() => openChat(friend)}className="ml-32 h-8 w-8 cursor-pointer" />
                             <TbFriendsOff onClick={() => deleteFriend(friend.username, friend.id)} className="ml-2 h-8 w-8 cursor-pointer" color="red"/>
                         </Stack>
                     ))}
