@@ -9,8 +9,12 @@ from games.models import VisitedGame, Game
 from games.serializers import GameSerializer
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models import Count, Q, F, ExpressionWrapper, IntegerField, Avg
+from django.db.models import Count, Q, F, ExpressionWrapper, IntegerField, Avg, FloatField
+import math
 # Create your views here.
+
+def f(x):
+    return 100 / (1 + (math.e / 1.8) ** (-0.08 * (x - 200)))
 
 class DeveloperStatsView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
@@ -62,6 +66,10 @@ class BestRatedGamesView(APIView):
             upload_date__gte=timezone.now()-timedelta(days=30)
         ).annotate(
             avg_rating=Avg('reviews_game__rating')
-        ).order_by('-avg_rating')[:5]
+        ).annotate(
+            review_count=Count('reviews_game')
+        ).annotate(
+            weighted_avg=ExpressionWrapper(F('avg_rating')*f(F('review_count')), output_field=FloatField())
+        ).order_by('-weighted_avg')[:5]
         games = GameSerializer(games, many=True).data
         return Response(games, status=200)
