@@ -73,3 +73,26 @@ class BestRatedGamesView(APIView):
         ).order_by('-weighted_avg')[:5]
         games = GameSerializer(games, many=True).data
         return Response(games, status=200)
+    
+class BestByCategoryView(APIView):
+    def get(self, request):
+
+        last_purchased_categories = GamesBought.objects.filter(
+            user_id=request.user.pk
+        ).values_list('game__category_id', 'game__category__name').order_by('-created_at').distinct()[:3]
+        
+        games_ordered = {}
+
+        for category in last_purchased_categories:
+            games_ordered[category[1]] = Game.objects.filter(
+                Q(category_id=category[0]) & ~Q(id__in=GamesBought.objects.filter(user_id=request.user.pk).values('game_id'))
+            ).annotate(
+                num_purchases=Count('games_bought_game', filter=Q(games_bought_game__created_at__gte=timezone.now()-timedelta(days=30)))
+            ).annotate(
+                num_visits=Count('visited_games_game', filter=Q(visited_games_game__visited_at__gte=timezone.now()-timedelta(days=30)))
+            ).annotate(
+                total_interactions=ExpressionWrapper(F('num_visits')+F('num_purchases')*8, output_field=IntegerField())
+            ).order_by('-total_interactions')[:5]
+
+        print(games_ordered)
+        return Response(status=200)

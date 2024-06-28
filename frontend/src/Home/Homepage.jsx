@@ -13,6 +13,7 @@ function Homepage() {
     const [games, setGames] = useState([])
     const [mostSold, setMostSold] = useState([])
     const [bestRated, setBestRated] = useState([])
+    const [bestByCategory, setBestByCategory] = useState([])
     const navigate = useNavigate()
     const { state } = useLocation()
     
@@ -22,6 +23,7 @@ function Homepage() {
                 mostSoldGames(),
                 allGames(),
                 bestRatedGames(),
+                bestGamesByCategory(),
             ]
 
             const data = await Promise.allSettled(promises).finally(() => {console.log(mostSold, bestRated, games); setLoading(false)});
@@ -65,6 +67,18 @@ function Homepage() {
             .catch(err => {
                 toast.error(ErrorMap[err.message])
             })
+    }
+
+    async function bestGamesByCategory() {
+        axiosConfig.get('api/stats/by-category')
+        .then(res => {
+            if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                throw new Error(res["response"]["data"])
+                setBestByCategory(res.data)
+                console.log(res.data)
+        }).catch(err => {
+            toast.error(ErrorMap[err.message])
+        })
     }
 
 
