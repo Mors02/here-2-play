@@ -59,9 +59,10 @@ class MostSoldGamesView(APIView):
 class BestRatedGamesView(APIView):
     def get(self, request):
         games = Game.objects.filter(
-            created_at__gte=timezone.now()-timedelta(days=30)
+            upload_date__gte=timezone.now()-timedelta(days=30)
         ).annotate(
             avg_rating=Avg('reviews_game__rating')
-        ).annotate(
-            total_interactions=ExpressionWrapper(F('num_visits')+F('num_purchases'), output_field=IntegerField())
-        ).order_by('-total_interactions')[:5]
+        ).order_by('-avg_rating')[:5]
+        print(games)
+        games = GameSerializer(games, many=True).data
+        return Response(games, status=200)
