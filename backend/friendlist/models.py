@@ -73,3 +73,22 @@ class Friendship(models.Model):
 
     userA = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friendship_user_A")
     userB = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friendship_user_B")
+
+class Chat(models.Model):
+    class Meta:
+        db_table = "chats"
+    
+    friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, related_name="chat_friend_request")
+    name = models.TextField()
+
+class Message(models.Model):
+    class Meta:
+        db_table = "messages"
+
+    def __str__(self):
+        return self.user.username + ": " + self.text
+    
+    user = models.ForeignKey(User, related_name="message_user", on_delete=models.CASCADE)
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name="message_chat")
+    sent_at = models.DateTimeField(auto_now_add=True)
+    text = models.TextField(max_length=300)

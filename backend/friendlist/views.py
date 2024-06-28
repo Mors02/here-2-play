@@ -2,11 +2,13 @@ from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from .serializer import UserReportSerializer, GameReportSerializer, FriendRequestSerializer, FriendRequestListSerializer, FriendshipSerializer, FriendshipListSerializer
+from .serializer import UserReportSerializer, GameReportSerializer, FriendRequestSerializer, FriendRequestListSerializer, FriendshipSerializer, FriendshipListSerializer, ChatSerializer, MessageSerializer
 from authentication.models import User
 from games.models import Game
-from .models import FriendRequest, Friendship
+from .models import FriendRequest, Friendship, Chat, Message
 from django.utils import timezone
+from django.db.models import Q
+import uuid 
 
 class UserReportsView(viewsets.ModelViewSet):
 
@@ -41,7 +43,6 @@ class UserReportsView(viewsets.ModelViewSet):
 
 
 class GameReportsView(viewsets.ModelViewSet):
-
     def get_permissions(self):
         if (self.action in ['create']):
             permission_classes = [IsAuthenticated]
@@ -71,6 +72,23 @@ class GameReportsView(viewsets.ModelViewSet):
 
     def list(self, request, pk=None):
         pass
+
+class ChatViewSet(viewsets.ModelViewSet):
+    def get_permission(self):
+        permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+    
+    def retrieve(self, request, pk=None):
+        # print(request)
+        userA = request.user.id
+        userB = pk
+        try:
+            request = FriendRequest.objects.get((Q(user_requested_id=userA) & Q(user_requester_id=userB)) | (Q(user_requested_id=userB) & Q(user_requester_id=userA)))
+            chat = Chat.objects.get(friend_request_id=request.pk)
+            chat = ChatSerializer(chat).data
+            return Response(chat, status=status.HTTP_200_OK)
+        except FriendRequest.DoesNotExist:
+            return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
 
 class FriendRequestView(viewsets.ModelViewSet):
     def get_permissions(self):
@@ -120,10 +138,20 @@ class FriendRequestView(viewsets.ModelViewSet):
             elif (data["status"] == "acc"):
                 friendRequest.status = FriendRequest.ACCEPTED
                 friendData = {"userA": friendRequest.user_requested, "userB": friendRequest.user_requester}
+                
+                #create the friendship
                 serializer = FriendshipSerializer(data=friendData)
                 friendRequest.save()
                 if (serializer.is_valid(raise_exception=True)):
                     serializer.create(data=friendData)
+                
+                #create the chat
+                chatData = {"name": uuid.uuid4().hex[:6].lower(), "friend_request": friendRequest}
+                print(chatData)
+                serializer = ChatSerializer(data={**chatData, 'friend_request': friendRequest.pk})
+                if (serializer.is_valid(raise_exception=True)):
+                    print("entered")
+                    serializer.create(data=chatData)
                     return Response(status=status.HTTP_201_CREATED)
                 
             return Response("ERR_SERVER_ERROR",status=status.HTTP_400_BAD_REQUEST)

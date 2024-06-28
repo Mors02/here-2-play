@@ -149,9 +149,14 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["user", "role", "profile_picture"]
 
 class UserInfoSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.SerializerMethodField()
+
+    def get_profile_picture(self, obj):
+        return obj.user_profile_user.profile_picture.url
+
     class Meta:
         model = UserModel
-        fields = ["username", "date_joined", "id"]
+        fields = ["username", "date_joined", "id", "profile_picture"]
 
 class DeveloperSerializer(serializers.ModelSerializer):
     games = PartialGameSerializer(source="games_publisher", many=True, read_only=True)

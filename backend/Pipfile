@@ -10,6 +10,8 @@ django-cors-headers = "*"
 pillow = "*"
 djangorestframework-simplejwt = "*"
 pytz = "*"
+channels = "*"
+daphne = "*"
 
 [dev-packages]
 
