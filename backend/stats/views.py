@@ -38,12 +38,12 @@ class DeveloperStatsView(APIView):
         for (id, purchases) in allCopies.items():
             #print(purchases)
             total['purchases'] += len(purchases)
-            total['earnings'] += sum([game.price for game in purchases])
+            total['earnings'] += sum([float(game.price) - float(game.price * H2P_CUT) for game in purchases])
             for purchase in purchases:
                 #make it an index
                 month = int(purchase.created_at.strftime('%m'))-1
                 statsByMonth[month]["purchases"] += 1
-                statsByMonth[month]["earnings"] += purchase.price
+                statsByMonth[month]["earnings"] += float(purchase.price) - float(purchase.price * H2P_CUT)
 
         for (id, visits) in allVisits.items():
             total['visits'] += len(visits)
