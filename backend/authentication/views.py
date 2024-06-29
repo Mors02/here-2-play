@@ -140,6 +140,11 @@ class UserViewSet(viewsets.ModelViewSet):
             #login(request, serializer.context["user"], 'authentication.views.EmailBackend')
             return Response({"user": serializer.data, "force_relogin": serializer.context["changedPassword"]}, status=status.HTTP_200_OK)
 
+class IsAdminView(APIView):
+    def get(self, request):
+        user = User.objects.get(id=request.user.pk)
+        return Response(user.is_superuser, status=status.HTTP_200_OK)
+
 #Classe per autenticare con la mail gli utenti
 class EmailBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
