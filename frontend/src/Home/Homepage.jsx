@@ -129,8 +129,10 @@ function Homepage() {
                     <RecommendedGames games={bestRated} title={"Ultime Uscite Migliori"} />
                     <RecommendedGames games={mostSold} title={"Giochi di Tendenza"} />
                     <RecommendedGames games={fromFriends} title={"Più Acquistati dagli Amici"} />
-                    { similarFriend && <RecommendedGames games={fromMostSimilar} title={`Come a "${similarFriend}", può interessarti`} /> }
-
+                    { similarFriend && <RecommendedGames games={fromMostSimilar} title={`Come a "${similarFriend}", Può Interessarti`} /> }
+                    {Object.keys(bestByCategory).map((category) => 
+                        (<RecommendedGames games={bestByCategory[category]} title={"Se Ti Piace " + category + ", Non Perderti"} />)
+                    )}
                     <Box>
                         <Divider className="text-3xl !my-6"><b>Tutti i Giochi</b></Divider>
                         <GameList games={games} maxCount={30} handleClick={handleClick} tagId={state?.tagId} previewPrices={true} searchSection={false} selection={[]} /> 

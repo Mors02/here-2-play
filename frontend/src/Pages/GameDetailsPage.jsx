@@ -40,7 +40,7 @@ function GameDetailsPage() {
     const [game, setGame] = useState([])
     const [owned, setOwned] = useState(false)
     const [bundles, setBundles] = useState([])
-    const { user, loading } = useCurrentUser()
+    const { user, loading, loggedIn } = useCurrentUser()
     const { gameId } = useParams()
     const navigate = useNavigate()
 
@@ -136,6 +136,8 @@ function GameDetailsPage() {
     }
 
     function addGame() {
+        if (!loggedIn)
+            return toast.error(ErrorMap("ERR_NOT_LOGGED_IN"))
         axiosConfig.post('api/orders/add-game/', {game_id: gameId})
             .then(res => {
                 if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")

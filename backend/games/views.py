@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
-
+from rest_framework.decorators import action
 from orders.serializers import GamesBoughtSerializer
 from orders.models import GamesBought
 from .models import Game, GameAttachment, Discount, Review, Tag, Category, Bundle, BundleGames, VisitedGame
@@ -163,7 +163,7 @@ class BundleViewSet(viewsets.ModelViewSet):
 
 class GameViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
-        if (self.action in ['list', 'retrieve']):
+        if (self.action in ['list', 'retrieve', 'game_bundles']):
             permission_classes = [AllowAny]
         else:
             permission_classes = [IsAuthenticated]
@@ -298,6 +298,7 @@ class GameViewSet(viewsets.ModelViewSet):
         except GamesBought.DoesNotExist:
             return Response(False, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=["get"])
     def game_bundles(self, request, pk=None):
         try:
             game = Game.objects.get(id=pk)

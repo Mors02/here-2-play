@@ -35,7 +35,7 @@ function Layout(props) {
                     <Box className="p-5">
                         <Link to="/">Here2Play</Link>
                         <Stack direction={"row"} className="float-right w-60 flex justify-end">
-                        {user && <>
+                        {!loading && user && <>
                             {!user.is_superuser && <AdminPanelSettingsIcon fontSize="large" className="cursor-pointer" onClick={() => openAdminPanel()}/>}
                             <ShoppingCartIcon fontSize="large" className="cursor-pointer" onClick={() => setDropdownVisibile(true)}/>
                         </>}
