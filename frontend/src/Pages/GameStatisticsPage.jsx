@@ -92,12 +92,14 @@ function GameStatisticsPage() {
     }
 
     function Purchases() {
+        let cut = parseFloat(process.env.REACT_APP_H2P_CUT)
+        
         return (
             <Stack spacing={2}>
                 <Divider><b>Acquisti ({lastMonth ? "Ultimo Mese" : "Sempre"})</b></Divider>
                 <Stack spacing={2} className="bg-gray-100 rounded-md p-6">
                     <Typography><b>Acquisiti: </b>{purchases}</Typography>
-                    <Typography><b>Ricavi: </b>{amountGain}</Typography>
+                    <Typography><b>Ricavi: </b>{(amountGain - (amountGain * cut)).toFixed(2)}</Typography>
                 </Stack>
             </Stack>
         )

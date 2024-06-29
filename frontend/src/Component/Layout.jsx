@@ -8,17 +8,24 @@ import { shouldShowFriendlistInUrl } from "../Routing/Route";
 import FriendListPage from "../Pages/FriendListPage";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { OrderDropdown } from "../Pages/OrderPage";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 function Layout(props) {
     const [open, toggleDrawer] = useState(false);
-    const { loggedIn, loading } = useCurrentUser();
+    const { loggedIn, loading, user } = useCurrentUser();
     const [showFriends, setShowFriends] = useState(false);
     const [dropdownVisibile, setDropdownVisibile] = useState(false);
+    const navigate = useNavigate();
     const location = window.location.href;
 
     function toggleFriends(){
+        console.log(user)
         setShowFriends(!showFriends)
+    }
+
+    function openAdminPanel() {
+        return navigate('/admin/');
     }
 
     return (
@@ -28,7 +35,10 @@ function Layout(props) {
                     <Box className="p-5">
                         <Link to="/">Here2Play</Link>
                         <Stack direction={"row"} className="float-right w-60 flex justify-end">
+                        {user && <>
+                            {!user.is_superuser && <AdminPanelSettingsIcon fontSize="large" className="cursor-pointer" onClick={() => openAdminPanel()}/>}
                             <ShoppingCartIcon fontSize="large" className="cursor-pointer" onClick={() => setDropdownVisibile(true)}/>
+                        </>}
                             <ReorderIcon fontSize="large" className="cursor-pointer ml-20" onClick={() => toggleDrawer(true)}/>
                         </Stack>
                     </Box>

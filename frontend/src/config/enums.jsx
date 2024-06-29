@@ -21,6 +21,7 @@ const ErrorMap = {
     'ERR_GAME_NOT_OWNED': 'Gioco non posseduto.',
     'ERR_UNAUTHORIZED': 'Non hai i permessi per compiere quest\'azione.',
     'ERR_OVERLAP_DISCOUNTS': 'I periodi di sconto non possono incrociarsi con quelli già attivi!',
+    'ERR_INSECURE_PASSWORD': 'La password deve: non essere comune, non essere numerica, almeno 8 caratteri, diversa dallo username'
 }
 const blockedUrls = []
 

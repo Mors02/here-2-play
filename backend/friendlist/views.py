@@ -3,7 +3,7 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from .serializer import UserReportSerializer, GameReportSerializer, FriendRequestSerializer, FriendRequestListSerializer, FriendshipSerializer, FriendshipListSerializer, ChatSerializer, MessageSerializer
-from authentication.models import User
+from authentication.models import User, UserProfile
 from games.models import Game
 from .models import FriendRequest, Friendship, Chat, Message
 from django.utils import timezone
@@ -23,14 +23,23 @@ class UserReportsView(viewsets.ModelViewSet):
         data = request.data
         user = request.user
         user_reported = User.objects.get(username=data["userReported"]["username"])
+        profile = UserProfile.objects.get(id=user_reported.pk)
+        #if its not a friend or a developer
+        try:
+            user_friends = Friendship.objects.filter(userA_id=user.pk, userB_id=user_reported.pk)
+        except Friendship.DoesNotExist:
+            if profile.role == 0:
+                #you cant report them
+                return Response("ERR_NOT_REPORTABLE", status=status.HTTP_400_BAD_REQUEST)
+
+
         clean_data = {"user": user.pk, 
                       "user_reported": user_reported.pk, 
                       "cause": data["selected"],
                       "report_date": timezone.now()}
         serializer = UserReportSerializer(data=clean_data)
+
         if (serializer.is_valid(raise_exception=True)):
-            #print(serializer.data)
-            #serializer.create(clean_data=clean_data)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response("ERR_SERVER_ERROR", status=status.HTTP_400_BAD_REQUEST)
