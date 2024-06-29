@@ -13,6 +13,7 @@ function Homepage() {
     const [games, setGames] = useState([])
     const [mostSold, setMostSold] = useState([])
     const [bestRated, setBestRated] = useState([])
+    const [bestByCategory, setBestByCategory] = useState([])
     const [fromFriends, setFromFriends] = useState([])
     const [fromMostSimilar, setFromMostSimilar] = useState([])
     const [similarFriend, setSimilarFriend] = useState([])
@@ -25,6 +26,7 @@ function Homepage() {
         bestRatedGames()
         recommendedFromFriends()
         recommendationsFromMostSimilarGames()
+        bestGamesByCategory()
     }, [])
 
     async function allGames() {
@@ -75,6 +77,20 @@ function Homepage() {
             })
     }
 
+
+    async function bestGamesByCategory() {
+        axiosConfig.get('api/stats/by-category')
+        .then(res => {
+            if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                throw new Error(res["response"]["data"])
+                setBestByCategory(res.data)
+                console.log(res.data)
+        }).catch(err => {
+            toast.error(ErrorMap[err.message])
+        })
+    }
+
+
     function recommendationsFromMostSimilarGames() {
          axiosConfig.get('/api/stats/recommendations-from-most-similar-friend/')
             .then(res => {
@@ -87,6 +103,7 @@ function Homepage() {
                 toast.error(ErrorMap[err.message])
             })
     }
+
 
     function handleClick(game) {
         axiosConfig.post('/api/visit/game/', { game: game.id })
