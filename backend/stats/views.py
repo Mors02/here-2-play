@@ -12,7 +12,7 @@ from django.utils import timezone
 from datetime import timedelta
 from friendlist.models import Friendship
 from orders.serializers import GamesBoughtSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models import Count, Q, F, ExpressionWrapper, IntegerField, Avg, FloatField
 import math
 
@@ -55,8 +55,8 @@ class DeveloperStatsView(APIView):
 
 
 class AdminStatsView(APIView):
-    #permission_classes = (permissions.IsAdminUser,)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAdminUser,)
+    
     def post(self, request):
         year = request.data["year"]
         stats = {'purchases': 0, 'earnings': 0, 'registrations': 0, 'reports': 0, 'games': 0}
@@ -129,6 +129,7 @@ class BestRatedGamesView(APIView):
     
 
 class BestByCategoryView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
 
         last_purchased_categories = GamesBought.objects.filter(
@@ -138,7 +139,7 @@ class BestByCategoryView(APIView):
         games_ordered = {}
 
         for category in last_purchased_categories:
-            games_ordered[category[1]] = Game.objects.filter(
+            games_ordered[category[1]] = GameSerializer(Game.objects.filter(
                 Q(category_id=category[0]) & ~Q(id__in=GamesBought.objects.filter(user_id=request.user.pk).values('game_id'))
             ).annotate(
                 num_purchases=Count('games_bought_game', filter=Q(games_bought_game__created_at__gte=timezone.now()-timedelta(days=30)))
@@ -146,10 +147,10 @@ class BestByCategoryView(APIView):
                 num_visits=Count('visited_games_game', filter=Q(visited_games_game__visited_at__gte=timezone.now()-timedelta(days=30)))
             ).annotate(
                 total_interactions=ExpressionWrapper(F('num_visits')+F('num_purchases')*8, output_field=IntegerField())
-            ).order_by('-total_interactions')[:5]
+            ).order_by('-total_interactions')[:5], many=True).data
 
-        print(games_ordered)
-        return Response(status=200)
+
+        return Response(games_ordered, status=200)
 
 class GameRecommendedFromFriendView(APIView):
     permission_classes = [IsAuthenticated]

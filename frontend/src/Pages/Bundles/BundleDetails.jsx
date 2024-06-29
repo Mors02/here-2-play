@@ -16,7 +16,7 @@ export default function BundleDetails() {
     const navigate = useNavigate()
     const [bundle, setBundle] = useState({})
     const [loadingPage, setLoading] = useState(true)
-    const {user} = useCurrentUser()
+    const {user, loggedIn} = useCurrentUser()
     const {state} = useLocation()
 
     useEffect(() => {
@@ -45,6 +45,8 @@ export default function BundleDetails() {
     }
 
     function addBundle() {
+        if (!loggedIn)
+            return toast.error(ErrorMap("ERR_NOT_LOGGED_IN"))
         axiosConfig.post('api/orders/add-bundle/', {bundle_id: bundle.id})
             .then(res => {
                 if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")

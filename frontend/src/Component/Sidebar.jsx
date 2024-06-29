@@ -12,7 +12,6 @@ function Sidebar(props) {
     const {user, loggedIn} = useCurrentUser();
     const navigate = useNavigate();
     const {logout} = useAuth();
-    const [, forceUpdate] = useReducer(x => x + 1, 0);
 
     function handleLogout(e) {
         onSelect()
@@ -21,9 +20,8 @@ function Sidebar(props) {
             logout();
             localStorage.clear();
             axiosConfig.defaults.headers.common['Authorization'] = null;
-            toast.success("Logout effettuato.", {onClose: () =>{forceUpdate(); navigate("/")}})
+            toast.success("Logout effettuato.", {onClose: () =>{window.location.replace("/")}})
         }).catch(err => {
-            console.log(err)
         })
     }
 
