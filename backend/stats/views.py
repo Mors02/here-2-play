@@ -16,7 +16,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count, Q, F, ExpressionWrapper, IntegerField, Avg, FloatField
 import math
 
-H2P_CUT = 1/10
+H2P_CUT = 0.1
 
 def f(x):
     return 100 / (1 + (math.e / 1.8) ** (-0.08 * (x - 200)))
