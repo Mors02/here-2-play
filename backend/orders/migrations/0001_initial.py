@@ -11,7 +11,6 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('games', '0008_review_created_at_visitedgame'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

@@ -165,9 +165,7 @@ class GamesBoughtViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
         game = GamesBought.objects.get(user_id=request.user.pk, game_id=pk)
-        print(game.play_time)
         game.play_time += int(request.data['playTime'])
-        print(game.play_time)
         game.save()
         
         return Response(status=status.HTTP_200_OK)
