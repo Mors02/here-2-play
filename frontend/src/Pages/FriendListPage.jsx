@@ -59,7 +59,6 @@ export default function FriendListPage({onClick}) {
         .then((res) => {
             if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
                 throw new Error(res["response"]["data"])
-            console.log(res.data)
             setFriends(res.data)
         })
         .catch((err) => {
@@ -77,7 +76,6 @@ export default function FriendListPage({onClick}) {
             .then((res) => {
                 if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
                     throw new Error(res["response"]["data"])
-                console.log(res)
                 toast.success("Richiesta inviata con successo.");
             })
             .catch((err) => {

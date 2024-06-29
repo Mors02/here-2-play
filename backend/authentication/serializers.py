@@ -122,7 +122,7 @@ class UserInfoWithGamesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserModel
-        fields = ["username", "id", "games", "role", "date_joined", "published_games", "profile_picture", "bundles", "recently_visited_games"]
+        fields = ["username", "id", "games", "role", "date_joined", "published_games", "profile_picture", "bundles", "recently_visited_games", "is_superuser"]
 
     def get_profile_picture(self, obj):
         return obj.user_profile_user.profile_picture.url
