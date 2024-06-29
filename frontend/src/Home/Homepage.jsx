@@ -13,22 +13,18 @@ function Homepage() {
     const [games, setGames] = useState([])
     const [mostSold, setMostSold] = useState([])
     const [bestRated, setBestRated] = useState([])
+    const [fromFriends, setFromFriends] = useState([])
+    const [fromMostSimilar, setFromMostSimilar] = useState([])
+    const [similarFriend, setSimilarFriend] = useState([])
     const navigate = useNavigate()
     const { state } = useLocation()
     
     useEffect(() => {
-        const gamesSections = async () => {
-            const promises = [
-                mostSoldGames(),
-                allGames(),
-                bestRatedGames(),
-            ]
-
-            const data = await Promise.allSettled(promises).finally(() => {console.log(mostSold, bestRated, games); setLoading(false)});
-            //console.log(data)
-        }
-        gamesSections();
-        //allGames()
+        mostSoldGames()
+        allGames()
+        bestRatedGames()
+        recommendedFromFriends()
+        recommendationsFromMostSimilarGames()
     }, [])
 
     async function allGames() {
@@ -66,38 +62,66 @@ function Homepage() {
                 toast.error(ErrorMap[err.message])
             })
     }
+            
+    function recommendedFromFriends() {
+        axiosConfig.get('/api/stats/recommended-from-friends/')
+            .then(res => {
+                if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                    throw new Error(res["response"]["data"])
+                setFromFriends(res.data)
+            })
+            .catch(err => {
+                toast.error(ErrorMap[err.message])
+            })
+    }
 
+    function recommendationsFromMostSimilarGames() {
+         axiosConfig.get('/api/stats/recommendations-from-most-similar-friend/')
+            .then(res => {
+                if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                    throw new Error(res["response"]["data"])
+                setFromMostSimilar(res.data.games)
+                setSimilarFriend(res.data.friend.username)
+            })
+            .catch(err => {
+                toast.error(ErrorMap[err.message])
+            })
+    }
 
     function handleClick(game) {
         axiosConfig.post('/api/visit/game/', { game: game.id })
             .then(res => {
                 return navigate('/games/' + game.id)
             })
-    } 
+    }
 
-    if (!loading)
-    return (
-        <Box className='p-10'>
-            { 
-                games.length > 0 ? 
+    function RecommendedGames({ games, title }) {
+        if (games?.length > 0)
+        return (
+            <Box className="mb-6">
+                <Divider className="text-3xl !my-6"><b>{title}</b></Divider>
+                <GameList games={games} maxCount={5} handleClick={handleClick} previewPrices={true} selection={[]} />
+            </Box>
+        )
+    }
+
+    if (!loading && games.length > 0)
+        return (
+            <Box className='p-10'>
                 <Box>
-                    {bestRated.length > 0 && <Box className="mb-6">
-                        <Divider className="text-3xl !my-6"><b>Ultime uscite migliori</b></Divider>
-                        <GameList games={bestRated} maxCount={5} handleClick={handleClick} previewPrices={true} selection={[]} />
-                    </Box>}
-                    {mostSold.length > 0 && <Box className="mb-6">
-                        <Divider className="text-3xl !my-6"><b>Giochi di tendenza</b></Divider>
-                        <GameList games={mostSold} maxCount={5} handleClick={handleClick} previewPrices={true} selection={[]} />
-                    </Box>}
+                    <RecommendedGames games={bestRated} title={"Ultime Uscite Migliori"} />
+                    <RecommendedGames games={mostSold} title={"Giochi di Tendenza"} />
+                    <RecommendedGames games={fromFriends} title={"Più Acquistati dagli Amici"} />
+                    { similarFriend && <RecommendedGames games={fromMostSimilar} title={`Come a "${similarFriend}", può interessarti`} /> }
+
                     <Box>
-                        <Divider className="text-3xl !my-6"><b>Tutti i giochi</b></Divider>
+                        <Divider className="text-3xl !my-6"><b>Tutti i Giochi</b></Divider>
                         <GameList games={games} maxCount={30} handleClick={handleClick} tagId={state?.tagId} previewPrices={true} searchSection={false} selection={[]} /> 
                     </Box>
                 </Box>
-                : <Typography>Non sono presenti giochi nello store...</Typography> 
-            }
-        </Box>
-    );
+            </Box>
+        );
+    return <Typography>Non sono presenti giochi nello store...</Typography>
 }
 
 export default Homepage;

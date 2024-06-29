@@ -1,8 +1,10 @@
 from django.urls import path
-from .views import DeveloperStatsView, MostSoldGamesView, BestRatedGamesView
+from .views import DeveloperStatsView, MostSoldGamesView, BestRatedGamesView, GameRecommendedFromFriendView, RecommendationFromMostSimilarFriendView
 
 urlpatterns = [    
     path('stats/dev/', DeveloperStatsView.as_view(), name='developer_stats'),
     path('stats/most-sold/', MostSoldGamesView.as_view()),
     path('stats/best-rated/', BestRatedGamesView.as_view()),
+    path('stats/recommended-from-friends/', GameRecommendedFromFriendView.as_view()),
+    path('stats/recommendations-from-most-similar-friend/', RecommendationFromMostSimilarFriendView.as_view()),
 ]

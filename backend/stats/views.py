@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import permissions, status
 from rest_framework.response import Response
-from authentication.serializers import DeveloperSerializer
+from authentication.serializers import DeveloperSerializer, UserInfoSerializer
 from authentication.models import User
 from orders.models import GamesBought
 from games.models import VisitedGame, Game
@@ -10,7 +10,9 @@ from games.serializers import GameSerializer
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Count, Q, F, ExpressionWrapper, IntegerField, Avg
-# Create your views here.
+from friendlist.models import Friendship
+from orders.serializers import GamesBoughtSerializer
+from rest_framework.permissions import IsAuthenticated
 
 class DeveloperStatsView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
@@ -65,3 +67,43 @@ class BestRatedGamesView(APIView):
         ).order_by('-avg_rating')[:5]
         games = GameSerializer(games, many=True).data
         return Response(games, status=200)
+    
+class GameRecommendedFromFriendView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        friendships = Friendship.objects.filter(userA=request.user.pk).values_list('userB', flat=True)
+        friends = User.objects.filter(id__in=friendships)
+
+        user_game_ids = GamesBought.objects.filter(user=request.user.pk).values_list('game_id', flat=True)
+
+        games_recommended_by_friends = Game.objects.filter(games_bought_game__user__in=friends).exclude(id__in=user_game_ids).annotate(purchase_count=Count('id')).order_by('-purchase_count')[:5]
+
+        games = GameSerializer(games_recommended_by_friends, many=True).data
+
+        return Response(games, status=status.HTTP_200_OK)
+
+class RecommendationFromMostSimilarFriendView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        friendships = Friendship.objects.filter(userA=request.user.pk).values_list('userB', flat=True)
+
+        user_game_ids = GamesBought.objects.filter(user=request.user.pk).values_list('game_id', flat=True)
+
+        friends_with_common_games = GamesBought.objects.filter(
+            user__in=friendships,
+            game_id__in=user_game_ids
+        ).values('user').annotate(common_game_count=Count('game')).order_by('-common_game_count')
+
+        if friends_with_common_games:
+            most_similar_friend = User.objects.get(id=friends_with_common_games[0]['user'])
+
+            games = Game.objects.filter(games_bought_game__user=most_similar_friend).order_by('-games_bought_game__created_at').exclude(games_bought_game__user_id=request.user.pk)
+            
+            games = GameSerializer(games, many=True).data
+
+            most_similar_friend = UserInfoSerializer(most_similar_friend).data
+
+            return Response({'games': games, 'friend': most_similar_friend}, status=status.HTTP_200_OK)
+        return Response(None, status=status.HTTP_200_OK)
