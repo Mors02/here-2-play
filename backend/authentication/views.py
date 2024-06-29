@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,13 +18,20 @@ class UserRegister(APIView):
     emailRegex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
     def post(self, request):
-        clean_data = request.data #TODO: VALIDATE DATA
+        clean_data = request.data 
         role = Role.objects.get(slug=clean_data["role_slug"])
         if (request.data["password"] != request.data["confirmPassword"]):
             return Response("ERR_INVALID_PASSWORD", status = status.HTTP_400_BAD_REQUEST)
         #if (re.fullmatch(self.emailRegex, request.data["email"])):
         #    return Response(status = status.HTTP_400_BAD_REQUEST)
         
+        try:
+            validation = validate_password(request.data["password"])
+        except:
+            return Response("ERR_INSECURE_PASSWORD", status = status.HTTP_400_BAD_REQUEST)
+        
+            
+
         clean_data = {"password": request.data["password"], "email": request.data["email"], "username": request.data["username"]}
         
         serializer = UserRegisterSerializer(data = clean_data)
