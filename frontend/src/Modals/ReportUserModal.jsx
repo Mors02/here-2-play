@@ -21,7 +21,7 @@ export default function ReportUserModal({afterOpenModal, closeModal, modalIsOpen
 
     function report() {
         console.log(selected);
-        axiosConfig.post('api/reports/user', {userReported, selected})
+        axiosConfig.post('api/reports/user/', {userReported, selected})
         .then(res => {
             console.log(res)
             toast.success("Segnalazione completata.", {onClose: () => {closeModal(); setSelected("ha")}})

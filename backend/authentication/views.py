@@ -108,7 +108,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
 
     def get_permissions(self):
-        if (self.action == "update"):
+        if (self.action in ["update", 'destroy']):
             permission_classes = (permissions.IsAuthenticated,)
         else:
             permission_classes = (permissions.AllowAny,)
@@ -120,6 +120,13 @@ class UserViewSet(viewsets.ModelViewSet):
             user = User.objects.get(id=pk)
             serializer = UserInfoWithGamesSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+    def destroy(self, request, pk=None):
+        try:
+            User.objects.get(id=pk).delete()
+            return Response(status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -153,7 +160,7 @@ class IsAdminView(APIView):
         user = User.objects.get(id=request.user.pk)
         return Response(user.is_superuser, status=status.HTTP_200_OK)
 
-#Classe per autenticare con la mail gli utenti
+# Classe per autenticare con la mail gli utenti
 class EmailBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         UserModel = get_user_model()
