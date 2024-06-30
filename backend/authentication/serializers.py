@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from .models import UserProfile, Role
 from games.models import VisitedGame
 from django.contrib.auth.models import User
@@ -20,6 +20,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             return None
         else:
             #se non trova lo user allora lo creiamo
+
             user = User.objects.create_user(
                 email = clean_data["email"],                 
                 username = clean_data["username"],
@@ -77,12 +78,14 @@ class UserEditSerializer(serializers.Serializer):
         if ("oldPassword" in data and data["oldPassword"] is not None):
             #check if oldPassword is correct
             correctUser = authenticate(username = user.email, password = data["oldPassword"])
-            print("CORRECT USER")
-            print(correctUser)
+                        
             #if is None then error
             if (correctUser is None):
                 self.context["message"] = "ERR_WRONG_CREDENTIALS"
             
+            #check if new password is secure
+            if (~check_password(data["newPassword"])):
+                self.context["message"] = "ERR_INSECURE_PASSWORD"
             #check if new password is not equal to confirm new password
             if (data["newPassword"] != data["confirmNewPassword"]):
                 self.context["message"] = "ERR_DIFFERENT_PASSWORDS"
@@ -122,7 +125,7 @@ class UserInfoWithGamesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserModel
-        fields = ["username", "id", "games", "role", "date_joined", "published_games", "profile_picture", "bundles", "recently_visited_games"]
+        fields = ["username", "id", "games", "role", "date_joined", "published_games", "profile_picture", "bundles", "recently_visited_games", "is_superuser"]
 
     def get_profile_picture(self, obj):
         return obj.user_profile_user.profile_picture.url

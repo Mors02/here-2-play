@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
-
+from rest_framework.decorators import action
 from orders.serializers import GamesBoughtSerializer
 from orders.models import GamesBought
 from .models import Game, GameAttachment, Discount, Review, Tag, Category, Bundle, BundleGames, VisitedGame
-from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer, BundleSerializer, BundleGamesSerializer, VisitedGameSerializer, CreateBundleSerializer
+from .serializers import GameSerializer, GameAttachmentSerializer, ReviewSerializer, TagSerializer, GameTagSerializer, CategorySerializer, BundleSerializer, BundleGamesSerializer, VisitedGameSerializer, CreateBundleSerializer, CreateReviewSerializer
 from rest_framework.response import Response
 from rest_framework import permissions, status, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
@@ -91,7 +91,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
                     tagSerializer.createOrUpdate({"tag": tagObj, "game": game, "count": 1})
 
             #save the review        
-            serializer = ReviewSerializer(data={**data, 'user': user.pk, 'game': game.pk})
+            serializer = CreateReviewSerializer(data={**data, 'user': user.pk, 'game': game.pk})
             if (serializer.is_valid(raise_exception=True)):
                 serializer.create(data={'body': data['body'], 'rating': data['rating'], 'user': user, 'game': game})
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -163,7 +163,7 @@ class BundleViewSet(viewsets.ModelViewSet):
 
 class GameViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
-        if (self.action in ['list', 'retrieve']):
+        if (self.action in ['list', 'retrieve', 'game_bundles']):
             permission_classes = [AllowAny]
         else:
             permission_classes = [IsAuthenticated]
@@ -177,6 +177,8 @@ class GameViewSet(viewsets.ModelViewSet):
             data = data.filter(title__icontains=request['title'])
         if 'category' in request:
             data = data.filter(category_id=request['category'])
+        if 'order' in request:
+            data = data.order_by(request['order'])
 
         serialized_data = GameSerializer(data, many=True).data
         copy = serialized_data[:]
@@ -256,7 +258,7 @@ class GameViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         game = Game.objects.get(id=pk)
-        if request.user.id == game.publisher.id:
+        if request.user.id == game.publisher.id or request.user.is_superuser:
             game.delete()
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -298,6 +300,7 @@ class GameViewSet(viewsets.ModelViewSet):
         except GamesBought.DoesNotExist:
             return Response(False, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=["get"])
     def game_bundles(self, request, pk=None):
         try:
             game = Game.objects.get(id=pk)

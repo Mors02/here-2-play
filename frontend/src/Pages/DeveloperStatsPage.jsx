@@ -21,9 +21,9 @@ export default function DeveloperStatsPage() {
     },[]);
 
     function getDataSet(year) {
-        axiosConfig.post('api/stats/dev', {year: year.year()})
+        axiosConfig.post('api/stats/dev/', {year: year.year()})
         .then(res => {
-            console.log(res.data)
+    
             setDataset(res.data.monthly)
             setTotalStats(res.data.year)
             setLoading(false)
@@ -48,9 +48,10 @@ export default function DeveloperStatsPage() {
         setSelected(selection)
         showStats(selection)
     }
+    const valueFormatter = (value) => `${(+value).toFixed(2)} €`;
 
     const series = [
-        {dataKey: 'earnings', label: 'Incassi' },
+        {dataKey: 'earnings', label: 'Incassi', valueFormatter},
         {dataKey: 'purchases', label: 'Acquisti'},
         {dataKey: 'visits', label: 'Visite'},
     ]
@@ -71,24 +72,9 @@ export default function DeveloperStatsPage() {
         })
 
         setFilteredSeries(filteredSeries)
-    }
-
+    }    
     const txtClass="bg-slate-400 p-3 rounded-xl !my-5";
 
-    // const dataset = [
-    //     {earnings: 30, purchases: 10, visits: 30, month: 'Gen'},
-    //     {earnings: 14, purchases: 25, visits: 67, month: 'Feb'},
-    //     {earnings: 16, purchases: 30, visits: 12, month: 'Mar'},
-    //     {earnings: 16, purchases: 30, visits: 12, month: 'Apr'},
-    //     {earnings: 16, purchases: 30, visits: 12, month: 'Mag'},
-    //     {earnings: 16, purchases: 30, visits: 12, month: 'Giu'},
-    //     {earnings: 16, purchases: 30, visits: 12, month: 'Lug'},
-    //     {earnings: 16, purchases: 30, visits: 12, month: 'Ago'},
-    //     {earnings: 16, purchases: 30, visits: 12, month: 'Set'},
-    //     {earnings: 16, purchases: 30, visits: 12, month: 'Ott'},
-    //     {earnings: 16, purchases: 30, visits: 12, month: 'Nov'},
-    //     {earnings: 16, purchases: 30, visits: 12, month: 'Dic'},
-    // ]
     return(
         <Box className="px-10 py-8 flex">
             <Typography> Sezione statistiche </Typography>

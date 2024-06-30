@@ -6,6 +6,9 @@ class Role(models.Model):
     class Meta:
         db_table = "roles"
 
+    DEVELOPER = 1
+    PLAYER = 0
+
     slug = models.CharField(max_length=30)
     name = models.CharField(max_length=30)
 
@@ -17,7 +20,7 @@ class UserProfile(models.Model):
     def pfps(instance, filename):
         return 'profile_pictures/{filename}'.format(filename=filename)
 
-    DEFAULT_PFP = 'profile_pictures/default.jpeg'
+    DEFAULT_PFP = 'profile_pictures/default.jpeg'    
 
     class Meta:
         db_table = "user_profiles"

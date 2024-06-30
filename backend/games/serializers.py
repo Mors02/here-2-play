@@ -93,6 +93,16 @@ class GameSerializer(serializers.ModelSerializer):
             return average
         return 0
 
+class CreateReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ["id", "user", "game", "rating", "body", "created_at"]
+
+    def create(self, data):
+        review = Review(**data)
+        review.save()
+        return review
+
 class ReviewSerializer(serializers.ModelSerializer):   
     user = serializers.SerializerMethodField()
 

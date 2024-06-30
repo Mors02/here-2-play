@@ -43,7 +43,7 @@ function LoginPage() {
                 localStorage.setItem('refresh_token', data.refresh);
                 axiosConfig.defaults.headers.common['Authorization'] = 
                                                 `JWT ${data['access']}`;
-                toast.success("Login effettuato con successo.", {onClose: () => {login(); navigate("/")}})                   
+                toast.success("Login effettuato con successo.", {onClose: () => {login(); window.location.replace("/")}})                   
                 
             })
             .catch(error => {
