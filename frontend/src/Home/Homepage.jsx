@@ -13,6 +13,7 @@ function Homepage() {
     const [games, setGames] = useState([])
     const [mostSold, setMostSold] = useState([])
     const [bestRated, setBestRated] = useState([])
+    const [bestByCategory, setBestByCategory] = useState([])
     const [fromFriends, setFromFriends] = useState([])
     const [fromMostSimilar, setFromMostSimilar] = useState([])
     const [similarFriend, setSimilarFriend] = useState([])
@@ -25,6 +26,7 @@ function Homepage() {
         bestRatedGames()
         recommendedFromFriends()
         recommendationsFromMostSimilarGames()
+        bestGamesByCategory()
     }, [])
 
     async function allGames() {
@@ -75,6 +77,20 @@ function Homepage() {
             })
     }
 
+
+    async function bestGamesByCategory() {
+        axiosConfig.get('api/stats/by-category')
+        .then(res => {
+            if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
+                throw new Error(res["response"]["data"])
+                setBestByCategory(res.data)
+                console.log(res.data)
+        }).catch(err => {
+            toast.error(ErrorMap[err.message])
+        })
+    }
+
+
     function recommendationsFromMostSimilarGames() {
          axiosConfig.get('/api/stats/recommendations-from-most-similar-friend/')
             .then(res => {
@@ -87,6 +103,7 @@ function Homepage() {
                 toast.error(ErrorMap[err.message])
             })
     }
+
 
     function handleClick(game) {
         axiosConfig.post('/api/visit/game/', { game: game.id })
@@ -112,8 +129,10 @@ function Homepage() {
                     <RecommendedGames games={bestRated} title={"Ultime Uscite Migliori"} />
                     <RecommendedGames games={mostSold} title={"Giochi di Tendenza"} />
                     <RecommendedGames games={fromFriends} title={"Più Acquistati dagli Amici"} />
-                    { similarFriend && <RecommendedGames games={fromMostSimilar} title={`Come a "${similarFriend}", può interessarti`} /> }
-
+                    { similarFriend && <RecommendedGames games={fromMostSimilar} title={`Come a "${similarFriend}", Può Interessarti`} /> }
+                    {Object.keys(bestByCategory).map((category) => 
+                        (<RecommendedGames games={bestByCategory[category]} title={"Se Ti Piace " + category + ", Non Perderti"} />)
+                    )}
                     <Box>
                         <Divider className="text-3xl !my-6"><b>Tutti i Giochi</b></Divider>
                         <GameList games={games} maxCount={30} handleClick={handleClick} tagId={state?.tagId} previewPrices={true} searchSection={false} selection={[]} /> 
