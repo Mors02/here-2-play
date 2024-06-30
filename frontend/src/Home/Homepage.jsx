@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import GameList from '../Component/GameList';
 import Box from '@mui/material/Box';
-import { Typography, Divider } from '@mui/material';
+import { Typography, Divider, TextField, Button, Stack, Slider, Select, FormControl, MenuItem, InputLabel } from '@mui/material';
+import { IoSearchOutline } from "react-icons/io5";
 import { axiosConfig } from '../config/axiosConfig';
 import { useLocation, useNavigate } from 'react-router';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { ErrorMap } from '../config/enums';
+import { useForm } from 'react-hook-form';
+import Search from '../Component/Search';
 
 function Homepage() {
     const [loading, setLoading] = useState()
@@ -17,17 +20,25 @@ function Homepage() {
     const [fromFriends, setFromFriends] = useState([])
     const [fromMostSimilar, setFromMostSimilar] = useState([])
     const [similarFriend, setSimilarFriend] = useState([])
-    const navigate = useNavigate()
     const { state } = useLocation()
-    
+    const navigate = useNavigate()
+
     useEffect(() => {
         mostSoldGames()
-        allGames()
         bestRatedGames()
         recommendedFromFriends()
         recommendationsFromMostSimilarGames()
         bestGamesByCategory()
+        allGames()
     }, [])
+
+    function updateData(games) {
+        setLoading(true)
+
+        setGames(games)
+
+        setLoading(false)
+    }
 
     async function allGames() {
         axiosConfig.get('/api/games/')
@@ -77,7 +88,6 @@ function Homepage() {
             })
     }
 
-
     async function bestGamesByCategory() {
         axiosConfig.get('api/stats/by-category')
         .then(res => {
@@ -89,7 +99,6 @@ function Homepage() {
             toast.error(ErrorMap[err.message])
         })
     }
-
 
     function recommendationsFromMostSimilarGames() {
          axiosConfig.get('/api/stats/recommendations-from-most-similar-friend/')
@@ -122,25 +131,32 @@ function Homepage() {
         )
     }
 
-    if (!loading && games.length > 0)
-        return (
-            <Box className='p-10'>
+    if (!loading)
+    return (
+        <Box className='p-10'>
+            <Search tagId={ state?.tagId } updateData={updateData} />
+
+            <Box>
+                <RecommendedGames games={bestRated} title={"Ultime Uscite Migliori"} />
+                <RecommendedGames games={mostSold} title={"Giochi di Tendenza"} />
+                <RecommendedGames games={fromFriends} title={"Più Acquistati dagli Amici"} />
+                { similarFriend && <RecommendedGames games={fromMostSimilar} title={`Come a "${similarFriend}", Può Interessarti`} /> }
+                {
+                    Object.keys(bestByCategory).map(category => 
+                        <RecommendedGames games={bestByCategory[category]} title={"Se Ti Piace " + category + ", Non Perderti"} />
+                    )
+                }
                 <Box>
-                    <RecommendedGames games={bestRated} title={"Ultime Uscite Migliori"} />
-                    <RecommendedGames games={mostSold} title={"Giochi di Tendenza"} />
-                    <RecommendedGames games={fromFriends} title={"Più Acquistati dagli Amici"} />
-                    { similarFriend && <RecommendedGames games={fromMostSimilar} title={`Come a "${similarFriend}", Può Interessarti`} /> }
-                    {Object.keys(bestByCategory).map((category) => 
-                        (<RecommendedGames games={bestByCategory[category]} title={"Se Ti Piace " + category + ", Non Perderti"} />)
-                    )}
-                    <Box>
-                        <Divider className="text-3xl !my-6"><b>Tutti i Giochi</b></Divider>
-                        <GameList games={games} maxCount={30} handleClick={handleClick} tagId={state?.tagId} previewPrices={true} searchSection={false} selection={[]} /> 
-                    </Box>
+                    <Divider className="text-3xl !my-6"><b>Tutti i Giochi</b></Divider>
+                    { 
+                        games.length > 0 
+                        ? <GameList games={games} maxCount={30} handleClick={handleClick} previewPrices={true} selection={[]} />
+                        : <Typography className='text-center'>Non ci sono giochi presenti secondo tali filtri</Typography>
+                    }
                 </Box>
             </Box>
-        );
-    return <Typography>Non sono presenti giochi nello store...</Typography>
+        </Box>
+    );
 }
 
 export default Homepage;

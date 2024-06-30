@@ -177,6 +177,8 @@ class GameViewSet(viewsets.ModelViewSet):
             data = data.filter(title__icontains=request['title'])
         if 'category' in request:
             data = data.filter(category_id=request['category'])
+        if 'order' in request:
+            data = data.order_by(request['order'])
 
         serialized_data = GameSerializer(data, many=True).data
         copy = serialized_data[:]

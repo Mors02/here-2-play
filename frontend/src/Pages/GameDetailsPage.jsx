@@ -15,7 +15,6 @@ import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import SwipeableViews from 'react-swipeable-views';
 import { autoPlay } from 'react-swipeable-views-utils';
-import { Colors } from '../config/Colors.js'
 import 'react-toastify/dist/ReactToastify.min.css';
 import Rating from '@mui/material/Rating';
 import moment from 'moment';
@@ -106,7 +105,7 @@ function GameDetailsPage() {
                     }
                 </AutoPlaySwipeableViews>
                 <MobileStepper
-                    style={{backgroundColor: Colors.light}}
+                    style={{backgroundColor: '#f3f4f6'}}
                     steps={maxLength}
                     position="static"
                     activeStep={activeStep}

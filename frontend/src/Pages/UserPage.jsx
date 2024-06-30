@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { axiosConfig } from "../config/axiosConfig";
+import { axiosConfig, getRefreshToken } from "../config/axiosConfig";
 import { useNavigate, useParams, useLocation } from "react-router";
 import { Container, LinearProgress, Typography, Button, Box, Stack, Tab, Divider } from "@mui/material";
 import {TabList, TabPanel, TabContext } from '@mui/lab'
@@ -13,6 +13,8 @@ import YourGames from "../Component/YourGames"
 import GameList from "../Component/GameList";
 import BundleOfUSer from "./Bundles/BundleOfUser";
 import DeveloperStatsPage from "./DeveloperStatsPage";
+import { useAuth } from "../config/AuthContext";
+import { toast } from "react-toastify";
 
 export default function UserPage() {
     const [retrievedUser, setUser] = useState()
@@ -23,6 +25,7 @@ export default function UserPage() {
     const location = useLocation()
     const [loadingPage, setLoading] = useState(true);
     const [modalIsOpen, setIsOpen] = useState(false);
+    const { logout } = useAuth();
 
     function openModal() {
       setIsOpen(true);
@@ -79,6 +82,16 @@ export default function UserPage() {
         return navigate('/games/' + game)
     }
 
+    function handleLogout(e) {
+        axiosConfig.post("/api/logout/", {"refresh_token": getRefreshToken()})
+            .then(res => {
+                logout();
+                localStorage.clear();
+                axiosConfig.defaults.headers.common['Authorization'] = null;
+                toast.success("Logout effettuato.", {onClose: () =>{window.location.replace("/")}})
+            })
+    }
+
     if (loadingPage || loading)
         return <LinearProgress />
     else
@@ -87,27 +100,34 @@ export default function UserPage() {
         {
             loadingPage || loading? <LinearProgress /> :
             <>
-                <Box className="bg-slate-400 p-2">
-                    <Box className="flex">
-                        <Stack direction={"row"} className="place-items-center w-full">
-                            <img className="object-cover w-16 h-16 rounded-full inline m-3" src={process.env.REACT_APP_BASE_URL + retrievedUser.profile_picture} />
-                            <Typography variant="h3" >{retrievedUser.username} </Typography>
-                            <Typography className="pl-4 pt-4"> Registrato da {dateDiff(retrievedUser.date_joined)} </Typography>
-                        </Stack>
+                <Box className="flex bg-slate-400 px-5 py-3 place-items-center">
+                    <Box className="flex place-items-center w-full gap-4">
+                        <img className="object-cover w-16 h-16 rounded-full inline" src={process.env.REACT_APP_BASE_URL + retrievedUser.profile_picture} />
+
                         <Box>
-                        {user && id == user.id?
-                            <Button variant="contained" sx={{marginTop: "11px", marginRight:"24px", float: "right"}} onClick={() => window.location.replace('/user')}><FaPen /> Modifica profilo</Button> :
-                            <Button variant="contained" color="error" sx={{marginTop: "11px", marginRight:"24px", float: "right"}} onClick={() => openModal()}><MdReport /> Segnala</Button>
-                        }
+                            <Typography variant="h5">{retrievedUser.username} </Typography>
+                            <Typography className="text-gray-600">Registrato da {dateDiff(retrievedUser.date_joined)}</Typography>
                         </Box>
                     </Box>
+                    <Box>
+                    {
+                        user && id == user.id ?
+                        <Box className="flex gap-4">
+                            <Button variant="contained" className="text-nowrap" onClick={() => window.location.replace('/user')} startIcon={<FaPen size={15} />}>Modifica profilo</Button>
+                            <Button variant="contained" color="error" onClick={() => handleLogout()}>Logout</Button>
+                        </Box>
+                        : <Button variant="contained" color="error" onClick={() => openModal()} startIcon={<MdReport />}>Segnala</Button>
+                    }
+                    </Box>
                 </Box>
+
                 <ReportUserModal  
                     closeModal={closeModal} 
                     modalIsOpen={modalIsOpen} 
                     userReported={retrievedUser}
                 />
-                <Box className="h-screen" sx={{borderLeft:"1px solid #aaa", borderRight:"1px solid #aaa"}}>
+
+                <Box className="min-h-[500px]" sx={{borderLeft:"1px solid #aaa", borderRight:"1px solid #aaa"}}>
                     <TabContext value={tab}>
                         <TabList onChange={(event, newValue) => setTab(newValue)}>
                             <Tab label={"Libreria"}></Tab>
@@ -132,8 +152,9 @@ export default function UserPage() {
                         </TabPanel>}
                     </TabContext>
                 </Box>
+                
                 <Box className="bg-slate-300 w-full p-6">
-                    <Divider className="!mb-6">Giochi Visitati di Recente</Divider>
+                    <Divider className="!mb-6"><b>Giochi Visitati di Recente</b></Divider>
                     <Box className="grid grid-cols-8 gap-6">
                     {
                         retrievedUser?.recently_visited_games.map(details => 

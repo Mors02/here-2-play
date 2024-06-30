@@ -11,15 +11,9 @@ import { ErrorMap } from "../config/enums"
 import { useForm } from 'react-hook-form';
 import moment from 'moment';
 
-function GameList({selection=[], games, handleClick, maxCount=1000, searchSection=false, tagId='', previewPrices=false }) {
+function GameList({ selection=[], games, handleClick, maxCount=1000, previewPrices=false }) {
     const [loading, setLoading] = useState(true)
     const [filteredGames, setFilteredGames] = useState([])
-    const [rangePrices, setRangePrices] = useState([0, 1000])
-    const [allCategories, setAllCategories] = useState([])
-    const [allTags, setAllTags] = useState([])
-    const [selectedCategory, setSelectedCategory] = useState('')
-    const [selectedTag, setSelectedTag] = useState(tagId)
-    const [open, setOpen] = useState(false)
     const [selected, setSelected] = useState(selection)
         
     useEffect(() => {
@@ -27,29 +21,11 @@ function GameList({selection=[], games, handleClick, maxCount=1000, searchSectio
     }, [selection]);
 
     const maxHomepageGames = maxCount
-    const minDistance = 20
-
-    const {
-        register,
-        getValues
-    } = useForm()
-
-    function retrieveData() {
-        axiosConfig.get('/api/tags/')
-            .then(res => {
-                setAllTags(res.data)
-            })
-
-        axiosConfig.get('/api/categories/')
-            .then(res => {
-                setAllCategories(res.data)
-            })
-    }
 
     function updateData(games) {
         setLoading(true)
 
-        let data = (games.length > maxHomepageGames && searchSection) ? games.slice(0, maxHomepageGames) : games
+        let data = (games.length > maxHomepageGames) ? games.slice(0, maxHomepageGames) : games
 
         setFilteredGames(data)
         
@@ -57,109 +33,12 @@ function GameList({selection=[], games, handleClick, maxCount=1000, searchSectio
     }
     
     useEffect(() => {
-        if (searchSection)
-            retrieveData()
         updateData(games)
-        
-        if (tagId)
-            executeSearch()
-    }, [])
-
-    function executeSearch() {
-        setLoading(true)
-        let params = {}
-
-        if (getValues('title')) params['title'] = getValues('title')
-        if (selectedCategory) params['category'] = selectedCategory
-        if (selectedTag) params['tag'] = selectedTag
-        if (rangePrices) {
-            params['start'] = rangePrices[0]
-            params['end'] = rangePrices[1]
-        }
-        
-        axiosConfig.get('/api/games/', { params })
-            .then(res => {
-                updateData(res.data)
-            })
-    }
-
-    function SearchSection() {
-        if (searchSection)
-        return (
-            <Box className="w-full flex gap-4">
-                <TextField size='small' className='grow' {...register('title')} label="Ricerca Giochi" />
-                <Button variant='contained' onClick={() => setOpen(!open)}>Filtri</Button>
-                <Button variant='contained' onClick={executeSearch}><IoSearchOutline size={25} /></Button>
-            </Box>
-        )
-    }
-
-    const handleChange = (event, newValue, activeThumb) => {
-        if (!Array.isArray(newValue)) {
-            return;
-        }
-
-        if (newValue[1] - newValue[0] < minDistance) {
-            if (activeThumb === 0) {
-                const clamped = Math.min(newValue[0], 100 - minDistance);
-                setRangePrices([clamped, clamped + minDistance]);
-            } else {
-                const clamped = Math.max(newValue[1], minDistance);
-                setRangePrices([clamped - minDistance, clamped]);
-            }
-        } else {
-            setRangePrices(newValue);
-        }
-    };
+    }, [games])
 
     if (!loading) 
     return (
         <Stack spacing={4}>
-            <SearchSection />
-            
-            {
-                open && (
-                    <Stack spacing={3} className="bg-gray-100 p-6 rounded-md">
-                        <Box className="flex gap-4">
-                            <Typography className='w-[125px] !my-auto'>Range Prezzi</Typography>
-                            <Slider
-                                max={1000}
-                                value={rangePrices}
-                                onChange={handleChange}
-                                valueLabelDisplay="on"
-                                disableSwap
-                            />
-                        </Box>
-
-                        <Box className="grid grid-cols-2 gap-4">
-                            <FormControl>
-                                <InputLabel>Categoria</InputLabel>
-                                <Select label="Categoria" value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
-                                    <MenuItem value="">--- Nessuna ---</MenuItem>
-                                    {
-                                        allCategories && allCategories.map(category => 
-                                            <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>
-                                        )
-                                    }
-                                </Select>
-                            </FormControl>
-
-                            <FormControl>
-                                <InputLabel>Tag</InputLabel>
-                                <Select label="Tag" value={selectedTag} onChange={e => setSelectedTag(e.target.value)}>
-                                    <MenuItem value="">--- Nessuno ---</MenuItem>
-                                    {
-                                        allTags && allTags.map(tag =>
-                                            <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem>
-                                        )
-                                    }
-                                </Select>
-                            </FormControl>
-                        </Box>
-                    </Stack>
-                )
-            }
-
             <Box className='grid sm:grid-cols-3 md:grid-cols-5 gap-8'>
                 {
                     filteredGames?.map(game =>
