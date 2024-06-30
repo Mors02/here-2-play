@@ -12,7 +12,7 @@ from django.utils import timezone
 from datetime import timedelta
 from friendlist.models import Friendship
 from orders.serializers import GamesBoughtSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.db.models import Count, Q, F, ExpressionWrapper, IntegerField, Avg, FloatField
 import math
 
@@ -166,3 +166,58 @@ class RecommendationFromMostSimilarFriendView(APIView):
 
             return Response({'games': games, 'friend': most_similar_friend}, status=status.HTTP_200_OK)
         return Response(None, status=status.HTTP_200_OK)
+
+class ReportedGames(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        games_with_reports = Game.objects.annotate(report_count=Count('game_reported')).filter(report_count__gt=0).order_by('-report_count')
+
+        games = GameSerializer(games_with_reports, many=True).data
+
+        for game in games:
+            total = GameReport.objects.filter(game_reported=game['id']).count()
+            explicit = GameReport.objects.filter(game_reported=game['id'], cause=GameReport.EXPLICIT).count()
+            hate_speech = GameReport.objects.filter(game_reported=game['id'], cause=GameReport.HATE_SPEECH).count()
+            rascism = GameReport.objects.filter(game_reported=game['id'], cause=GameReport.RACISM).count()
+            scam = GameReport.objects.filter(game_reported=game['id'], cause=GameReport.SCAM).count()
+            other = GameReport.objects.filter(game_reported=game['id'], cause=GameReport.OTHER).count()
+
+            game['reports'] = {
+                'total': total,
+                'explicit': explicit,
+                'hate_speech': hate_speech,
+                'rascism': rascism,
+                'scam': scam,
+                'other': other
+            }
+
+        return Response(games, status=status.HTTP_200_OK)
+    
+class ReportedUsers(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        users_with_reports = User.objects.annotate(report_count=Count('user_reported')).filter(report_count__gt=0).order_by('-report_count')
+        print(users_with_reports)
+
+        users = UserInfoSerializer(users_with_reports, many=True).data
+
+        for user in users:
+            total = UserReport.objects.filter(user_reported=user['id']).count()
+            harassment = UserReport.objects.filter(user_reported=user['id'], cause=UserReport.HARASSMENT).count()
+            spam = UserReport.objects.filter(user_reported=user['id'], cause=UserReport.SPAM).count()
+            bot = UserReport.objects.filter(user_reported=user['id'], cause=UserReport.BOT).count()
+            scam = UserReport.objects.filter(user_reported=user['id'], cause=UserReport.SCAM).count()
+            other = UserReport.objects.filter(user_reported=user['id'], cause=UserReport.OTHER).count()
+
+            user['reports'] = {
+                'total': total,
+                'harassment': harassment,
+                'spam': spam,
+                'bot': bot,
+                'scam': scam,
+                'other': other
+            }
+
+        return Response(users, status=status.HTTP_200_OK)

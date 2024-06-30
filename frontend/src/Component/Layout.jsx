@@ -35,7 +35,7 @@ function Layout(props) {
                     <Box className="p-5">
                         <Link to="/">Here2Play</Link>
                         <Stack direction={"row"} className="float-right w-60 flex justify-end">
-                            {!user.is_superuser && <AdminPanelSettingsIcon fontSize="large" className="cursor-pointer" onClick={() => openAdminPanel()}/>}
+                            { user?.is_superuser && <AdminPanelSettingsIcon fontSize="large" className="cursor-pointer" onClick={() => openAdminPanel()}/> }
                             <ShoppingCartIcon fontSize="large" className="cursor-pointer" onClick={() => setDropdownVisibile(true)}/>
                             <ReorderIcon fontSize="large" className="cursor-pointer ml-20" onClick={() => toggleDrawer(true)}/>
                         </Stack>

@@ -256,7 +256,7 @@ class GameViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         game = Game.objects.get(id=pk)
-        if request.user.id == game.publisher.id:
+        if request.user.id == game.publisher.id or request.user.is_superuser:
             game.delete()
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
