@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import { ErrorMap } from "../config/enums";
 import PaymentModal from "../Modals/PaymentModal";
 import moment from "moment";
+import { IoMdClose } from "react-icons/io";
+import { useNavigate } from "react-router";
 
 function applyDiscounts(games) {
     games.map(game => {
@@ -26,6 +28,7 @@ export default function OrderPage() {
     const [loading, isLoading] = useState(true)
     const [state, dispatch] = useReducer(reducer, initialState, initializer);
     const [showModal, setShowModal] = useState(false)
+    const navigate = useNavigate()
 
     const openModal = () => setShowModal(true)
     const closeModal = () => setShowModal(false)
@@ -100,32 +103,54 @@ export default function OrderPage() {
         })
     }
 
-    const normalStyle = "border-b-2 min-w-60 min-h-16 border-black py-8"
+    function navigateToGame(game) {
+        navigate('/games/' + game.details.id)
+    }
+
+    function navigateToBundle(bundle) {
+        navigate('/bundle/' + bundle.details.id)
+    }
 
     return (
-        <Box>
-            <Typography variant="h6">Carrello</Typography>
-            <Stack className="flex justify-start max-h-full overflow-auto ">               
-                {games.map((game, index) => (
-                    <Box className={index==0? normalStyle + " border-t-2" : normalStyle}>
-                        <Typography>{game.details.title}</Typography>
-                        <Typography className="float-right">€ {(+game.details.price).toFixed(2)}</Typography>
-                        <Button onClick={() => deleteGame(game.id)} color={"error"} variant={"contained"}>Rimuovi</Button>
+        <Box className="px-[10%] lg:px-[12%] py-8">
+            <Divider><Typography variant="h4" className="font-semibold">Carrello</Typography></Divider>
+
+            <Stack spacing={2} className="flex justify-start overflow-auto my-4">               
+                {games?.map((game, index) => (
+                    <Box className="flex pr-4 rounded bg-gray-100 overflow-hidden">
+                        <Box className="flex gap-4">
+                            <img className="aspect-[600/900] object-cover w-[70px]" src={process.env.REACT_APP_BASE_URL + game.details.image} />
+                            <Typography onClick={() => navigateToGame(game)} className="!my-auto py-3 cursor-pointer hover:text-blue-500 transition ease-linear">{game.details.title}</Typography>
+                        </Box>
+                        
+                        <Box className="flex py-3 grow gap-4 justify-end">
+                            <Typography className="!my-auto">{(+game.details.price).toFixed(2)} €</Typography>
+                            <IoMdClose className="!my-auto" onClick={() => deleteGame(game.id)} color="red" size={30} />
+                        </Box>
                     </Box>
                 ))}
-                {bundles.map((bundle, index) => (
-                    <Box className={index==0 && games.length == 0? normalStyle + " border-t-2" : normalStyle}>
-                        <Typography>{bundle.details.name}</Typography>
-                        <Typography className="float-right">€ {(+bundle.details.discounted_price).toFixed(2)}</Typography>
-                        <Button onClick={() => deleteBundle(bundle.id)} color={"error"} variant={"contained"}>Rimuovi</Button>
+                {bundles?.map((bundle, index) => (
+                    <Box className="flex px-4 rounded bg-gray-100 overflow-hidden">
+                        <Typography onClick={() => navigateToBundle(bundle)} className="flex gap-2 !my-auto py-3 cursor-pointer hover:text-blue-500 transition ease-linear">{bundle.details.name} 
+                            <Typography className="text-gray-400">(Bundle)</Typography>
+                        </Typography>
+                        
+                        <Box className="flex py-3 grow gap-4 justify-end">
+                            <Typography className="!my-auto">{(+bundle.details.discounted_price).toFixed(2)} €</Typography>
+                            <IoMdClose className="!my-auto" onClick={() => deleteBundle(bundle.id)} color="red" size={30} />
+                        </Box>
                     </Box>
                 ))}
             </Stack>
-            <Stack>
-                {games.length == 0 && bundles.length == 0 && <Typography variant="h3">Il tuo carrello è vuoto. Riempilo!</Typography>}
-                <Typography variant="h5" className="float-right">Subtotale: € {!loading? (state.totalCost).toFixed(2) : 0}</Typography>
+
+            <Stack spacing={2}>
+                {games.length == 0 && bundles.length == 0 && <Typography variant="h5" className="text-center !mt-3 !mb-4 rounded p-2 bg-slate-500 text-white">Il tuo carrello è vuoto. Riempilo!</Typography>}
+                <Box className="flex justify-end">
+                    <Typography variant="h5">Totale: € {!loading ? (state.totalCost).toFixed(2) : 0}</Typography>
+                </Box>
                 <Button variant="contained" onClick={() => openModal()} disabled={games.length == 0 && bundles.length == 0}>Completa ordine</Button>
             </Stack>
+
             <PaymentModal modalIsOpen={showModal} openModal={openModal} closeModal={closeModal} order={order}/>
         </Box>
     )
@@ -139,19 +164,22 @@ export function OrderDropdown() {
 
     useEffect(() => {
         axiosConfig.get('api/orders/')
-            .then((res) => {
+            .then(res => {
                 if (res.data == "") {
+                    isLoading(false)
                     return
                 }
 
-                applyDiscounts(res.data.games)
-                setGames(res.data.games)
-                setBundles(res.data.bundles)                
-                res.data.games.map(game => {
+                applyDiscounts(res.data?.games)
+                setGames(res.data?.games)
+                setBundles(res.data?.bundles)     
+
+                res.data.games?.map(game => {
                     let price = game.details.price;
                     dispatch({price: +price, type: "add"})
                 })
-                res.data.bundles.map(bundle => {
+
+                res.data.bundles?.map(bundle => {
                     let price = bundle.details.discounted_price;
                     dispatch({price: +price, type: "add"})                
                 })
@@ -172,18 +200,20 @@ export function OrderDropdown() {
             </Box>
 
             <Stack className="flex text-center max-h-full overflow-auto">
-                { games.length == 0 && bundles.length == 0 && <Typography>Vuoto...</Typography> }              
+                { games?.length == 0 && bundles?.length == 0 && <Typography className="!my-4">Vuoto...</Typography> }
+
                 { 
-                    games.map((game, index) => 
+                    games?.map((game, index) => 
                         <Box className={"flex justify-between px-4 py-2 " + (index % 2 == 0 ? 'bg-slate-400' : '')}>
                             <Typography>{game.details.title}</Typography>
                             <Typography>{game.details.price} €</Typography>
                         </Box>
                     )
                 }
+
                 {
-                    bundles.map((bundle, index) =>
-                        <Box className={"flex justify-between px-4 py-2 " + (index % 2 == 0 ? 'bg-slate-400' : '')}>
+                    bundles?.map((bundle, index) =>
+                        <Box className={"flex justify-between px-4 py-2 " + (index % 2 == (games.length % 2 == 0 ? 0 : 1) ? 'bg-slate-400' : '')}>
                             <Typography>{bundle.details.name}</Typography>
                             <Typography className="float-right">{(+bundle.details.discounted_price).toFixed(2)} €</Typography>
                         </Box>
@@ -192,7 +222,7 @@ export function OrderDropdown() {
             </Stack>
 
             <Box className="flex flex-col gap-4 p-4 text-center border-t border-t-gray-400">
-                <Typography className="text-white" variant="h5">Totale: {(state.totalCost).toFixed(2)} €</Typography>
+                <Typography className="text-white" variant="h5">Totale: {(state?.totalCost).toFixed(2)} €</Typography>
                 <a href="/cart"><Button variant="contained">Vai alla pagina del carrello</Button></a>
             </Box>
         </Box>

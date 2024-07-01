@@ -1,7 +1,7 @@
-import { Typography, Box, Button, Stack, Container, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from '@mui/material';
+import { Typography, Box, Button, Stack, Container, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Divider } from '@mui/material';
 import React, { useState } from 'react';
 import Modal from 'react-modal';
-import { MdReport } from "react-icons/md";
+import { MdClose, MdReport } from "react-icons/md";
 import { toast } from 'react-toastify';
 import { axiosConfig } from '../config/axiosConfig';
 import { ErrorMap } from '../config/enums';
@@ -41,29 +41,26 @@ export default function PaymentModal({afterOpenModal, closeModal, modalIsOpen, o
         {"name": "Satispay", "slug": "sat", "color": "error"},
     ]
   return (
-      <Modal
-        isOpen={modalIsOpen}
-        onAfterOpen={afterOpenModal}
-        onRequestClose={closeModal}
-        style={customStyles}
-        contentLabel="Modale di pagamento"
-      >
-            <Typography variant='h4' className='text-center'>Completa il pagamento</Typography>
-            <Box>
-                <Stack>
-                    <Typography variant="h5">Seleziona il metodo di pagamento</Typography>
-                        
+        <Modal
+            isOpen={modalIsOpen}
+            onAfterOpen={afterOpenModal}
+            onRequestClose={closeModal}
+            style={customStyles}
+            contentLabel="Modale di pagamento"
+        >
+            <Box className="w-[500px] relative">
+                <MdClose onClick={() => closeModal()} className='absolute top-0 right-0 bg-white !pl-2' size={30} color='red' />
+                <Divider>
+                    <Typography variant='h6'>Completa il Pagamento</Typography>
+                </Divider>
+
+                <Box className="flex gap-4 !mt-4 justify-center">
                     {methods.map((method) => (
-                        <Container>
-                            <Button variant="contained" color={method.color} onClick={() => pay(method.slug)}>{method.name}</Button>
-                        </Container>
+                        <Button className='text-nowrap' variant="contained" color={method.color} onClick={() => pay(method.slug)}>{method.name}</Button>
                     ))}
-                    <Box>
-                        <Button variant="text" onClick={() => closeModal()} color="error">Chiudi</Button>                        
-                    </Box>
-                </Stack>
+                </Box>
             </Box>
-      </Modal>
+        </Modal>
   );
 }
 

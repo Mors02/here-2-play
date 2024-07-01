@@ -67,21 +67,20 @@ function UserEditPage() {
         })
     }
 
+    if (!loading)
     return (
-        <>
-        {!loading?
-        <Container>
+        <Box className="flex justify-center">
             <CenterBox>
-                <Typography variant="h3">
-                    Ciao, {user.username}! Sei un {role.name}
-                </Typography>
-                <UserForm title={"Modifica dati"} onSubmit={onSubmit} isEdit={true} user={user} pfp={pfp}/>
+                <UserForm title={"Modifica Dati"} onSubmit={onSubmit} isEdit={true} user={user} pfp={pfp}/>
                 <ErrorLabel text={err} />
-                {role.slug != "developer"? <Button variant={"contained"} onClick={changeRole}>Diventa developer!</Button> : <></>}
+                { 
+                    role.slug != "developer" && 
+                    <Box className="flex justify-center mx-8 mb-4">
+                        <Button className="w-full" variant="contained" onClick={changeRole}>Diventa Developer!</Button> 
+                    </Box>
+                }
             </CenterBox>
-        </Container>
-        : <></>}
-        </>
+        </Box>
     )
 }
 

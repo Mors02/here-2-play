@@ -99,7 +99,7 @@ export default function UserPage() {
         <Box className="w-full overflow-x-hidden">
             <Box className="flex bg-slate-400 px-5 py-3 place-items-center">
                 <Box className="flex place-items-center w-full gap-4">
-                    <img className="object-cover w-16 h-16 rounded-full inline" src={process.env.REACT_APP_BASE_URL + retrievedUser.profile_picture} />
+                    <img className="object-cover w-16 h-16 rounded-full inline" src={process.env.REACT_APP_BASE_URL + retrievedUser?.profile_picture} />
 
                     <Box>
                         <Typography variant="h5">{retrievedUser.username} </Typography>
@@ -154,7 +154,7 @@ export default function UserPage() {
             </Box>
                 
             {
-                retrievedUser?.id == user?.id &&
+                retrievedUser?.id == user?.id && retrievedUser?.recently_visited_games.length > 0 &&
                 <Box className="bg-slate-300 w-full p-6">
                     <Divider className="!mb-6"><b>Giochi Visitati di Recente</b></Divider>
                     <Box className="grid grid-cols-8 gap-6">

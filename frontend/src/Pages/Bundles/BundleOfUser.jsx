@@ -13,7 +13,7 @@ export default function BundleOfUSer({user}) {
     }
 
     return (
-        <Box className="px-10 py-8">
+        <Box className="px-4 py-3">
             <BundleList bundles={user.bundles} handleClick={handleClick}/>
             
             <Button className='!mt-6' variant='contained'>
