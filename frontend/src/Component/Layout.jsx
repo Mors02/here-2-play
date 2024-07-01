@@ -35,8 +35,11 @@ function Layout(props) {
                     { user?.is_superuser && <MdAdminPanelSettings color="white" size={30} className="cursor-pointer" onClick={() => openAdminPanel()}/> }
                     { user && <FaUserFriends color="white" size={30} className="cursor-pointer" onClick={() => toggleDrawer(true)}/> }
                     { user && <FaShoppingCart color="white" size={30} className="cursor-pointer" onClick={() => setDropdownVisibile(true)} /> }
-                    { user ? <Avatar className="cursor-pointer" onClick={() => navigateProfile()} sx={{ width: 40, height: 40 }} src={process.env.REACT_APP_BASE_URL + user?.profile_picture} />
-                    : <SlLogin size={30} onClick={() => navigateProfile()} className="cursor-pointer"/>}
+                    { 
+                        user 
+                        ? <Avatar className="cursor-pointer" onClick={() => navigateProfile()} sx={{ width: 40, height: 40 }} src={process.env.REACT_APP_BASE_URL + user?.profile_picture} />
+                        : <SlLogin color="white" size={30} onClick={() => navigateProfile()} className="cursor-pointer"/>
+                    }
                 </Box>
             </Box>
 

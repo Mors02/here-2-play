@@ -22,7 +22,9 @@ const ErrorMap = {
     'ERR_UNAUTHORIZED': 'Non hai i permessi per compiere quest\'azione.',
     'ERR_OVERLAP_DISCOUNTS': 'I periodi di sconto non possono incrociarsi con quelli già attivi!',
     'ERR_NOT_LOGGED_IN': 'Non sei loggato!',
-    'ERR_INSECURE_PASSWORD': 'La password deve: non essere comune, non essere numerica, almeno 8 caratteri, diversa dallo username'
+    'ERR_INSECURE_PASSWORD': 'La password deve: non essere comune, non essere numerica, almeno 8 caratteri, diversa dallo username',
+    'ERR_EMPTY_EMAIL_OR_USERNAME': 'La mail o lo username non possono essere vuoti',
+    'ERR_INVALID_EMAIL': 'La mail non è valida'
 }
 const blockedUrls = []
 

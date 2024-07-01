@@ -9,29 +9,28 @@ from django.contrib.auth.backends import ModelBackend
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Role, UserProfile
 from rest_framework import viewsets
-from rest_framework.decorators import action
 from .models import User
+import re
+
+emailRegex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
 # Classe per la registrazione degli utenti
 class UserRegister(APIView):
     permission_classes = (permissions.AllowAny,)
-    emailRegex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
     def post(self, request):
         clean_data = request.data 
         role = Role.objects.get(slug=clean_data["role_slug"])
         if (request.data["password"] != request.data["confirmPassword"]):
             return Response("ERR_INVALID_PASSWORD", status = status.HTTP_400_BAD_REQUEST)
-        #if (re.fullmatch(self.emailRegex, request.data["email"])):
-        #    return Response(status = status.HTTP_400_BAD_REQUEST)
+        if (re.fullmatch(emailRegex, request.data["email"]) == None):
+            return Response("ERR_INVALID_EMAIL", status = status.HTTP_400_BAD_REQUEST)
         
         try:
             validation = validate_password(request.data["password"])
         except:
             return Response("ERR_INSECURE_PASSWORD", status = status.HTTP_400_BAD_REQUEST)
-        
-            
-
+    
         clean_data = {"password": request.data["password"], "email": request.data["email"], "username": request.data["username"]}
         
         serializer = UserRegisterSerializer(data = clean_data)
@@ -52,13 +51,10 @@ class ChangeRole(APIView):
         user = request.user
         devRole = Role.objects.get(slug="developer")
         profile = UserProfile.objects.get(user_id=request.user.pk)
-        #serializer = UserSerializer(profile) 
         profile.role_id = devRole.pk
         profile.save()
-        print(profile)
-        #print(serializer.data)
+        print(profile)        
         return Response(status=status.HTTP_200_OK)
-        #return Response("ERR_PROFILE_UNKNOWN", status=status.HTTP_400_BAD_REQUEST)
 
 # Classe per il login degli utenti
 class UserLogin(APIView):
@@ -132,12 +128,20 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         data = request.data
-        print(request.data)
-        serializer = UserEditSerializer(data={"username": data["username"],
-                                              "first_name": data["first_name"],
-                                              "last_name": data["last_name"],
-                                              "email": data["email"],
-                                              "profile_picture": data["profile_picture"]},
+        data = {"username": data["username"],                                     
+                "first_name": data["first_name"],
+                "last_name": data["last_name"],
+                "email": data["email"]}
+        if ('profile_picture' in request.data):
+            data = {**data, "profile_picture": request.data["profile_picture"]}
+
+        if (re.fullmatch(emailRegex, data["email"]) == None):
+            return Response("ERR_INVALID_EMAIL", status = status.HTTP_400_BAD_REQUEST)
+
+        #check if mail or username is empty
+        if ('email' not in data or 'username' not in data or data['username'] == '' or data['email'] == ''):
+            return Response("ERR_EMPTY_EMAIL_OR_USERNAME", status=status.HTTP_400_BAD_REQUEST)
+        serializer = UserEditSerializer(data=data,
                                         context={"user": request.user, 
                                                  "message": "", 
                                                  "changedPassword": False})

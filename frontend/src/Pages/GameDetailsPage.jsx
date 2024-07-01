@@ -242,13 +242,15 @@ function GameDetailsPage() {
                     gameReported={game}
                 />
             </Box>
+
             {
-                bundles.length > 0 &&
-                <Box>
+                bundles?.length > 0 &&
+                <Stack spacing={2}>
                     <Typography variant="h5">Il gioco compare in:</Typography>
                     <BundleList bundles={bundles} handleClick={handleBundleClick} />
-                </Box>
+                </Stack>
             }
+
             {   
                 (game.publisher?.id != user?.id) && owned && (
                     <ReviewSection game={game.id}/>

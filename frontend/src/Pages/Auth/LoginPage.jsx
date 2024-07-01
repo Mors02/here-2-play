@@ -1,7 +1,7 @@
 import React, { Component, useEffect, useState } from "react";
 import axios from "axios";
 import { useForm } from 'react-hook-form';
-import { Stack, Grid, TextField, Button } from "@mui/material";
+import { Stack, Grid, TextField, Button, Box, Divider, Typography } from "@mui/material";
 import CenterBox from "../../Component/CenterBox";
 import { ErrorMap } from "../../config/enums";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.min.css';
 import { ToastContainer, toast } from 'react-toastify';
 import ErrorLabel from "../../Component/ErrorLabel";
 import { axiosConfig } from "../../config/axiosConfig";
+import WhiteDivider from "../../Component/WhiteDivider";
 
 function LoginPage() {
     const [error, setError] = useState("");
@@ -35,7 +36,6 @@ function LoginPage() {
         e.preventDefault();
         const data = getValues();
         axios.post(`${process.env.REACT_APP_BASE_URL}/api/login/`, data).then(response => {
-                //console.log(response)
                 setError()
                 const data = response.data
                 console.log(data, data.access)
@@ -56,34 +56,32 @@ function LoginPage() {
     }
 
     return (
-        <Grid container
-            spacing={0}
-            direction="column"
-            alignItems="center"
-            justifyContent="center"
-            className="flex items-center min-h-screen bg-slate-300 justify-center">
+        <Box className="flex justify-center">
             <CenterBox>
-                <Stack direction="column">
-                    <h2>Login</h2>
-                    <form onSubmit={e => onSubmit(e)}>
-                        <p>
-                            <TextField label="Email" type="email" defaultValue="" {...register("email")} variant="standard" />
-                        </p>
-                        <p>
-                            <TextField label="Password" type="password" defaultValue="" {...register("password")} variant="standard" />
-                        </p>
-                        <p>
-                            <Button type="submit" variant="contained" color="info">Entra</Button>
-                        </p>
-                    </form>
-                    <ErrorLabel text={error} />
-                    <p>
-                        <span>Non sei ancora registrato?</span><a href="/register"> Registrati.</a>
-                    </p>
+                <Stack spacing={2}>
+                    <Box className="px-8 py-4 bg-slate-500">
+                        <Typography variant="h5" className="text-center font-semibold text-white">Login</Typography>
+                    </Box>
+
+                    <Box className="px-8 py-4">
+                        <form onSubmit={e => onSubmit(e)}>
+                            <Stack spacing={2}>
+                                <TextField className="bg-gray-200 rounded" label="Email" type="email" defaultValue="" {...register("email")} variant="outlined" />
+                                <TextField className="bg-gray-200 rounded" label="Password" type="password" defaultValue="" {...register("password")} variant="outlined" />
+                                <Button type="submit" variant="contained" color="info">Entra</Button>
+                            </Stack>
+                        </form>
+
+                        <ErrorLabel text={error} />
+
+                        <Typography className="flex gap-1 text-white !mt-4">
+                            Non sei ancora registrato?
+                            <a className="hover:text-black transition ease-linear" href="/register"> Registrati</a>
+                        </Typography>
+                    </Box>
                 </Stack>
             </CenterBox>
-             {/* Container in cui verranno renderizzati i toast */}
-        </Grid>
+        </Box>
     ); 
 }
 

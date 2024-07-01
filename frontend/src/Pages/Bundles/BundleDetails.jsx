@@ -76,39 +76,17 @@ export default function BundleDetails() {
                             <b>Prezzo: </b>
                             <Price />
                         </Typography>
-                        {/* <Typography><b>Categoria: </b>{game.category? game.category.name : "(Categoria Eliminata)"}</Typography>
-                        <Typography><b>Data di Pubblicazione: </b>{moment(game.upload_date).format('DD/MM/YYYY')}</Typography> */}
                         <Typography>
                             <b>Sviluppatore: </b>
                             <a className="text-blue-500" href={"/user/" + bundle.publisher?.id}>{bundle.publisher?.username}</a>
                         </Typography>
-                        {/* <Box className="flex gap-2">
-                            <b>Tags: </b>
-                            {
-                                game?.tags.map(tag => 
-                                    <Typography onClick={() => handleTagClick(tag.tag.id)} className="bg-orange-400 hover:bg-opacity-60 transition ease-linear text-white px-2 rounded cursor-pointer">{tag.tag.name}</Typography>
-                                )
-                            }
-                        </Box> */}
                     </Stack>
                 </Box>
             </Box>
 
-            <Box className="grid grid-cols-2 gap-4 !mb-10">
-                <Button variant="contained" className="float-right" onClick={() => addBundle()} color="info">Aggiungi al carrello</Button>
-                {/* <Button variant="contained" color="error" onClick={() => openModal()}><MdReport className="mr-2" />Segnala</Button>
-                <ReportGameModal 
-                    closeModal={closeModal} 
-                    modalIsOpen={modalIsOpen} 
-                    gameReported={game}
-                /> */}
+            <Box className="gap-4 !mb-10">
+                <Button variant="contained" className="w-full" onClick={() => addBundle()} color="info">Aggiungi al carrello</Button>
             </Box>
-
-            {/* {   
-                game.publisher?.id != user.id && (
-                    <ReviewSection game={game.id}/>
-                ) 
-            } */}
         </Stack>
     )
 }
