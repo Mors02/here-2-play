@@ -46,10 +46,8 @@ class UserLoginSerializer(serializers.Serializer):
             return user
 
 class UserEditSerializer(serializers.Serializer):    
-    pk = serializers.IntegerField()
     username = serializers.CharField()
     email = serializers.EmailField()
-    password = serializers.CharField()
     first_name = serializers.CharField(allow_null=True, allow_blank=True)
     last_name = serializers.CharField(allow_null=True, allow_blank=True)
     profile_picture = serializers.ImageField()

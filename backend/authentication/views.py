@@ -133,10 +133,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         data = request.data
         print(request.data)
-        serializer = UserEditSerializer(data={"username": data["username"], 
-                                              "password": request.user.password, 
-                                              "pk": request.user.pk,
-                                              "username": data["username"],
+        serializer = UserEditSerializer(data={"username": data["username"],
                                               "first_name": data["first_name"],
                                               "last_name": data["last_name"],
                                               "email": data["email"],
