@@ -11,6 +11,7 @@ import { ErrorMap } from "../../config/enums";
 import ErrorLabel from "../../Component/ErrorLabel";
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
+import { IoArrowBackCircle } from "react-icons/io5";
 
 function UserEditPage() {
     const {user, role, loading, loggedIn, pfp} = useCurrentUser();
@@ -69,7 +70,9 @@ function UserEditPage() {
 
     if (!loading)
     return (
-        <Box className="flex justify-center">
+        <Box className="flex justify-center relative">
+            <IoArrowBackCircle color="#63748B" size={50} className="absolute top-4 left-4 cursor-pointer" onClick={() => navigate('/user/' + user.id)} />
+
             <CenterBox>
                 <UserForm title={"Modifica Dati"} onSubmit={onSubmit} isEdit={true} user={user} pfp={pfp}/>
                 <ErrorLabel text={err} />
