@@ -29,9 +29,7 @@ class UserRegister(APIView):
             validation = validate_password(request.data["password"])
         except:
             return Response("ERR_INSECURE_PASSWORD", status = status.HTTP_400_BAD_REQUEST)
-        
-            
-
+    
         clean_data = {"password": request.data["password"], "email": request.data["email"], "username": request.data["username"]}
         
         serializer = UserRegisterSerializer(data = clean_data)
@@ -52,13 +50,10 @@ class ChangeRole(APIView):
         user = request.user
         devRole = Role.objects.get(slug="developer")
         profile = UserProfile.objects.get(user_id=request.user.pk)
-        #serializer = UserSerializer(profile) 
         profile.role_id = devRole.pk
         profile.save()
-        print(profile)
-        #print(serializer.data)
+        print(profile)        
         return Response(status=status.HTTP_200_OK)
-        #return Response("ERR_PROFILE_UNKNOWN", status=status.HTTP_400_BAD_REQUEST)
 
 # Classe per il login degli utenti
 class UserLogin(APIView):
@@ -132,15 +127,17 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         data = request.data
-        print(request.data)
-        serializer = UserEditSerializer(data={"username": data["username"], 
-                                              "password": request.user.password, 
-                                              "pk": request.user.pk,
-                                              "username": data["username"],
-                                              "first_name": data["first_name"],
-                                              "last_name": data["last_name"],
-                                              "email": data["email"],
-                                              "profile_picture": data["profile_picture"]},
+        data = {"username": data["username"],                                     
+                "first_name": data["first_name"],
+                "last_name": data["last_name"],
+                "email": data["email"]}
+        if ('profile_picture' in request.data):
+            data = {**data, "profile_picture": request.data["profile_picture"]}
+
+        #check if mail or username is empty
+        if ('email' not in data or 'username' not in data or data['username'] == '' or data['email'] == ''):
+            return Response("ERR_EMPTY_EMAIL_OR_USERNAME", status=status.HTTP_400_BAD_REQUEST)
+        serializer = UserEditSerializer(data=data,
                                         context={"user": request.user, 
                                                  "message": "", 
                                                  "changedPassword": False})

@@ -48,23 +48,26 @@ function UserEditPage() {
       };
     
     function onSubmit(e, values) {
-        axiosConfig.put('/api/user/' + user.id +"/", values,  {
+        values = {...values,
+                  'username': values['username']? values['username'] : '',
+                  'first_name': values['first_name']? values['first_name'] : '',
+                  'last_name': values['last_name']? values['last_name'] : '',
+                  'email': values['email']? values['email'] : ''}
+        axiosConfig.put('/api/user/' + user.id +"/", {...values},  {
             headers: {
             'Content-Type': 'multipart/form-data'
             }
         })
         .then(res => {
             setError()
-            if (res.data && res.data.force_relogin)
-                toast.success("Cambio password effettuato. Dovrai rifare il login.", {onClose: () => {localStorage.clear(); navigate("/login")}})
-            else {
-                toast.success("Dati modificati.")
-            }
-                
+            if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")
+                throw new Error(res["response"]["data"])
+
+            if (res.data )            
+                toast.success("Dati modificati.")                            
         }).catch((err) => {
-            console.log("ERR", err, ErrorMap[err]);
-            setError(ErrorMap[err["response"]["data"]]);
-            toast.error(ErrorMap[err["response"]["data"]]);
+            setError(ErrorMap[err.message]);
+            toast.error(ErrorMap[err.message]);
         })
     }
 
