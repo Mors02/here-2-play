@@ -20,6 +20,7 @@ function Homepage() {
     const [fromFriends, setFromFriends] = useState([])
     const [fromMostSimilar, setFromMostSimilar] = useState([])
     const [similarFriend, setSimilarFriend] = useState([])
+    const [showRecommendations, setShowRecommendations] = useState(true)
     const { state } = useLocation()
     const navigate = useNavigate()
 
@@ -134,16 +135,22 @@ function Homepage() {
     if (!loading)
     return (
         <Box className='p-10'>
-            <Search tagId={ state?.tagId } updateData={updateData} />
+            <Search tagId={ state?.tagId } updateData={updateData} setShowRecommendations={setShowRecommendations} />
 
             <Box>
-                <RecommendedGames games={bestRated} title={"Ultime Uscite Migliori"} />
-                <RecommendedGames games={mostSold} title={"Giochi di Tendenza"} />
-                <RecommendedGames games={fromFriends} title={"Più Acquistati dagli Amici"} />
-                { similarFriend && <RecommendedGames games={fromMostSimilar} title={`Come a "${similarFriend}", Può Interessarti`} /> }
                 {
-                    Object.keys(bestByCategory).map(category => 
-                        <RecommendedGames games={bestByCategory[category]} title={"Se Ti Piace " + category + ", Non Perderti"} />
+                    showRecommendations && (
+                        <Box>
+                            <RecommendedGames games={bestRated} title={"Ultime Uscite Migliori"} />
+                            <RecommendedGames games={mostSold} title={"Giochi di Tendenza"} />
+                            <RecommendedGames games={fromFriends} title={"Più Acquistati dagli Amici"} />
+                            { similarFriend && <RecommendedGames games={fromMostSimilar} title={`Come a "${similarFriend}", Può Interessarti`} /> }
+                            {
+                                Object.keys(bestByCategory).map(category => 
+                                    <RecommendedGames games={bestByCategory[category]} title={"Se Ti Piace " + category + ", Non Perderti"} />
+                                )
+                            }
+                        </Box>
                     )
                 }
                 <Box>

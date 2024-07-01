@@ -18,7 +18,7 @@ const orders = [
     { slug: '-upload_date', name: 'Giochi Recenti' },
 ]
 
-function Search({ tagId='', updateData }) {
+function Search({ tagId='', updateData, setShowRecommendations }) {
     const [loading, setLoading] = useState()
     const [rangePrices, setRangePrices] = useState([0, maxPrice])
     const [allCategories, setAllCategories] = useState([])
@@ -103,6 +103,7 @@ function Search({ tagId='', updateData }) {
         let params = {}
 
         if (!reset) {
+            setShowRecommendations(false)
             if (getValues('title')) params['title'] = getValues('title')
             if (selectedCategory) params['category'] = selectedCategory
             if (selectedTag) params['tag'] = selectedTag
@@ -111,6 +112,8 @@ function Search({ tagId='', updateData }) {
                 params['end'] = rangePrices[1]
             }
             if (selectedOrder) params['order'] = selectedOrder
+        } else {
+            setShowRecommendations(true)
         }
         
         axiosConfig.get('/api/games/', { params })
