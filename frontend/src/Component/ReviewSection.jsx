@@ -1,4 +1,4 @@
-import { Typography, Box, FormControl, FormLabel, TextareaAutosize, Grid, Stack, Rating, Button, MenuItem, Select, Chip } from "@mui/material";
+import { Typography, Box, FormControl, FormLabel, TextareaAutosize, Grid, Stack, Rating, Button, MenuItem, Select, Chip, Divider } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import StarIcon from '@mui/icons-material/Star';
 import { toast } from "react-toastify";
@@ -108,35 +108,31 @@ export default function ReviewSection({game}) {
           )
     }
 
+    if (!loadingPage)
     return (
         <Box className="bg-slate-100 w-full p-6 rounded">
-            <Typography variant="h4">Lascia una recensione</Typography>
-            {!loadingPage && <FormControl className="w-full">
-                <Box className="flex gap-4 mb-6" >
-                    <Box className="grow">
+            <Divider><b>Lascia una Recensione</b></Divider>
+            <FormControl className="w-full !mt-4">
+                <Stack spacing={2}>
+                    <Stack className="flex place-items-start !-mt-2">
+                        <Rating value={rating} 
+                            onChange={(event, newValue) => setRating(newValue)}
+                            onChangeActive={(event, newHover) => setHover(newHover)} 
+                            defaultValue={2.5} 
+                            precision={0.5}
+                            icon={<StarIcon style={{minHeight:"50px", minWidth:"50px"}} fontSize="large"/>}
+                            emptyIcon={<StarIcon style={{ minHeight:"50px", minWidth:"50px" }} fontSize="large" 
+                            size={"large"}                                
+                            />}
+                        />
+                    </Stack>
+
+                    <TextareaAutosize className="w-full" value={body} minRows={3} maxRows={5} onChange={(event) => setBody(event.target.value)}/>
+
+                    {
+                        !review && 
                         <Stack>
-                            <FormLabel><Typography variant="h5">Cosa ne pensi del gioco?</Typography></FormLabel>
-                            <TextareaAutosize value={body} minRows={3} maxRows={5} onChange={(event) => setBody(event.target.value)}/>
-                        </Stack>
-                    </Box>
-                    <Box className="mx-10">
-                        <Stack className="flex place-items-center">
-                            <FormLabel><Typography variant="h5">Lascia un voto</Typography></FormLabel>
-                            <Rating value={rating} 
-                                onChange={(event, newValue) => setRating(newValue)}
-                                onChangeActive={(event, newHover) => setHover(newHover)} 
-                                defaultValue={2.5} 
-                                precision={0.5}
-                                icon={<StarIcon style={{minHeight:"50px", minWidth:"50px"}} fontSize="large"/>}
-                                emptyIcon={<StarIcon style={{ minHeight:"50px", minWidth:"50px" }} fontSize="large" 
-                                size={"large"}                                
-                                />}
-                            />
-                        </Stack>
-                    </Box>
-                    {!review && <Box className="w-2/5">
-                        <Stack>
-                            <FormLabel><Typography variant="h5">Consiglia i tags</Typography></FormLabel>
+                            <FormLabel><Typography>Consiglia i tags (Opzionale)</Typography></FormLabel>
                             <Select
                                 value={selectedTags}
                                 onChange={handleChange}
@@ -148,12 +144,13 @@ export default function ReviewSection({game}) {
                                 }
                             </Select>
                         </Stack>
-                    </Box>}
-                </Box>
-                <Box className="text-center">
+                    }
+                </Stack>
+
+                <Box className="text-center mt-6">
                     <Button className="w-1/3" variant="contained" onClick={() => sendReview()}>Invia</Button>
                 </Box>
-            </FormControl>}
+            </FormControl>
         </Box>
     )
 }

@@ -1,7 +1,7 @@
 import React, { Component, useEffect, useState } from "react";
 //import axios from "axios";
 import axios from "axios";
-import { Stack, Grid, Container, Button } from "@mui/material";
+import { Stack, Grid, Container, Button, Box, Typography } from "@mui/material";
 import CenterBox from "../../Component/CenterBox";
 import { ErrorMap } from "../../config/enums";
 import { useNavigate } from "react-router-dom";
@@ -61,45 +61,59 @@ function RegisterPage() {
         }  
     }
 
+    function Roles() {
+        return (
+            <Stack spacing={4} className="p-8">
+                <Button className="w-fit" variant="contained" onClick={() => setShowRoles(false)} startIcon={<FaAngleLeft />}>Indietro</Button>
+
+                <Box className="flex gap-8">
+                    <RoleButton selected={selectedButton} 
+                        icon={<IoGameController className={iconClass}/>} 
+                        onClick={() => clickRoleButton('player')} 
+                        name='Giocatore'
+                        slug="player"
+                        description={"Compra e gioca tutti i giochi che vuoi. Più semplice di così!"}
+                    />
+                    <RoleButton selected={selectedButton} 
+                        icon={<FaComputer className={iconClass}/>} 
+                        onClick={() => clickRoleButton('developer')} 
+                        name="Developer" 
+                        slug="developer"
+                        description={"Carica i tuoi giochi sullo store per milioni di giocatori pronti a giocarlo!"}
+                    />
+                </Box>
+
+                <Box className="flex justify-center"><Button disabled={!selectedButton} onClick={sendData} variant="contained">Completa Registrazione</Button></Box>
+            </Stack>
+        )
+    }
+
+    function RegistrationForm() {
+        return (
+            <Box>
+                <UserForm title="Registrazione" user={data} onSubmit={onSubmit} isEdit={false} />
+                <ErrorLabel text={error}/>
+
+                <Box className="flex justify-center">
+                    <Typography className="flex gap-1 text-white !mb-4">
+                        Sei già registrato?
+                        <a className="hover:text-black transition ease-linear" href="/login">Entra</a>
+                    </Typography>
+                </Box>
+            </Box>
+        )
+    }
+
     return (
-        <Grid container
-            spacing={0}
-            direction="column"
-            alignItems="center"
-            justifyContent="center"
-            className="flex items-center min-h-screen bg-slate-300 justify-center">
+        <Box className="flex justify-center">
             <CenterBox>
-                {showRoles?
-                <Container>
-                    <Button variant="contained" onClick={() => setShowRoles(false)}><FaAngleLeft />Indietro</Button>
-                    <Stack direction={"row"}>
-                        <RoleButton selected={selectedButton} 
-                            icon={<IoGameController className={iconClass}/>} 
-                            onClick={() => clickRoleButton('player')} 
-                            name='Giocatore'
-                            slug="player"
-                            description={"Compra e gioca tutti i giochi che vuoi. Più semplice di così!"} />
-                        <RoleButton selected={selectedButton} 
-                            icon={<FaComputer className={iconClass}/>} 
-                            onClick={() => clickRoleButton('developer')} 
-                            name="Developer" 
-                            slug="developer"
-                            description={"Carica i tuoi giochi sullo store per milioni di giocatori pronti a giocarlo."} />
-                    </Stack>
-                    {selectedButton? <Button onClick={sendData} className="mt-12" variant="contained">Completa registrazione.</Button> : <></>}
-                </Container>
-                :
-                <>
-                    <UserForm title="Registrazione" user={data} onSubmit={onSubmit} isEdit={false} />
-                    <ErrorLabel text={error}/>
-                    <p>
-                        <span>Sei già registrato?</span><a href="/login"> Entra.</a>
-                    </p>
-                </>
+                {
+                    showRoles
+                    ? <Roles />
+                    : <RegistrationForm />
                 }
             </CenterBox>
-             {/* Container in cui verranno renderizzati i toast */}
-        </Grid>
+        </Box>
     ); 
 }
 

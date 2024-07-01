@@ -1,16 +1,14 @@
 import React from "react";
-import { Button, Container, Typography } from "@mui/material";
+import { Box, Button, Container, Typography } from "@mui/material";
+import Tooltip from '@mui/material/Tooltip';
 
 export default function RoleButton({icon, selected, onClick, slug, name, description}) {
-    const normalClass = "bg-slate-50 border-solid border-black rounded-md shadow-xl min-h-64 w-64 m-3 px-3";
-    const selectedClass = "bg-slate-200 border-4 border-solid border-black rounded-md shadow-2xl min-h-64 w-64 m-3 px-3"
     return (
-        <Container>
-            <Button onClick={onClick} className={selected == slug? selectedClass : normalClass}>
-                {icon}               
+        <Tooltip title={description} placement="top">
+            <Box onClick={onClick} className={"p-4 flex flex-col gap-2 bg-gray-100 rounded cursor-pointer " + (selected == slug ? 'outline outline-4 outline-slate-600 shadow-2xl' : '')}>
+                {icon}
                 <Typography variant="h3">{name}</Typography>
-                <Typography>{description}</Typography>
-            </Button>
-        </Container>
+            </Box>
+        </Tooltip>
     );
 }
