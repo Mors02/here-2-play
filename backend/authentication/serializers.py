@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model, authenticate
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth import get_user_model, authenticate, logout
+from django.contrib.auth.password_validation import validate_password
 from .models import UserProfile, Role
 from games.models import VisitedGame
 from django.contrib.auth.models import User
@@ -46,15 +46,13 @@ class UserLoginSerializer(serializers.Serializer):
             return user
 
 class UserEditSerializer(serializers.Serializer):    
-    pk = serializers.IntegerField()
-    username = serializers.CharField()
     email = serializers.EmailField()
-    password = serializers.CharField()
     first_name = serializers.CharField(allow_null=True, allow_blank=True)
     last_name = serializers.CharField(allow_null=True, allow_blank=True)
-    profile_picture = serializers.ImageField()
+    profile_picture = serializers.ImageField(allow_null=True, required=False)
 
-    def edit(self, user, data):     
+    def edit(self, user, data):   
+
         #check if new email is already used
         try:
             alreadyRegistered = User.objects.filter(email=data["email"]).get()
@@ -74,18 +72,21 @@ class UserEditSerializer(serializers.Serializer):
         if (alreadyRegistered.pk != user.pk):
             self.context["message"] = "ERR_ALREADY_REGISTERED"
         
-
-        if ("oldPassword" in data and data["oldPassword"] is not None):
+        
+        if ("oldPassword" in data and data["oldPassword"] is not ""):
             #check if oldPassword is correct
             correctUser = authenticate(username = user.email, password = data["oldPassword"])
-                        
+                
             #if is None then error
             if (correctUser is None):
                 self.context["message"] = "ERR_WRONG_CREDENTIALS"
-            
+              
             #check if new password is secure
-            if (~check_password(data["newPassword"])):
+            try:
+                validate_password(data["newPassword"])
+            except:
                 self.context["message"] = "ERR_INSECURE_PASSWORD"
+            
             #check if new password is not equal to confirm new password
             if (data["newPassword"] != data["confirmNewPassword"]):
                 self.context["message"] = "ERR_DIFFERENT_PASSWORDS"
@@ -98,11 +99,10 @@ class UserEditSerializer(serializers.Serializer):
             editedUser.last_name = data["last_name"]
             if ("newPassword" in data):
                 self.context["changedPassword"] = True
-                editedUser.set_password(data["newPassword"])
+                editedUser.set_password(data["newPassword"])        
             editedUser.save()
 
             #change pfp
-            print(data["profile_picture"])
             if ("profile_picture" in data):
                 profile = UserProfile.objects.get(user_id=user.pk)
                 profile.profile_picture = data["profile_picture"]
@@ -125,7 +125,7 @@ class UserInfoWithGamesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserModel
-        fields = ["username", "id", "games", "role", "date_joined", "published_games", "profile_picture", "bundles", "recently_visited_games", "is_superuser"]
+        fields = ["username", "email", "id", "games", "role", "date_joined", "published_games", "profile_picture", "bundles", "recently_visited_games", "is_superuser"]
 
     def get_profile_picture(self, obj):
         return obj.user_profile_user.profile_picture.url
