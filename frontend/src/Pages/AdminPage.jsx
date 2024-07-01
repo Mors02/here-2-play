@@ -1,4 +1,4 @@
-import { Typography, Box, Divider, Stack, FormGroup, FormControlLabel, Checkbox, Avatar } from "@mui/material";
+import { Typography, Box, Divider, Stack, FormGroup, FormControlLabel, Checkbox, Avatar, Button } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { BarChart } from "@mui/x-charts";
 import React, {useState, useEffect} from "react";
@@ -9,6 +9,7 @@ import { axiosConfig } from "../config/axiosConfig";
 import { useNavigate } from "react-router";
 import ManageGameReportModal from "../Modals/ManageGameReportModal";
 import ManageUserReportModal from "../Modals/ManageUserReportModal";
+import { FiDatabase } from "react-icons/fi";
 
 
 export default function AdminPage() {
@@ -170,6 +171,9 @@ export default function AdminPage() {
     if (!loadingPage)
     return (
         <Stack spacing={4} className="p-10">
+            <Box className="flex justify-end !-mt-5 !-mb-6">
+                <Button variant="contained" startIcon={<FiDatabase />} className="text-nowrap inline" color={"info"} onClick={() => window.location.replace(`${process.env.REACT_APP_BASE_URL}/admin`)}>Passa alla gestione DB</Button>
+            </Box>
             <Box>
                 <Divider className="relative"><Typography variant="h5">Sezione Statistiche</Typography></Divider>
                 <Box className="grid grid-cols-3">        
