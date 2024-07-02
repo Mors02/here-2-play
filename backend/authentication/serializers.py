@@ -72,11 +72,11 @@ class UserEditSerializer(serializers.Serializer):
         #and its not our user
         if (alreadyRegistered.pk != user.pk):
             self.context["message"] = "ERR_ALREADY_REGISTERED"
-            
+        
         if ("oldPassword" in data and data["oldPassword"] != ""):
             #check if oldPassword is correct
             correctUser = authenticate(username = user.email, password = data["oldPassword"])
-                
+
             #if is None then error
             if (correctUser is None):
                 self.context["message"] = "ERR_WRONG_CREDENTIALS"
