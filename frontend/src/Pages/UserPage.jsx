@@ -11,7 +11,7 @@ import { MdReport, MdRotateLeft } from "react-icons/md";
 import ReportUserModal from "../Modals/ReportUserModal";
 import YourGames from "../Component/YourGames"
 import GameList from "../Component/GameList";
-import BundleOfUSer from "./Bundles/BundleOfUser";
+import BundleOfUser from "./Bundles/BundleOfUser";
 import DeveloperStatsPage from "./DeveloperStatsPage";
 import { useAuth } from "../config/AuthContext";
 import { toast } from "react-toastify";
@@ -142,7 +142,7 @@ export default function UserPage() {
                         <YourGames user={retrievedUser} />
                     </TabPanel>
                     <TabPanel value={2}>
-                        <BundleOfUSer user={retrievedUser}/>
+                        <BundleOfUser user={retrievedUser} currentUser={user} />
                     </TabPanel>
                     { 
                         retrievedUser?.id == user?.id && role?.slug == "developer" && 
