@@ -24,7 +24,6 @@ class UserEditTestCase(TestCase):
 
     def test_edit_user(self):
         user = User.objects.get(id=1)
-        
         #controlliamo con valori corretti
         base_data={"username": "Nuovo", "first_name": "Test", "last_name": "Prova", "email": "correct@email.it"}
         context={"user": user, "message": "", "changedPassword": False}
