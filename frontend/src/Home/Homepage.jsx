@@ -30,7 +30,9 @@ function Homepage() {
         recommendedFromFriends()
         recommendationsFromMostSimilarGames()
         bestGamesByCategory()
-        allGames()
+
+        if (!state?.tagId)
+            allGames()
     }, [])
 
     function updateData(games) {

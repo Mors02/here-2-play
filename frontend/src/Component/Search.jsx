@@ -83,8 +83,10 @@ function Search({ tagId='', updateData, setShowRecommendations }) {
         setSelectedTag('')
         setSelectedOrder('')
         setValue('title', '')
+        tagId = ''
+        let reset = true
 
-        executeSearch({ reset: true})
+        executeSearch(reset)
     }
 
     function SearchSection() {
@@ -93,12 +95,12 @@ function Search({ tagId='', updateData, setShowRecommendations }) {
                 <TextField size='small' className='grow' {...register('title')} label="Ricerca Giochi" />
                 <Button variant='contained' onClick={() => reset()} color='error'>Reset</Button>
                 <Button variant='contained' onClick={() => setOpen(!open)}>Filtri</Button>
-                <Button variant='contained' onClick={executeSearch}><IoSearchOutline size={25} /></Button>
+                <Button variant='contained' onClick={() => executeSearch()}><IoSearchOutline size={25} /></Button>
             </Box>
         )
     }
 
-    function executeSearch({ reset=false }) {
+    function executeSearch(reset = false) {
         setLoading(true)
         let params = {}
 
