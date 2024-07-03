@@ -108,7 +108,6 @@ class UserEditTestCase(TestCase):
         #controlliamo first_name e last_name con tipo errato
         data_invalid_name={**base_data, "first_name": 44, "last_name": 60}
         context={"user": user, "message": "", "changedPassword": False}
-        print(data_invalid_name)
         serializer = UserEditSerializer(data=data_invalid_name,
                                         context=context)
         if (serializer.is_valid(raise_exception=True)):
