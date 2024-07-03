@@ -1,6 +1,6 @@
 import base64
 from django.test import TestCase
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from authentication.models import UserProfile, Role
 from authentication.serializers import UserEditSerializer, UserInfoSerializer
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -11,15 +11,19 @@ class UserEditTestCase(TestCase):
     def setUp(self):
         role = Role.objects.create(name="Developer", slug='developer')
         #user che verrà modificato
-        user = User.objects.create(username="Test", email="test@email.it", password="test123.")
+        user = User.objects.create(username="Test", email="test@email.it")
+        user.set_password("test123.")
+        user.save()
         UserProfile.objects.create(user=user, role_id=1, profile_picture='profile_pictures/default.jpeg')
 
         #user secondario per i controlli
         user = User.objects.create(username="Modificato", email="modificato@email.it", password="test123.")
+        user.set_password("test123.")
+        user.save()
         UserProfile.objects.create(user=user, role_id=1, profile_picture='profile_pictures/default.jpeg')
 
     def test_edit_user(self):
-        user = User.objects.get(id=1)        
+        user = User.objects.get(id=1)
         
         #controlliamo con valori corretti
         base_data={"username": "Nuovo", "first_name": "Test", "last_name": "Prova", "email": "correct@email.it"}
@@ -28,7 +32,22 @@ class UserEditTestCase(TestCase):
                                         context=context)
         if (serializer.is_valid(raise_exception=True)):
             serializer.edit(user, base_data)
-            self.assertEqual(serializer.context["message"], "")        
+            self.assertEqual(serializer.context["message"], "")
+        #riprendiamo lo user dopo le modifiche
+        user = User.objects.get(id=1)
+
+        #controlliamo con la foto profilo
+        content = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAUA" + "AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO" + "9TXL0Y4OHwAAAABJRU5ErkJggg==")
+        image = SimpleUploadedFile("file.jpeg", content, content_type="image/jpeg")
+        data_with_pfp={**base_data, "profile_picture": image}
+        context={"user": user, "message": "", "changedPassword": False}
+        serializer = UserEditSerializer(data=data_with_pfp,
+                                        context=context)
+        if (serializer.is_valid(raise_exception=True)):
+            serializer.edit(user, data_with_pfp)
+            self.assertEqual(serializer.context["message"], "") 
+        #riprendiamo lo user dopo le modifiche
+        user = User.objects.get(id=1)  
 
         #controlliamo con email già registrata
         data_existing_email={**base_data, "email": "modificato@email.it"}
@@ -104,6 +123,19 @@ class UserEditTestCase(TestCase):
         if (serializer.is_valid(raise_exception=True)):
             serializer.edit(user, data_bad_old_password)
             self.assertEqual(serializer.context["message"], "ERR_WRONG_CREDENTIALS")
+
+        #controlliamo cambio password corretto
+        
+        data_good_new_password={**base_data, "oldPassword": "test123.", "newPassword": "nuovo123.", "confirmNewPassword": "nuovo123."}
+        context={"user": user, "message": "", "changedPassword": False}
+        serializer = UserEditSerializer(data=data_good_new_password,
+                                        context=context)
+        if (serializer.is_valid(raise_exception=True)):
+            serializer.edit(user, data_good_new_password)
+            self.assertEqual(serializer.context["message"], "")
+            self.assertEqual(serializer.context["changedPassword"], True)
+        #riprendiamo lo user dopo le modifiche
+        user = User.objects.get(id=1) 
 
         #controlliamo first_name e last_name con tipo errato
         data_invalid_name={**base_data, "first_name": 44, "last_name": 60}
