@@ -105,7 +105,7 @@ class UserEditTestCase(TestCase):
             serializer.edit(user, data_blank_new_password)
             self.assertEqual(serializer.context["message"], "ERR_INSECURE_PASSWORD")
 
-        #controlliamo cambio password con nuova password vuota
+        #controlliamo cambio password con nuova password errata
         data_different_new_password={**base_data, "oldPassword": "test123.", "newPassword": "nuovo123.", "confirmNewPassword": "nuovo312."}
         context={"user": user, "message": "", "changedPassword": False}
         serializer = UserEditSerializer(data=data_different_new_password,
@@ -124,7 +124,6 @@ class UserEditTestCase(TestCase):
             self.assertEqual(serializer.context["message"], "ERR_WRONG_CREDENTIALS")
 
         #controlliamo cambio password corretto
-        
         data_good_new_password={**base_data, "oldPassword": "test123.", "newPassword": "nuovo123.", "confirmNewPassword": "nuovo123."}
         context={"user": user, "message": "", "changedPassword": False}
         serializer = UserEditSerializer(data=data_good_new_password,
