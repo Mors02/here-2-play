@@ -52,7 +52,8 @@ class UserEditSerializer(serializers.Serializer):
     profile_picture = serializers.ImageField(allow_null=True, required=False)
 
     def edit(self, user, data):   
-
+        if (type(data["email"]) != str or type(data["username"]) != str or type(data["first_name"]) != str or type(data["last_name"]) != str):
+            self.context["message"] = "ERR_INVALID_TYPE"
         #check if new email is already used
         try:
             alreadyRegistered = User.objects.filter(email=data["email"]).get()
@@ -72,24 +73,23 @@ class UserEditSerializer(serializers.Serializer):
         if (alreadyRegistered.pk != user.pk):
             self.context["message"] = "ERR_ALREADY_REGISTERED"
         
-        
-        if ("oldPassword" in data and data["oldPassword"] is not ""):
+        if ("oldPassword" in data and data["oldPassword"] != ""):
             #check if oldPassword is correct
             correctUser = authenticate(username = user.email, password = data["oldPassword"])
-                
+
             #if is None then error
             if (correctUser is None):
                 self.context["message"] = "ERR_WRONG_CREDENTIALS"
               
+            #check if new password is not equal to confirm new password
+            if (data["newPassword"] != data["confirmNewPassword"]):
+                self.context["message"] = "ERR_DIFFERENT_PASSWORDS"
+
             #check if new password is secure
             try:
                 validate_password(data["newPassword"])
             except:
                 self.context["message"] = "ERR_INSECURE_PASSWORD"
-            
-            #check if new password is not equal to confirm new password
-            if (data["newPassword"] != data["confirmNewPassword"]):
-                self.context["message"] = "ERR_DIFFERENT_PASSWORDS"
 
         if (self.context["message"] == ""):
             editedUser = User.objects.filter(pk=user.pk).get()

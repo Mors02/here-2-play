@@ -19,7 +19,7 @@ export default function ReviewSection({game}) {
 
     useEffect(() => {
         getTags()
-        axiosConfig.get("api/games/" + game + "/reviews")
+        axiosConfig.get("api/games/" + game + "/reviews/")
         .then(res => {
             if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
                 throw new Error(res["response"]["data"])
@@ -59,7 +59,7 @@ export default function ReviewSection({game}) {
 
     function updateReview() {
         console.log(review)
-        axiosConfig.patch("api/games/"+game+"/reviews/"+review.id, {body, rating})
+        axiosConfig.patch("api/games/"+game+"/reviews/"+review.id+"/", {body, rating})
         .then(res => {
             if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
                 throw new Error(res["response"]["data"])

@@ -77,9 +77,8 @@ export default function DeveloperStatsPage() {
 
     return(
         <Box className="px-10 py-8 flex">
-            <Typography> Sezione statistiche </Typography>
-            <Box>
-               {!loadingPage && <BarChart 
+            <Box className="!ml-32">
+               {!loadingPage && <BarChart
                      xAxis={[{ scaleType: 'band', dataKey: 'month' }]}
                      series={filteredSeries}
                      dataset={dataset}

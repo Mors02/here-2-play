@@ -18,7 +18,14 @@ class OrderView(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def complete_order(self, request, pk=None):
-        orderObj = Order.objects.get(id=pk)
+        try:
+            orderObj = Order.objects.get(id=pk)
+        except Order.DoesNotExist:
+            return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
+        
+        if (orderObj.user_id != request.user.pk):
+            return Response("ERR_NOT_PERMITTED", status=status.HTTP_401_UNAUTHORIZED)
+
         order = OrderSerializer(orderObj).data
         orderObj.status = Order.COMPLETED
         orderObj.order_date = timezone.now()
@@ -30,7 +37,7 @@ class OrderView(viewsets.ModelViewSet):
             except Game.DoesNotExist:
                 return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
             if len(game["details"]["discounts"]) > 0:
-                price = game["details"]["price"] - (game["details"]["price"] * game["details"]["discounts"][0]["percentage"] /100)
+                price = float(game["details"]["price"]) - (float(game["details"]["price"]) * float(game["details"]["discounts"][0]["percentage"]) /100)
             else:
                 price = game["details"]["price"]
             clean_data = {"game": game["game"], "user": request.user.pk, "price": price}
@@ -46,7 +53,7 @@ class OrderView(viewsets.ModelViewSet):
                     gameObj = Game.objects.get(id=game["game"]["id"])
                 except Game.DoesNotExist:
                     return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
-                print(game)                
+                              
                 #eventual game discount
                 if len(game["game"]["discounts"]) > 0:
                     price = float(game["game"]["price"]) - (float(game["game"]["price"]) * float(game["game"]["discounts"][0]["percentage"])/100)
@@ -56,12 +63,16 @@ class OrderView(viewsets.ModelViewSet):
                 #bundle discount
                 price = float(price) - (float(price) * float(bundle["details"]["discount"]) / 100)
                 
-                clean_data = {"game": game["game"]["id"], "user": request.user.pk, "price": price}
-                serializer = GamesBoughtSerializer(data=clean_data)
-                if (serializer.is_valid(raise_exception=True)):
-                    gameInLibrary = serializer.create(data={"game": gameObj, "user": request.user, "price": price})
-                else:
-                    return Response("ERR_STUPID", status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    #se il gioco è già in possesso allora lo salto
+                    gameAlreadyBought = GamesBought.objects.get(user_id=request.user.pk, game_id=game["game"]["id"])
+                except GamesBought.DoesNotExist:
+                    clean_data = {"game": game["game"]["id"], "user": request.user.pk, "price": price}
+                    serializer = GamesBoughtSerializer(data=clean_data)
+                    if (serializer.is_valid(raise_exception=True)):
+                        gameInLibrary = serializer.create(data={"game": gameObj, "user": request.user, "price": price})
+                    else:
+                        return Response("ERR_STUPID", status=status.HTTP_400_BAD_REQUEST)
                 
         
         orderObj.save()
@@ -71,7 +82,6 @@ class OrderView(viewsets.ModelViewSet):
     def retrieve_last_order(self, request):
         user = User.objects.get(id=request.user.pk)
         order = lastOrderOfUser(user)
-        print(order)
         if (order == {}):
             return Response({}, status=status.HTTP_204_NO_CONTENT)
         return Response(order, status=status.HTTP_200_OK)
@@ -79,7 +89,10 @@ class OrderView(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def add_game(self, request):
         user = User.objects.get(id=request.user.pk)
-        game = Game.objects.get(pk=request.data["game_id"])        
+        try:
+            game = Game.objects.get(pk=request.data["game_id"])        
+        except Game.DoesNotExist:
+            return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
         game = GameSerializer(game).data
         order = lastOrderOfUser(user)
         if (order == {}):
@@ -105,7 +118,11 @@ class OrderView(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def add_bundle(self, request):
         user = User.objects.get(id=request.user.pk)
-        bundle = Bundle.objects.get(pk=request.data["bundle_id"])        
+        try:
+            bundle = Bundle.objects.get(pk=request.data["bundle_id"])        
+        except Bundle.DoesNotExist:
+            return Response("ERR_RESOURCE_NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
+        
         bundle = BundleSerializer(bundle).data
         order = lastOrderOfUser(user)
         if (order == {}):
@@ -120,14 +137,6 @@ class OrderView(viewsets.ModelViewSet):
         if (bundleAddedSerializer.is_valid()):            
             bundleAdded = bundleAddedSerializer.create(bundleData)           
             return Response(status=status.HTTP_201_CREATED)
-        # try:
-        #     #check if the game is already bought
-        #     alreadyBought = GamesBought.objects.get(user=user.pk, game=game["id"])
-        #     return Response("ERR_ALREADY_BOUGHT", status=status.HTTP_400_BAD_REQUEST)
-        # except GamesBought.DoesNotExist:
-        #     if (gameAddedSerializer.is_valid()):            
-        #         gameAdded = gameAddedSerializer.create(gameData)           
-        #         return Response(status=status.HTTP_201_CREATED)
           
         return Response("ERR_ALREADY_IN_CART", status=status.HTTP_400_BAD_REQUEST)
 

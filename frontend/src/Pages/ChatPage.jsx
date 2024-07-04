@@ -72,7 +72,7 @@ export default function ChatPage() {
                 return (
                     <Box className={"flex " + (fromFriend ? '' : 'justify-end')}>
                         <Box className={"rounded p-[5px] flex gap-4 place-items-end max-w-[60%] " + (fromFriend ? 'bg-[#212E36]' : 'bg-[#1B76D2]')}>
-                            <Typography className="pl-1 text-white">{message.text}</Typography>
+                            <Typography variant="h5" className="pl-1 text-white">{message.text}</Typography>
                             <Typography className="!text-xs text-gray-300">{moment(message.sent_at).format('HH:mm')}</Typography>
                         </Box>
                     </Box>
