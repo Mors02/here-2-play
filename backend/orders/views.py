@@ -64,8 +64,10 @@ class OrderView(viewsets.ModelViewSet):
                 price = float(price) - (float(price) * float(bundle["details"]["discount"]) / 100)
                 
                 try:
-                    #se il gioco è già in possesso allora lo salto
+                    #se il gioco è già in possesso sommo il valore all'acquisto già presente.
                     gameAlreadyBought = GamesBought.objects.get(user_id=request.user.pk, game_id=game["game"]["id"])
+                    gameAlreadyBought.price += price
+                    gameAlreadyBought.save()
                 except GamesBought.DoesNotExist:
                     clean_data = {"game": game["game"]["id"], "user": request.user.pk, "price": price}
                     serializer = GamesBoughtSerializer(data=clean_data)
