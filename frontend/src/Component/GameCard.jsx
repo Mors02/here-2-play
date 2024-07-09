@@ -56,11 +56,11 @@ function GameCard({ game, owned }) {
                         <Rating defaultValue={game?.average_rating} precision={0.5} readOnly />
                         <Typography>({game?.reviews?.length})</Typography>
                     </Box>
-                    <Box className="flex gap-2">
+                    <Box className="flex gap-2 flex-wrap">
                         <b>Tags: </b>
                         {
                             game?.tags.map(tag => 
-                                <Typography onClick={() => handleTagClick(tag.tag.id)} className="bg-orange-400 hover:bg-opacity-60 transition ease-linear text-white px-2 rounded cursor-pointer">{tag.tag.name}</Typography>
+                                <Typography onClick={() => handleTagClick(tag.tag.id)} className="bg-orange-400 hover:bg-opacity-60 transition ease-linear text-white px-2 rounded cursor-pointer text-nowrap">{tag.tag.name}</Typography>
                             )
                         }
                     </Box>
