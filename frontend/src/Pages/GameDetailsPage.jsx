@@ -135,8 +135,9 @@ function GameDetailsPage() {
     }
 
     function addGame() {
+        console.log(ErrorMap)
         if (!loggedIn)
-            return toast.error(ErrorMap("ERR_NOT_LOGGED_IN"))
+            return toast.error(ErrorMap["ERR_NOT_LOGGED_IN"])
         axiosConfig.post('api/orders/add-game/', {game_id: gameId})
             .then(res => {
                 if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")
@@ -201,7 +202,7 @@ function GameDetailsPage() {
             window.URL.revokeObjectURL(url); // Free up memory
         })
         .catch(err => {
-            toast.error(ErrorMap(err.message))
+            toast.error(ErrorMap[err.message])
         })
     }
 

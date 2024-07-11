@@ -54,12 +54,12 @@ function GameEditPage() {
             .then(res => {
                 if (res?.response?.status == 404) {
                     navigate('/')
-                    return toast.error(ErrorMap('ERR_GAME_NOT_FOUND')) 
+                    return toast.error(ErrorMap['ERR_GAME_NOT_FOUND']) 
                 }
 
                 if (res.data.publisher.id != user.id) {
                     navigate('/')
-                    return toast.error(ErrorMap('ERR_UNAUTHORIZED')) 
+                    return toast.error(ErrorMap['ERR_UNAUTHORIZED']) 
                 }
                 
                 setAttachments(res.data.attachments)
@@ -266,7 +266,7 @@ function GameEditPage() {
                                 updateData()
                                 return toast.success('Sconto cancellato con successo!')
                             }
-                            return toast.error(ErrorMap('ERR_SERVER_ERROR'))
+                            return toast.error(ErrorMap['ERR_SERVER_ERROR'])
                         })
                     }
                 },

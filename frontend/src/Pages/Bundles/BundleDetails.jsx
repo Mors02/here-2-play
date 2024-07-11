@@ -46,7 +46,7 @@ export default function BundleDetails() {
 
     function addBundle() {
         if (!loggedIn)
-            return toast.error(ErrorMap("ERR_NOT_LOGGED_IN"))
+            return toast.error(ErrorMap["ERR_NOT_LOGGED_IN"])
         axiosConfig.post('api/orders/add-bundle/', {bundle_id: bundle.id})
             .then(res => {
                 if (res.code == "ERR_BAD_RESPONSE" || res.code == "ERR_BAD_REQUEST")
