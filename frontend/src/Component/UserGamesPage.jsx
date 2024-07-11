@@ -9,7 +9,7 @@ import useCurrentUser from '../config/UseCurrentUser';
 import { toast } from 'react-toastify';
 import { ErrorMap } from '../config/enums';
 
-function UserGamesPage({ retrievedUser }) {
+function UserGamesPage() {
     const [games, setGames] = useState([])
     const [pageLoading, setPageLoading] = useState()
     const { user, userLoading } = useCurrentUser()
@@ -18,11 +18,11 @@ function UserGamesPage({ retrievedUser }) {
 
     useEffect(() => {
         setPageLoading(true)
-        axiosConfig.get('/api/your-games/')
+        axiosConfig.get('/api/user/' + id)
             .then(res => {
                 if (res.code == "ERR_BAD_REQUEST" || res.code == "ERR_BAD_RESPONSE")
                     throw new Error(res["response"]["data"])
-                setGames(res.data)
+                setGames(res.data.published_games)
                 setPageLoading(false)
             }
         )

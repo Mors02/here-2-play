@@ -9,7 +9,7 @@ import 'react-tabs/style/react-tabs.css';
 import { FaPen } from "react-icons/fa";
 import { MdReport, MdRotateLeft } from "react-icons/md";
 import ReportUserModal from "../Modals/ReportUserModal";
-import YourGames from "../Component/YourGames"
+import UserGamesPage from "../Component/UserGamesPage"
 import GameList from "../Component/GameList";
 import BundleOfUser from "./Bundles/BundleOfUser";
 import DeveloperStatsPage from "./DeveloperStatsPage";
@@ -139,7 +139,7 @@ export default function UserPage() {
                         </Box>
                     </TabPanel>
                     <TabPanel value={1}>
-                        <YourGames user={retrievedUser} />
+                        <UserGamesPage user={retrievedUser} />
                     </TabPanel>
                     <TabPanel value={2}>
                         <BundleOfUser user={retrievedUser} currentUser={user} />
