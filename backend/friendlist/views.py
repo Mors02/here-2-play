@@ -23,7 +23,7 @@ class UserReportsView(viewsets.ModelViewSet):
         data = request.data
         user = request.user
         user_reported = User.objects.get(username=data["userReported"]["username"])
-        profile = UserProfile.objects.get(id=user_reported.pk)
+        profile = UserProfile.objects.get(user=user_reported)
         #if its not a friend or a developer
         try:
             user_friends = Friendship.objects.filter(userA_id=user.pk, userB_id=user_reported.pk)
@@ -46,7 +46,7 @@ class UserReportsView(viewsets.ModelViewSet):
         
         report.save()
 
-        return Response(report.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_201_CREATED)
     
     def destroy(self, request, pk=None):
         UserReport.objects.filter(user_reported_id=pk).delete()

@@ -62,7 +62,7 @@ export default function ReportUserModal({afterOpenModal, closeModal, modalIsOpen
                     </FormControl>
                     <Box>
                         <Button variant="text" onClick={() => closeModal()} color="error">Chiudi</Button>
-                        <Button variant="contained" className='float-right' color="error" onClick={() => report()}><MdReport />Segnala</Button>
+                        <Button variant="contained" className='float-right' color="error" onClick={() => report()} startIcon={<MdReport />}>Segnala</Button>
                     </Box>
                 </Stack>
             </Box>
